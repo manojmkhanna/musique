@@ -8,7 +8,7 @@ gulp.task('clean', () => {
 });
 
 gulp.task('build', () => {
-    return gulp.src('./src/*.ts')
+    return gulp.src('./src/**/*.ts')
         .pipe(sourcemaps.init())
         .pipe(ts.createProject('tsconfig.json')())
         .pipe(sourcemaps.write('.'))

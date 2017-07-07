@@ -4,6 +4,9 @@
   "main": "./out/musique.js",
   "types": "./out/musique.d.ts",
   "license": "MIT",
+  "dependencies": {
+    "parsque": "file:..\\Parsque"
+  },
   "devDependencies": {
     "del": "^3.0.0",
     "gulp": "^3.9.1",
