@@ -1,0 +1,14 @@
+{
+  "name": "musique",
+  "version": "1.0.0",
+  "main": "./out/musique.js",
+  "types": "./out/musique.d.ts",
+  "license": "MIT",
+  "devDependencies": {
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-typescript": "^3.2.0",
+    "typescript": "^2.4.1"
+  }
+}
