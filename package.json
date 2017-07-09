@@ -1,10 +1,10 @@
 {
   "name": "musique",
   "version": "1.0.0",
-  "main": "./out/musique.js",
-  "types": "./out/musique.d.ts",
+  "main": "./dist/musique.js",
+  "types": "./dist/musique.d.ts",
   "license": "MIT",
   "dependencies": {
-    "parsque": "file:..\\Parsque"
+    "parsque": "file:../parsque"  //TODO: Change later
   }
 }
