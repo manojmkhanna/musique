@@ -3,9 +3,10 @@
     "module": "commonjs",
     "target": "es6",
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./build/dist",
     "strict": true,
-    "declaration": true,
+    "allowJs": true,
+    "jsx": "react",
     "sourceMap": true
   }
 }

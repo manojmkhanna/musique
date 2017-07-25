@@ -1,0 +1,27 @@
+{
+  "name": "musique-app",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "eject": "react-scripts-ts eject",
+    "test": "react-scripts-ts test --env=jsdom",
+    "build": "react-scripts-ts build",
+    "start": "react-scripts-ts start"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Manoj Khanna",
+    "email": "manojkhannakm@gmail.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.16",
+    "@types/react": "^15.0.39",
+    "@types/react-dom": "^15.5.1",
+    "react-scripts-ts": "2.4.0"
+  }
+}
