@@ -1,0 +1,30 @@
+{
+  "name": "musique-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/musique.js",
+  "types": "./dist/musique.d.ts",
+  "scripts": {
+    "clean": "gulp clean",
+    "build": "gulp build",
+    "watch": "gulp watch",
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": {
+    "name": "Manoj Khanna",
+    "email": "manojkhannakm@gmail.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "parsque-api": "file:../../parsque/api"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.13",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-typescript": "^3.2.1",
+    "typescript": "^2.4.1"
+  }
+}
