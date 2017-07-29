@@ -15,6 +15,12 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@material/button": "^0.3.10",
+    "@material/card": "^0.2.5",
+    "@material/ripple": "^0.8.1",
+    "@material/tabs": "^0.2.4",
+    "@material/toolbar": "^0.4.3",
+    "animate.css": "^3.5.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
   },

@@ -1,13 +1,21 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
-import './index.css';
+import Toolbar from "./toolbar";
+import Content from "./content";
 
-import registerServiceWorker from './registerServiceWorker';
+import "@material/typography/dist/mdc.typography.css";
+
+import "./index.css";
+
+import registerServiceWorker from "./registerServiceWorker";
 
 ReactDOM.render(
-    <div/>,
-    document.getElementById('root') as HTMLElement
+    <div className="mdc-typography">
+        <Toolbar/>
+        <Content/>
+    </div>,
+    document.getElementById("root")
 );
 
 registerServiceWorker();
