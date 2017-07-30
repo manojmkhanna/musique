@@ -1,0 +1,15 @@
+/*.mdc-toolbar__row {*/
+/*min-height: 48px;*/
+/*}*/
+
+.mdc-toolbar__title {
+    font-weight: normal;
+}
+
+.mdc-tab-bar-scroller__indicator__inner {
+    color: white;
+}
+
+.mdc-tab {
+    font-weight: normal;
+}
