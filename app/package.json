@@ -17,6 +17,7 @@
   "dependencies": {
     "@material/button": "^0.3.10",
     "@material/tabs": "^0.2.4",
+    "@material/theme": "^0.1.6",
     "@material/toolbar": "^0.4.3",
     "@material/typography": "^0.2.3",
     "react": "^15.6.1",
