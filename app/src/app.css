@@ -2,35 +2,31 @@
 
 :root {
     --mdc-theme-primary: #3f51b5;
-    --mdc-theme-accent: #2962ff;
+    --mdc-theme-accent: #448aff;
 }
 
-/*.mdc-toolbar__row {*/
-/*min-height: 48px;*/
-/*}*/
-
-/*.mdc-toolbar__title {*/
-/*font-weight: normal;*/
-/*}*/
-
-/*.mdc-tab {*/
-/*font-weight: normal;*/
-/*}*/
+.toolbar-title {
+    font-weight: normal;
+}
 
 .tab-bar-scroller-indicator {
-    color: white;
+    color: var(--mdc-theme-text-primary-on-primary);
 }
 
-/*.mdc-temporary-drawer__toolbar-spacer {*/
-/*height: 56px;*/
+.tab {
+    font-weight: normal;
+}
+
+/*.drawer-header {*/
+/*background-color: var(--mdc-theme-primary);*/
 /*}*/
 
-.drawer-spacer-logo {
-    color: var(--mdc-theme-primary);
-    margin: 4px 0;
-}
+/*.drawer-header-icon {*/
+/*font-size: 48px !important;*/
+/*color: var(--mdc-theme-text-primary-on-primary);*/
+/*}*/
 
-.drawer-spacer-title {
-    color: var(--mdc-theme-primary);
-    margin-left: 16px;
-}
+/*.drawer-header-title {*/
+/*margin-left: 16px;*/
+/*color: var(--mdc-theme-text-primary-on-primary);*/
+/*}*/
