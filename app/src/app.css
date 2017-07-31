@@ -1,7 +1,36 @@
-.mdc-toolbar__row {
-    min-height: 48px;
+@import "~@material/theme/dist/mdc.theme.css";
+
+:root {
+    --mdc-theme-primary: #3f51b5;
+    --mdc-theme-accent: #2962ff;
 }
 
-.mdc-tab-bar-scroller__indicator__inner {
+/*.mdc-toolbar__row {*/
+/*min-height: 48px;*/
+/*}*/
+
+/*.mdc-toolbar__title {*/
+/*font-weight: normal;*/
+/*}*/
+
+/*.mdc-tab {*/
+/*font-weight: normal;*/
+/*}*/
+
+.tab-bar-scroller-indicator {
     color: white;
+}
+
+/*.mdc-temporary-drawer__toolbar-spacer {*/
+/*height: 56px;*/
+/*}*/
+
+.drawer-spacer-logo {
+    color: var(--mdc-theme-primary);
+    margin: 4px 0;
+}
+
+.drawer-spacer-title {
+    color: var(--mdc-theme-primary);
+    margin-left: 16px;
 }

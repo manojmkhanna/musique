@@ -4,7 +4,6 @@
     "target": "es6",
     "rootDir": "./src",
     "outDir": "./build/dist",
-    "strict": true,
     "allowJs": true,
     "jsx": "react",
     "sourceMap": true
