@@ -17,34 +17,34 @@ export default class App extends React.Component {
                 <header className="mdc-toolbar mdc-toolbar--fixed mdc-toolbar--waterfall">
                     <div className="mdc-toolbar__row">
                         <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-                            <a className="mdc-toolbar__icon--menu material-icons" href="#">menu</a>
-                            <span className="mdc-toolbar__title toolbar-title">Musique</span>
+                            <a className="material-icons mdc-toolbar__icon--menu" href="#">menu</a>
+                            <span className="mdc-toolbar__title">Musique</span>
                         </section>
                         <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
-                            <a className="mdc-toolbar__icon material-icons" href="#">settings</a>
-                            <a className="mdc-toolbar__icon material-icons" href="#">more_vert</a>
+                            <a className="material-icons mdc-toolbar__icon" href="#">settings</a>
+                            <a className="material-icons mdc-toolbar__icon" href="#">more_vert</a>
                         </section>
                     </div>
                     <div className="mdc-toolbar__row">
                         <section className="mdc-toolbar__section">
                             <div className="mdc-tab-bar-scroller">
                                 <div className="mdc-tab-bar-scroller__indicator mdc-tab-bar-scroller__indicator--back">
-                                    <a className="mdc-tab-bar-scroller__indicator__inner material-icons tab-bar-scroller-indicator"
+                                    <a className="material-icons mdc-tab-bar-scroller__indicator__inner tab-bar-scroller-indicator"
                                        href="#">navigate_before</a>
                                 </div>
                                 <div className="mdc-tab-bar-scroller__scroll-frame">
-                                    <nav className="mdc-tab-bar-scroller__scroll-frame__tabs mdc-tab-bar">
-                                        <a className="mdc-tab mdc-tab--active tab" href="#">Search</a>
-                                        <a className="mdc-tab tab" href="#">Songs</a>
-                                        <a className="mdc-tab tab" href="#">Albums</a>
-                                        <a className="mdc-tab tab" href="#">Artists</a>
-                                        <a className="mdc-tab tab" href="#">Playlists</a>
+                                    <nav className="mdc-tab-bar mdc-tab-bar-scroller__scroll-frame__tabs">
+                                        <a className="mdc-tab mdc-tab--active" href="#">Search</a>
+                                        <a className="mdc-tab" href="#">Songs</a>
+                                        <a className="mdc-tab" href="#">Albums</a>
+                                        <a className="mdc-tab" href="#">Artists</a>
+                                        <a className="mdc-tab" href="#">Playlists</a>
                                         <span className="mdc-tab-bar__indicator"/>
                                     </nav>
                                 </div>
                                 <div
                                     className="mdc-tab-bar-scroller__indicator mdc-tab-bar-scroller__indicator--forward">
-                                    <a className="mdc-tab-bar-scroller__indicator__inner material-icons tab-bar-scroller-indicator"
+                                    <a className="material-icons mdc-tab-bar-scroller__indicator__inner tab-bar-scroller-indicator"
                                        href="#">navigate_next</a>
                                 </div>
                             </div>
@@ -53,23 +53,26 @@ export default class App extends React.Component {
                 </header>
                 <aside className="mdc-temporary-drawer">
                     <nav className="mdc-temporary-drawer__drawer">
-                        {/*<header className="mdc-temporary-drawer__header drawer-header">*/}
-                        {/*<div className="mdc-temporary-drawer__header-content">*/}
-                        {/*<i className="material-icons drawer-header-icon">music_note</i>*/}
-                        {/*<span className="mdc-typography--display2 drawer-header-title">Musique</span>*/}
-                        {/*</div>*/}
-                        {/*</header>*/}
-                        <nav className="mdc-temporary-drawer__content mdc-list-group">
+                        <header className="mdc-temporary-drawer__header drawer-header">
+                            <div className="mdc-temporary-drawer__header-content">
+                                <i className="material-icons drawer-header-icon">music_note</i>
+                                <span className="mdc-typography--headline drawer-header-title">Musique</span>
+                            </div>
+                        </header>
+                        <nav className="mdc-list-group mdc-temporary-drawer__content">
                             <div className="mdc-list">
                                 <a className="mdc-list-item mdc-temporary-drawer--selected" href="#">
-                                    <i className="mdc-list-item__start-detail material-icons">inbox</i>Inbox
+                                    <i className="material-icons mdc-list-item__start-detail">music_note</i>Songs
                                 </a>
                                 <a className="mdc-list-item" href="#">
-                                    <i className="mdc-list-item__start-detail material-icons">star</i>Star
+                                    <i className="material-icons mdc-list-item__start-detail">album</i>Albums
                                 </a>
-
-                                <a className="mdc-list-item mdc-temporary-drawer--selected" href="#">Inbox</a>
-                                <a className="mdc-list-item" href="#">Star</a>
+                                <a className="mdc-list-item" href="#">
+                                    <i className="material-icons mdc-list-item__start-detail">person</i>Artists
+                                </a>
+                                <a className="mdc-list-item" href="#">
+                                    <i className="material-icons mdc-list-item__start-detail">playlist_play</i>Playlists
+                                </a>
                             </div>
                         </nav>
                     </nav>

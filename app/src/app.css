@@ -5,28 +5,20 @@
     --mdc-theme-accent: #448aff;
 }
 
-.toolbar-title {
-    font-weight: normal;
-}
-
 .tab-bar-scroller-indicator {
     color: var(--mdc-theme-text-primary-on-primary);
 }
 
-.tab {
-    font-weight: normal;
+.drawer-header {
+    background-color: var(--mdc-theme-primary);
 }
 
-/*.drawer-header {*/
-/*background-color: var(--mdc-theme-primary);*/
-/*}*/
+.drawer-header-icon {
+    font-size: 32px !important;
+    color: var(--mdc-theme-text-primary-on-primary);
+}
 
-/*.drawer-header-icon {*/
-/*font-size: 48px !important;*/
-/*color: var(--mdc-theme-text-primary-on-primary);*/
-/*}*/
-
-/*.drawer-header-title {*/
-/*margin-left: 16px;*/
-/*color: var(--mdc-theme-text-primary-on-primary);*/
-/*}*/
+.drawer-header-title {
+    margin-left: 24px;
+    color: var(--mdc-theme-text-primary-on-primary);
+}
