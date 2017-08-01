@@ -5,25 +5,29 @@
     --mdc-theme-accent: #448aff;
 }
 
-.tab-bar-scroller-indicator {
+.tab-bar-scroller-icon {
     color: var(--mdc-theme-text-primary-on-primary);
 }
 
-.drawer-header {
+.tab-bar-scroller-icon:active {
+    color: var(--mdc-theme-text-primary-on-primary);
+}
+
+#drawer-header {
     background-color: var(--mdc-theme-primary);
 }
 
-.drawer-header-icon {
+#drawer-header-icon {
     font-size: 32px !important;
     color: var(--mdc-theme-text-primary-on-primary);
 }
 
-.drawer-header-title {
+#drawer-header-title {
     margin-left: 24px;
     color: var(--mdc-theme-text-primary-on-primary);
 }
 
-.menu {
+#menu {
     top: 16px;
     right: 16px;
 }
