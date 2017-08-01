@@ -22,3 +22,8 @@
     margin-left: 24px;
     color: var(--mdc-theme-text-primary-on-primary);
 }
+
+.menu {
+    top: 16px;
+    right: 16px;
+}
