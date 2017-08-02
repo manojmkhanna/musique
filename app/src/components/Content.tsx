@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import "@material/toolbar/dist/mdc.toolbar.css";
+
 import "./Content.css";
 
 export default class Content extends React.Component<any, any> {    //TODO

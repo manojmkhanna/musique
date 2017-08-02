@@ -2,8 +2,10 @@ import * as React from "react";
 import * as mdc from "material-components-web";
 
 import TabBar from "./TabBar";
+import Menu from "./Menu";
 
 import "@material/toolbar/dist/mdc.toolbar.css";
+import "@material/menu/dist/mdc.menu.css";
 
 import "./Toolbar.css";
 import "../assets/fonts/material-icons/material-icons.css";
@@ -19,7 +21,10 @@ export default class Toolbar extends React.Component<any, any> {
                     </section>
                     <section className="mdc-toolbar__section mdc-toolbar__section--align-end">
                         <i className="material-icons mdc-toolbar__icon" id="toolbar-settings-icon">settings</i>
-                        <i className="material-icons mdc-toolbar__icon" id="toolbar-menu-icon">more_vert</i>
+                        <div className="mdc-toolbar__icon mdc-menu-anchor">
+                            <i className="material-icons" id="toolbar-menu-icon">more_vert</i>
+                            <Menu/>
+                        </div>
                     </section>
                 </div>
                 <div className="mdc-toolbar__row">
