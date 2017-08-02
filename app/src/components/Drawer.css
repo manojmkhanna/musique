@@ -1,0 +1,15 @@
+@import "~@material/theme/dist/mdc.theme.css";
+
+#drawer-header {
+    background-color: var(--mdc-theme-primary);
+}
+
+#drawer-header-icon {
+    font-size: 32px !important;
+    color: var(--mdc-theme-text-primary-on-primary);
+}
+
+#drawer-header-title {
+    margin-left: 24px;
+    color: var(--mdc-theme-text-primary-on-primary);
+}

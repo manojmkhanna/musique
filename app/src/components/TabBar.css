@@ -1,0 +1,9 @@
+@import "~@material/theme/dist/mdc.theme.css";
+
+.tab-bar-scroller-icon {
+    color: var(--mdc-theme-text-primary-on-primary);
+}
+
+.tab-bar-scroller-icon:active {
+    color: var(--mdc-theme-text-primary-on-primary);
+}
