@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/content/base_content.ts"],"names":[],"mappings":";;AAAA,qCAAgC;AAEhC,iBAAiC,SAAQ,iBAAO;CAE/C;AAFD,8BAEC","file":"base_content.js","sourcesContent":["import {Content} from \"parsque\";\r\n\r\nexport default class BaseContent extends Content {\r\n    public html: string;\r\n}\r\n"]}
