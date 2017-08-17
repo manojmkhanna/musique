@@ -1,6 +1,7 @@
 @import "~@material/theme/dist/mdc.theme.css";
 
 #drawer-spacer {
+    border-bottom: 0;
     background-color: var(--mdc-theme-primary);
 }
 

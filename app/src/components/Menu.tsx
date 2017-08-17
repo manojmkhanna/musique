@@ -9,9 +9,9 @@ import "./Menu.css";
 export default class Menu extends React.Component<any, any> {
     render() {
         return (
-            <div className="mdc-simple-menu mdc-simple-menu--open-from-top-right" id="menu" data-tabindex="-1">
+            <div className="mdc-simple-menu mdc-simple-menu--open-from-top-right" id="menu" tabIndex={-1}>
                 <ul className="mdc-list mdc-simple-menu__items" role="menu">
-                    <li className="mdc-list-item" role="menuitem" data-tabindex="0">About</li>
+                    <li className="mdc-list-item" role="menuitem" tabIndex={0}>About</li>
                 </ul>
             </div>
         );

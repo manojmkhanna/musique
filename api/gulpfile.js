@@ -1,15 +1,11 @@
 const gulp = require("gulp");
-const del = require("del");
 const ts = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
-
-const tsProject = ts.createProject("./tsconfig.json");
-
-gulp.task("clean", () => {
-    return del(["./dist"]);
-});
+const nodemon = require("gulp-nodemon");
 
 gulp.task("build", () => {
+    let tsProject = ts.createProject("./tsconfig.json");
+
     return tsProject.src()
         .pipe(sourcemaps.init())
         .pipe(tsProject())
@@ -17,6 +13,12 @@ gulp.task("build", () => {
         .pipe(gulp.dest("./dist"))
 });
 
-gulp.task("watch", ["build"], () => {
-    return gulp.watch("./src/**/*.ts", ["build"]);
+gulp.task("start", ["build"], () => {
+    return nodemon({
+        watch: "./src",
+        ext: "ts",
+        tasks: ["build"]
+    });
 });
+
+gulp.task("default", ["start"]);

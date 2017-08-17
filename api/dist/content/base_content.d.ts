@@ -1,5 +1,4 @@
-import {Content} from "parsque-api";
-
+import { Content } from "parsque-api";
 export default class BaseContent extends Content {
     body: string;
 }

@@ -7,7 +7,29 @@ import "@material/list/dist/mdc.list.css";
 import "./Drawer.css";
 import "../assets/fonts/material-icons/material-icons.css";
 
-export default class Drawer extends React.Component<any, any> {
+export default class Drawer extends React.Component {
+    handleNavClick(index: number) {
+        console.log(index);
+
+        let navList = document.querySelector("#nav-list"),
+            oldNav = navList.querySelector(".nav-selected"),
+            newNav = navList.querySelector("#nav-list:nth-child(" + (index + 1) + ")");
+
+        // if (oldNav === newNav) {
+        //     console.log("return");
+        //
+        //     return;
+        // }
+
+        oldNav.classList.remove("nav-selected");
+        oldNav.classList.remove("mdc-temporary-drawer--selected");
+
+        newNav.classList.add("nav-selected");
+        newNav.classList.add("mdc-temporary-drawer--selected");
+
+        // this.props.handleNavClick();
+    }
+
     render() {
         return (
             <aside className="mdc-temporary-drawer">
@@ -17,12 +39,14 @@ export default class Drawer extends React.Component<any, any> {
                         <span className="mdc-typography--title" id="drawer-spacer-title">Musique</span>
                     </div>
                     <nav className="mdc-list-group mdc-temporary-drawer__content">
-                        <div className="mdc-list">
-                            <a className="mdc-list-item mdc-temporary-drawer--selected" href="#">
-                                <i className="material-icons mdc-list-item__start-detail">library_music</i>Deezer
+                        <div className="mdc-list" id="nav-list">
+                            <a className="mdc-list-item mdc-temporary-drawer--selected nav-selected" href="#" onClick={() => console.log("asd")}>
+                                <i className="material-icons mdc-list-item__start-detail">queue_music</i>Deezer
                             </a>
-                            <a className="mdc-list-item" href="#">
-                                <i className="material-icons mdc-list-item__start-detail">library_music</i>Saavn
+                            <a href="#" onClick={() => console.log("asd")}>
+                                <li className="mdc-list-item">
+                                    <i className="material-icons mdc-list-item__start-detail">queue_music</i>Saavn
+                                </li>
                             </a>
                         </div>
                     </nav>
