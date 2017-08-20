@@ -10,7 +10,5 @@ export default class AlbumOutput extends BaseOutput {
     public released: string;
     public title: string;
     public artists: ArtistOutput[];
-    public composers: ArtistOutput[];
-    public producers: ArtistOutput[];
     public songs: SongOutput[];
 }

@@ -1,13 +1,13 @@
 import SongParser from "../parser/song_parser";
 
 export default abstract class Platform {
-    abstract parseSong(url: string): SongParser;
+    public abstract createSongParser(): SongParser;
 
-    abstract parseAlbum(url: string): SongParser;
+    public abstract createAlbumParser(): SongParser;
 
-    abstract parseArtist(url: string): SongParser;
+    public abstract createArtistParser(): SongParser;
 
-    abstract parsePlaylist(url: string): SongParser;
+    public abstract createPlaylistParser(): SongParser;
 
-    abstract parseSearch(query: string): SongParser;
+    public abstract createSearchParser(): SongParser;
 }
