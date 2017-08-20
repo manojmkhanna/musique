@@ -6,11 +6,7 @@ export default class SongOutput extends BaseOutput {
     public duration: string;
     public genre: string;
     public lyrics: string;
-    public mp3: {
-        low: string,
-        medium: string,
-        high: string
-    };
+    public mp3: string;
     public rating: number;
     public title: string;
     public track: number;

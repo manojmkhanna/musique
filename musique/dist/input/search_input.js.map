@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/input/search_input.ts"],"names":[],"mappings":";;AAAA,qCAA8B;AAE9B,iBAAiC,SAAQ,eAAK;CAE7C;AAFD,8BAEC","file":"search_input.js","sourcesContent":["import {Input} from \"parsque\";\r\n\r\nexport default class SearchInput extends Input {\r\n    public query: string;\r\n}\r\n"]}

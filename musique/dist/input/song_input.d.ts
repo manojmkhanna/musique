@@ -4,5 +4,4 @@ import ArtistInput from "./artist_input";
 export default class SongInput extends BaseInput {
     album: AlbumInput;
     artists: ArtistInput[];
-    writers: ArtistInput[];
 }

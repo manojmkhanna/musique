@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/content/search_content.ts"],"names":[],"mappings":";;AAAA,qCAAgC;AAEhC,mBAAmC,SAAQ,iBAAO;CAEjD;AAFD,gCAEC","file":"search_content.js","sourcesContent":["import {Content} from \"parsque\";\r\n\r\nexport default class SearchContent extends Content {\r\n    public html: string;\r\n}\r\n"]}
