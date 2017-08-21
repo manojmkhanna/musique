@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
 const request = require("request-promise");
 const cheerio = require("cheerio");
-const song_parser_1 = require("../../../parser/song_parser");
-const song_content_1 = require("../../../content/song_content");
-class SaavnSongParser extends song_parser_1.default {
+const playlist_parser_1 = require("../../../parser/playlist_parser");
+const playlist_content_1 = require("../../../content/playlist_content");
+class SaavnPlaylistParser extends playlist_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
             request.get(this.input.url, {
@@ -23,7 +23,7 @@ class SaavnSongParser extends song_parser_1.default {
                 gzip: true
             })
                 .then(html => {
-                let content = new song_content_1.default();
+                let content = new playlist_content_1.default();
                 content.html = html;
                 resolve(content);
             })
@@ -45,6 +45,6 @@ class SaavnSongParser extends song_parser_1.default {
         });
     }
 }
-exports.default = SaavnSongParser;
+exports.default = SaavnPlaylistParser;
 
-//# sourceMappingURL=saavn_song_parser.js.map
+//# sourceMappingURL=saavn_playlist_parser.js.map

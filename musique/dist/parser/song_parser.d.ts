@@ -5,21 +5,14 @@ import SongInput from "../input/song_input";
 import SongOutput from "../output/song_output";
 import SongContent from "../content/song_content";
 import AlbumOutput from "../output/album_output";
+import AlbumParser from "./album_parser";
 import ArtistOutput from "../output/artist_output";
+import ArtistParser from "./artist_parser";
 export default class SongParser extends BaseParser<SongInput, SongOutput, SongContent> {
-    parse(): Promise<this>;
-    parseDuration(): Promise<this>;
-    parseGenre(): Promise<this>;
-    parseLyrics(): Promise<this>;
-    parseMp3(): Promise<this>;
-    parseRating(): Promise<this>;
-    parseTitle(): Promise<this>;
-    parseTrack(): Promise<this>;
-    parseAlbum(outputParser?: (childParser: this) => Promise<any>): Promise<this>;
-    parseArtists(): Promise<this>;
     protected createInput(): Promise<SongInput>;
     protected createOutput(): Promise<SongOutput>;
     protected createContent(): Promise<SongContent>;
+    parse(): Promise<this>;
     protected createDuration(): Promise<string>;
     protected createGenre(): Promise<string>;
     protected createLyrics(): Promise<string>;
@@ -29,4 +22,13 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     protected createTrack(): Promise<number>;
     protected createAlbum(): Promise<AlbumOutput>;
     protected createArtists(): Promise<ArtistOutput[]>;
+    parseDuration(): Promise<this>;
+    parseGenre(): Promise<this>;
+    parseLyrics(): Promise<this>;
+    parseMp3(): Promise<this>;
+    parseRating(): Promise<this>;
+    parseTitle(): Promise<this>;
+    parseTrack(): Promise<this>;
+    parseAlbum(outputParser?: (childParser: AlbumParser) => Promise<any>): Promise<this>;
+    parseArtists(outputsParser?: (childParser: ArtistParser, index: number) => Promise<any>, ...indexes: number[]): Promise<this>;
 }

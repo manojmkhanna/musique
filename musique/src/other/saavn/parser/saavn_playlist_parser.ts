@@ -1,13 +1,13 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const Promise = require("bluebird");
-const request = require("request-promise");
-const cheerio = require("cheerio");
-const song_parser_1 = require("../../../parser/song_parser");
-const song_content_1 = require("../../../content/song_content");
-class SaavnSongParser extends song_parser_1.default {
-    createContent() {
-        return new Promise((resolve, reject) => {
+import * as Promise from "bluebird";
+import * as request from "request-promise";
+import * as cheerio from "cheerio";
+
+import PlaylistParser from "../../../parser/playlist_parser";
+import PlaylistContent from "../../../content/playlist_content";
+
+export default class SaavnPlaylistParser extends PlaylistParser {
+    protected createContent(): Promise<PlaylistContent> {
+        return new Promise<PlaylistContent>((resolve, reject) => {
             request.get(this.input.url, {
                 headers: {
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
@@ -23,28 +23,30 @@ class SaavnSongParser extends song_parser_1.default {
                 gzip: true
             })
                 .then(html => {
-                let content = new song_content_1.default();
-                content.html = html;
-                resolve(content);
-            })
+                    let content = new PlaylistContent();
+                    content.html = html;
+
+                    resolve(content);
+                })
                 .catch(error => {
-                reject(error);
-            });
+                    reject(error);
+                });
         });
     }
-    contentCreated() {
-        return new Promise(() => {
+
+    protected contentCreated(): Promise<any> {
+        return new Promise<any>(() => {
         });
     }
-    createTitle() {
-        return new Promise(resolve => {
+
+    protected createTitle(): Promise<string> {
+        return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
+
             let title = $("h1.page-title").text();
             title = title.trim();
+
             resolve(title);
         });
     }
 }
-exports.default = SaavnSongParser;
-
-//# sourceMappingURL=saavn_song_parser.js.map
