@@ -29,7 +29,8 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
     }
 
     public parse(): Promise<this> {
-        return this.parseTitle()
+        return super.parse()
+            .then(() => this.parseTitle())
             .then(() => this.parseAlbums())
             .then(() => this.parseSongs());
     }

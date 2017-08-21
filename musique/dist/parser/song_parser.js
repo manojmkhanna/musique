@@ -22,7 +22,8 @@ class SongParser extends base_parser_1.default {
         });
     }
     parse() {
-        return this.parseDuration()
+        return super.parse()
+            .then(() => this.parseDuration())
             .then(() => this.parseGenre())
             .then(() => this.parseLyrics())
             .then(() => this.parseMp3())

@@ -27,7 +27,8 @@ export default class PlaylistParser extends BaseParser<PlaylistInput, PlaylistOu
     }
 
     public parse(): Promise<this> {
-        return this.parseTitle()
+        return super.parse()
+            .then(() => this.parseTitle())
             .then(() => this.parseSongs());
     }
 

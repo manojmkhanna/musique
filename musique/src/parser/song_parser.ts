@@ -29,7 +29,8 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     }
 
     public parse(): Promise<this> {
-        return this.parseDuration()
+        return super.parse()
+            .then(() => this.parseDuration())
             .then(() => this.parseGenre())
             .then(() => this.parseLyrics())
             .then(() => this.parseMp3())

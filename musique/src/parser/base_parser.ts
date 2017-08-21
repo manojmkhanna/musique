@@ -6,11 +6,23 @@ import BaseOutput from "../output/base_output";
 import BaseContent from "../content/base_content";
 import Platform from "../platform/platform";
 
-export default abstract class BaseParser<I extends BaseInput,
+export default class BaseParser<I extends BaseInput,
     O extends BaseOutput, C extends BaseContent> extends Parser<I, O, C> {
     public constructor(protected platform: Platform) {
         super();
     }
 
-    public abstract parse(): Promise<this>;
+    public parse(): Promise<this> {
+        return this.parseUrl();
+    }
+
+    protected createUrl(): Promise<string> {
+        return new Promise<string>(resolve => {
+            resolve(this.input.url);
+        });
+    }
+
+    public parseUrl(): Promise<this> {
+        return this.parseValue("url", () => this.createUrl());
+    }
 }

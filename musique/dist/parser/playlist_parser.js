@@ -22,7 +22,8 @@ class PlaylistParser extends base_parser_1.default {
         });
     }
     parse() {
-        return this.parseTitle()
+        return super.parse()
+            .then(() => this.parseTitle())
             .then(() => this.parseSongs());
     }
     createTitle() {

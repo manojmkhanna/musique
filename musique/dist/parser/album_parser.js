@@ -22,7 +22,8 @@ class AlbumParser extends base_parser_1.default {
         });
     }
     parse() {
-        return this.parseArt()
+        return super.parse()
+            .then(() => this.parseArt())
             .then(() => this.parseDuration())
             .then(() => this.parseLabel())
             .then(() => this.parseLanguage())
