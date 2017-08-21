@@ -32,10 +32,10 @@ class SaavnSongParser extends song_parser_1.default {
             });
         });
     }
-    contentCreated() {
-        return new Promise(() => {
-        });
-    }
+    // protected contentCreated(): Promise<any> {  //TODO
+    //     return new Promise<any>(() => {
+    //     });
+    // }
     createTitle() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);

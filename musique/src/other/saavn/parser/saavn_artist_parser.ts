@@ -34,10 +34,10 @@ export default class SaavnArtistParser extends ArtistParser {
         });
     }
 
-    protected contentCreated(): Promise<any> {
-        return new Promise<any>(() => {
-        });
-    }
+    // protected contentCreated(): Promise<any> {  //TODO
+    //     return new Promise<any>(() => {
+    //     });
+    // }
 
     protected createTitle(): Promise<string> {
         return new Promise<string>(resolve => {

@@ -5,9 +5,6 @@ import PlaylistParser from "../parser/playlist_parser";
 import SearchParser from "../parser/search_parser";
 
 export default abstract class Platform {
-    public constructor(public readonly name: string) {
-    }
-
     public abstract createSongParser(): SongParser;
 
     public abstract createAlbumParser(): AlbumParser;

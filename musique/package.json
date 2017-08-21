@@ -2,7 +2,7 @@
   "name": "musique",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/example.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "gulp build",
