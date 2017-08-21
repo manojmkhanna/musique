@@ -29,7 +29,14 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
     }
 
     public parse(): Promise<this> {
-        return this.parseTitle();
+        return this.parseArt()
+            .then(() => this.parseDuration())
+            .then(() => this.parseLabel())
+            .then(() => this.parseLanguage())
+            .then(() => this.parseReleased())
+            .then(() => this.parseTitle())
+            .then(() => this.parseArtists())
+            .then(() => this.parseSongs());
     }
 
     protected createArt(): Promise<string> {
