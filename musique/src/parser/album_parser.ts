@@ -4,6 +4,10 @@ import BaseParser from "./base_parser";
 import AlbumInput from "../input/album_input";
 import AlbumOutput from "../output/album_output";
 import AlbumContent from "../content/album_content";
+import ArtistOutput from "../output/artist_output";
+import ArtistParser from "./artist_parser";
+import SongOutput from "../output/song_output";
+import SongParser from "./song_parser";
 
 export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, AlbumContent> {
     protected createInput(): Promise<AlbumInput> {
@@ -28,13 +32,97 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
         return this.parseTitle();
     }
 
+    protected createArt(): Promise<string> {
+        return new Promise<string>(resolve => {
+            resolve();
+        });
+    }
+
+    protected createDuration(): Promise<string> {
+        return new Promise<string>(resolve => {
+            resolve();
+        });
+    }
+
+    protected createLabel(): Promise<string> {
+        return new Promise<string>(resolve => {
+            resolve();
+        });
+    }
+
+    protected createLanguage(): Promise<string> {
+        return new Promise<string>(resolve => {
+            resolve();
+        });
+    }
+
+    protected createReleased(): Promise<string> {
+        return new Promise<string>(resolve => {
+            resolve();
+        });
+    }
+
     protected createTitle(): Promise<string> {
         return new Promise<string>(resolve => {
             resolve();
         });
     }
 
+    protected createArtists(): Promise<ArtistOutput[]> {
+        return new Promise<ArtistOutput[]>(resolve => {
+            resolve();
+        });
+    }
+
+    protected createSongs(): Promise<SongOutput[]> {
+        return new Promise<SongOutput[]>(resolve => {
+            resolve();
+        });
+    }
+
+    public parseArt(): Promise<this> {
+        return this.parseValue("art", () => this.createArt());
+    }
+
+    public parseDuration(): Promise<this> {
+        return this.parseValue("duration", () => this.createDuration());
+    }
+
+    public parseLabel(): Promise<this> {
+        return this.parseValue("label", () => this.createLabel());
+    }
+
+    public parseLanguage(): Promise<this> {
+        return this.parseValue("language", () => this.createLanguage());
+    }
+
+    public parseReleased(): Promise<this> {
+        return this.parseValue("released", () => this.createReleased());
+    }
+
     public parseTitle(): Promise<this> {
         return this.parseValue("title", () => this.createTitle());
+    }
+
+    public parseArtists(outputsParser?: (childParser: ArtistParser, index: number) => Promise<any>,
+                        ...indexes: number[]): Promise<this> {
+        if (outputsParser == undefined) {
+            return this.parseValue("artists", () => this.createArtists());
+        } else {
+            return this.parseOutputs("artists", () => new Promise<ArtistParser>(resolve => {
+                resolve(this.platform.createArtistParser());
+            }), outputsParser, ...indexes);
+        }
+    }
+
+    public parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>,
+                      ...indexes: number[]): Promise<this> {
+        if (outputsParser == undefined) {
+            return this.parseValue("songs", () => this.createSongs());
+        } else {
+            return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {
+                resolve(this.platform.createSongParser());
+            }), outputsParser, ...indexes);
+        }
     }
 }
