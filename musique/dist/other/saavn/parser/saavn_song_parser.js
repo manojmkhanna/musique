@@ -3,8 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
 const request = require("request-promise");
 const cheerio = require("cheerio");
+const crypto = require("crypto");
 const song_parser_1 = require("../../../parser/song_parser");
 const song_content_1 = require("../../../content/song_content");
+const album_input_1 = require("../../../input/album_input");
+const artist_input_1 = require("../../../input/artist_input");
 class SaavnSongParser extends song_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
@@ -32,16 +35,78 @@ class SaavnSongParser extends song_parser_1.default {
             });
         });
     }
-    // protected contentCreated(): Promise<any> {  //TODO
-    //     return new Promise<any>(() => {
-    //     });
-    // }
+    contentCreated() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            let albumInput = new album_input_1.default();
+            let artistInputs = [];
+            $("h2.page-subtitle>a").each((index, element) => {
+                if (index == 0) {
+                    albumInput.url = $(element).attr("href");
+                }
+                else {
+                    let artistInput = new artist_input_1.default();
+                    artistInput.url = $(element).attr("href");
+                    artistInputs.push(artistInput);
+                }
+            });
+            this.input.album = albumInput;
+            this.input.artists = artistInputs;
+            resolve();
+        });
+    }
+    createDuration() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            let match = $("h2.page-subtitle").first().text().match(/ · (.+)$/);
+            if (match) {
+                resolve(match[1]);
+            }
+            else {
+                resolve();
+            }
+        });
+    }
+    createLyrics() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            let lyrics = $("h2.page-subtitle:contains(Lyrics)+p").first().html();
+            if (lyrics) {
+                resolve(lyrics.replace(/(<br>){2,}/g, "\n\n").replace(/<br>/g, "\n"));
+            }
+            else {
+                resolve();
+            }
+        });
+    }
+    createMp3() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
+            let buffer = Buffer.from(JSON.parse($("div.song-json").first().text()).url, "base64");
+            buffer = Buffer.concat([cipher.update(buffer), cipher.final()]);
+            resolve("https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3");
+        });
+    }
     createTitle() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            let title = $("h1.page-title").text();
-            title = title.trim();
-            resolve(title);
+            resolve($("h1.page-title").first().text().trim());
+        });
+    }
+    createTrack() {
+        return new Promise(resolve => {
+            resolve();
+        });
+    }
+    createAlbum() {
+        return new Promise(resolve => {
+            resolve();
+        });
+    }
+    createArtists() {
+        return new Promise(resolve => {
+            resolve();
         });
     }
 }

@@ -32,16 +32,15 @@ class SaavnArtistParser extends artist_parser_1.default {
             });
         });
     }
-    // protected contentCreated(): Promise<any> {  //TODO
-    //     return new Promise<any>(() => {
-    //     });
-    // }
+    contentCreated() {
+        return new Promise(resolve => {
+            resolve();
+        });
+    }
     createTitle() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            let title = $("h1.page-title").text();
-            title = title.trim();
-            resolve(title);
+            resolve($("h1.page-title").first().text().trim());
         });
     }
 }

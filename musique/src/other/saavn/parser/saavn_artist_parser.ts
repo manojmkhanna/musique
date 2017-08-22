@@ -34,19 +34,17 @@ export default class SaavnArtistParser extends ArtistParser {
         });
     }
 
-    // protected contentCreated(): Promise<any> {  //TODO
-    //     return new Promise<any>(() => {
-    //     });
-    // }
+    protected contentCreated(): Promise<any> {  //TODO
+        return new Promise<any>(resolve => {
+            resolve();
+        });
+    }
 
     protected createTitle(): Promise<string> {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            let title = $("h1.page-title").text();
-            title = title.trim();
-
-            resolve(title);
+            resolve($("h1.page-title").first().text().trim());
         });
     }
 }
