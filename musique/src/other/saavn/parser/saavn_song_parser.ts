@@ -148,8 +148,10 @@ export default class SaavnSongParser extends SongParser {
                 albumOutput = new AlbumOutput();
             }
 
-            albumOutput.url = $("h2.page-subtitle>a").first().attr("href");
-            albumOutput.title = $("h2.page-subtitle>a").first().text();
+            let element = $("h2.page-subtitle>a").first();
+
+            albumOutput.url = element.attr("href");
+            albumOutput.title = element.text();
 
             resolve(albumOutput);
         });

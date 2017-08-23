@@ -124,8 +124,9 @@ class SaavnSongParser extends song_parser_1.default {
             if (!albumOutput) {
                 albumOutput = new album_output_1.default();
             }
-            albumOutput.url = $("h2.page-subtitle>a").first().attr("href");
-            albumOutput.title = $("h2.page-subtitle>a").first().text();
+            let element = $("h2.page-subtitle>a").first();
+            albumOutput.url = element.attr("href");
+            albumOutput.title = element.text();
             resolve(albumOutput);
         });
     }
