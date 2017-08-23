@@ -34,13 +34,15 @@ class SaavnArtistParser extends artist_parser_1.default {
     }
     contentCreated() {
         return new Promise(resolve => {
+            this.input.albums = [];
+            this.input.songs = [];
             resolve();
         });
     }
     createTitle() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("h1.page-title").first().text().trim());
+            resolve($("h1.page-title").first().text());
         });
     }
 }

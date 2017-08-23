@@ -40,7 +40,7 @@ class SaavnPlaylistParser extends playlist_parser_1.default {
     createTitle() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("h1.page-title").first().text().trim());
+            resolve($("h1.page-title").first().text());
         });
     }
 }

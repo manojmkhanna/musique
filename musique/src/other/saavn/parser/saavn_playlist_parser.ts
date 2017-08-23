@@ -44,7 +44,7 @@ export default class SaavnPlaylistParser extends PlaylistParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("h1.page-title").first().text().trim());
+            resolve($("h1.page-title").first().text());
         });
     }
 }

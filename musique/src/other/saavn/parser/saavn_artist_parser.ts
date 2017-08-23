@@ -34,8 +34,11 @@ export default class SaavnArtistParser extends ArtistParser {
         });
     }
 
-    protected contentCreated(): Promise<any> {  //TODO
+    protected contentCreated(): Promise<any> {
         return new Promise<any>(resolve => {
+            this.input.albums = [];
+            this.input.songs = [];
+
             resolve();
         });
     }
@@ -44,7 +47,7 @@ export default class SaavnArtistParser extends ArtistParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("h1.page-title").first().text().trim());
+            resolve($("h1.page-title").first().text());
         });
     }
 }

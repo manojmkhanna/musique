@@ -48,7 +48,7 @@ class SaavnSongParser extends song_parser_1.default {
                 }
                 else {
                     let artistInput = new artist_input_1.default();
-                    artistInput.url = $(element).attr("href");
+                    artistInput.url = $(element).attr("href").replace("albums", "artist");
                     artistInputs[index - 1] = artistInput;
                 }
             });
@@ -143,7 +143,7 @@ class SaavnSongParser extends song_parser_1.default {
                     if (!artistOutput) {
                         artistOutput = new artist_output_1.default();
                     }
-                    artistOutput.url = $(element).attr("href");
+                    artistOutput.url = $(element).attr("href").replace("albums", "artist");
                     artistOutput.title = $(element).text();
                     artistOutputs[index - 1] = artistOutput;
                 }

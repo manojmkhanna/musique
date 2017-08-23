@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
 const request = require("request-promise");
-const cheerio = require("cheerio");
 const search_parser_1 = require("../../../parser/search_parser");
 const search_content_1 = require("../../../content/search_content");
 class SaavnSearchParser extends search_parser_1.default {
@@ -30,17 +29,6 @@ class SaavnSearchParser extends search_parser_1.default {
                 .catch(error => {
                 reject(error);
             });
-        });
-    }
-    contentCreated() {
-        return new Promise(resolve => {
-            resolve();
-        });
-    }
-    createTitle() {
-        return new Promise(resolve => {
-            let $ = cheerio.load(this.content.html);
-            resolve($("h1.page-title").first().text().trim());
         });
     }
 }

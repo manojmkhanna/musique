@@ -1,6 +1,5 @@
 import * as Promise from "bluebird";
 import * as request from "request-promise";
-import * as cheerio from "cheerio";
 
 import SearchParser from "../../../parser/search_parser";
 import SearchContent from "../../../content/search_content";
@@ -31,20 +30,6 @@ export default class SaavnSearchParser extends SearchParser {
                 .catch(error => {
                     reject(error);
                 });
-        });
-    }
-
-    protected contentCreated(): Promise<any> {  //TODO
-        return new Promise<any>(resolve => {
-            resolve();
-        });
-    }
-
-    protected createTitle(): Promise<string> {
-        return new Promise<string>(resolve => {
-            let $ = cheerio.load(this.content.html);
-
-            resolve($("h1.page-title").first().text().trim());
         });
     }
 }

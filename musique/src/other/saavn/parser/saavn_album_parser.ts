@@ -46,7 +46,7 @@ export default class SaavnAlbumParser extends AlbumParser {
 
             $("h2.page-subtitle>a").each((index, element) => {
                 let artistInput = new ArtistInput();
-                artistInput.url = $(element).attr("href");
+                artistInput.url = $(element).attr("href").replace("albums", "artist");
 
                 artistInputs[index] = artistInput;
             });
@@ -104,7 +104,7 @@ export default class SaavnAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("p.copyright").first().text().match(/Released (.+)©/)![1].replace(/,/, ""));
+            resolve($("p.copyright").first().text().match(/Released (.+)©/)![1].replace(",", ""));
         });
     }
 
@@ -112,7 +112,7 @@ export default class SaavnAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("h1.page-title").first().text().trim());
+            resolve($("h1.page-title").first().text());
         });
     }
 
@@ -133,7 +133,7 @@ export default class SaavnAlbumParser extends AlbumParser {
                     artistOutput = new ArtistOutput();
                 }
 
-                artistOutput.url = $(element).attr("href");
+                artistOutput.url = $(element).attr("href").replace("albums", "artist");
                 artistOutput.title = $(element).text();
 
                 artistOutputs[index] = artistOutput;
