@@ -1,4 +1,5 @@
 "use strict";
+//TODO: Remove this file and change package.json later
 Object.defineProperty(exports, "__esModule", { value: true });
 const musique = require("./index");
 let startTime = new Date().getTime();

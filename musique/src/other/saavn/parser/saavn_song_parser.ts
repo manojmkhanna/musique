@@ -52,7 +52,8 @@ export default class SaavnSongParser extends SongParser {
                 } else {
                     let artistInput = new ArtistInput();
                     artistInput.url = $(element).attr("href");
-                    artistInputs.push(artistInput);
+
+                    artistInputs[index - 1] = artistInput;
                 }
             });
 
@@ -67,13 +68,7 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            let match = $("h2.page-subtitle").first().text().match(/ · (.+)$/);
-
-            if (match) {
-                resolve(match[1]);
-            } else {
-                resolve();
-            }
+            resolve($("h2.page-subtitle").first().text().match(/ · (.+)$/)![1]);
         });
     }
 
@@ -113,20 +108,79 @@ export default class SaavnSongParser extends SongParser {
     }
 
     protected createTrack(): Promise<number> {
-        return new Promise<number>(resolve => {
-            resolve();
+        return new Promise<number>((resolve, reject) => {
+            let $ = cheerio.load(this.content.html);
+
+            let id = JSON.parse($("div.song-json").first().text()).songid;
+
+            request.get(this.input.album.url, {
+                headers: {
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Accept-Language": "en,en-US;q=0.8",
+                    "Cache-Control": "max-age=0",
+                    "Connection": "keep-alive",
+                    "DNT": "1",
+                    "Host": "www.saavn.com",
+                    "Upgrade-Insecure-Requests": "1",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
+                },
+                gzip: true
+            })
+                .then(html => {
+                    let $ = cheerio.load(html);
+
+                    resolve(parseInt($("li.song-wrap[data-songid=" + id + "]>div.index").first().text()));
+                })
+                .catch(error => {
+                    reject(error);
+                });
         });
     }
 
     protected createAlbum(): Promise<AlbumOutput> {
         return new Promise<AlbumOutput>(resolve => {
-            resolve();
+            let $ = cheerio.load(this.content.html);
+
+            let albumOutput = this.output.album;
+
+            if (!albumOutput) {
+                albumOutput = new AlbumOutput();
+            }
+
+            albumOutput.url = $("h2.page-subtitle>a").first().attr("href");
+            albumOutput.title = $("h2.page-subtitle>a").first().text();
+
+            resolve(albumOutput);
         });
     }
 
     protected createArtists(): Promise<ArtistOutput[]> {
         return new Promise<ArtistOutput[]>(resolve => {
-            resolve();
+            let $ = cheerio.load(this.content.html);
+
+            let artistOutputs: ArtistOutput[] = this.output.artists;
+
+            if (!artistOutputs) {
+                artistOutputs = [];
+            }
+
+            $("h2.page-subtitle>a").each((index, element) => {
+                if (index > 0) {
+                    let artistOutput = artistOutputs[index];
+
+                    if (!artistOutput) {
+                        artistOutput = new ArtistOutput();
+                    }
+
+                    artistOutput.url = $(element).attr("href");
+                    artistOutput.title = $(element).text();
+
+                    artistOutputs[index - 1] = artistOutput;
+                }
+            });
+
+            resolve(artistOutputs);
         });
     }
 }

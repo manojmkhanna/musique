@@ -1,3 +1,5 @@
+//TODO: Remove this file and change package.json later
+
 import * as musique from "./index";
 
 let startTime = new Date().getTime();
