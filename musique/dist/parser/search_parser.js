@@ -63,7 +63,7 @@ class SearchParser extends parsque_1.Parser {
     }
     parseAlbums(outputsParser, ...indexes) {
         if (outputsParser == undefined) {
-            return this.parseValue("albums", () => this.createSongs());
+            return this.parseValue("albums", () => this.createAlbums());
         }
         else {
             return this.parseOutputs("albums", () => new Promise(resolve => {
@@ -83,7 +83,7 @@ class SearchParser extends parsque_1.Parser {
     }
     parsePlaylists(outputsParser, ...indexes) {
         if (outputsParser == undefined) {
-            return this.parseValue("playlists", () => this.createArtists());
+            return this.parseValue("playlists", () => this.createPlaylists());
         }
         else {
             return this.parseOutputs("playlists", () => new Promise(resolve => {

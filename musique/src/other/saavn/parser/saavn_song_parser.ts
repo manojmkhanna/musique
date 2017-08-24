@@ -51,7 +51,7 @@ export default class SaavnSongParser extends SongParser {
                     albumInput.url = $(element).attr("href");
                 } else {
                     let artistInput = new ArtistInput();
-                    artistInput.url = $(element).attr("href").replace("albums", "artist");
+                    artistInput.url = $(element).attr("href").replace("-albums", "-artist");
 
                     artistInputs[index - 1] = artistInput;
                 }
@@ -175,7 +175,7 @@ export default class SaavnSongParser extends SongParser {
                         artistOutput = new ArtistOutput();
                     }
 
-                    artistOutput.url = $(element).attr("href").replace("albums", "artist");
+                    artistOutput.url = $(element).attr("href").replace("-albums", "-artist");
                     artistOutput.title = $(element).text();
 
                     artistOutputs[index - 1] = artistOutput;

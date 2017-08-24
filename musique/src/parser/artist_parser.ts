@@ -60,7 +60,7 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
     public parseAlbums(outputsParser?: (childParser: AlbumParser, index: number) => Promise<any>,
                        ...indexes: number[]): Promise<this> {
         if (outputsParser == undefined) {
-            return this.parseValue("albums", () => this.createSongs());
+            return this.parseValue("albums", () => this.createAlbums());
         } else {
             return this.parseOutputs("albums", () => new Promise<AlbumParser>(resolve => {
                 resolve(this.platform.createAlbumParser());

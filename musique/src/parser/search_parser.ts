@@ -82,7 +82,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
     public parseAlbums(outputsParser?: (childParser: AlbumParser, index: number) => Promise<any>,
                        ...indexes: number[]): Promise<this> {
         if (outputsParser == undefined) {
-            return this.parseValue("albums", () => this.createSongs());
+            return this.parseValue("albums", () => this.createAlbums());
         } else {
             return this.parseOutputs("albums", () => new Promise<AlbumParser>(resolve => {
                 resolve(this.platform.createAlbumParser());
@@ -104,7 +104,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
     public parsePlaylists(outputsParser?: (childParser: PlaylistParser, index: number) => Promise<any>,
                           ...indexes: number[]): Promise<this> {
         if (outputsParser == undefined) {
-            return this.parseValue("playlists", () => this.createArtists());
+            return this.parseValue("playlists", () => this.createPlaylists());
         } else {
             return this.parseOutputs("playlists", () => new Promise<PlaylistParser>(resolve => {
                 resolve(this.platform.createPlaylistParser());

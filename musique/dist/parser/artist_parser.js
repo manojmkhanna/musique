@@ -47,7 +47,7 @@ class ArtistParser extends base_parser_1.default {
     }
     parseAlbums(outputsParser, ...indexes) {
         if (outputsParser == undefined) {
-            return this.parseValue("albums", () => this.createSongs());
+            return this.parseValue("albums", () => this.createAlbums());
         }
         else {
             return this.parseOutputs("albums", () => new Promise(resolve => {

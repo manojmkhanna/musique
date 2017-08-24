@@ -42,7 +42,7 @@ class SaavnAlbumParser extends album_parser_1.default {
             let artistInputs = [];
             $("h2.page-subtitle>a").each((index, element) => {
                 let artistInput = new artist_input_1.default();
-                artistInput.url = $(element).attr("href").replace("albums", "artist");
+                artistInput.url = $(element).attr("href").replace("-albums", "-artist");
                 artistInputs[index] = artistInput;
             });
             this.input.artists = artistInputs;
@@ -104,7 +104,7 @@ class SaavnAlbumParser extends album_parser_1.default {
                 if (!artistOutput) {
                     artistOutput = new artist_output_1.default();
                 }
-                artistOutput.url = $(element).attr("href").replace("albums", "artist");
+                artistOutput.url = $(element).attr("href").replace("-albums", "-artist");
                 artistOutput.title = $(element).text();
                 artistOutputs[index] = artistOutput;
             });

@@ -46,7 +46,7 @@ export default class SaavnAlbumParser extends AlbumParser {
 
             $("h2.page-subtitle>a").each((index, element) => {
                 let artistInput = new ArtistInput();
-                artistInput.url = $(element).attr("href").replace("albums", "artist");
+                artistInput.url = $(element).attr("href").replace("-albums", "-artist");
 
                 artistInputs[index] = artistInput;
             });
@@ -133,7 +133,7 @@ export default class SaavnAlbumParser extends AlbumParser {
                     artistOutput = new ArtistOutput();
                 }
 
-                artistOutput.url = $(element).attr("href").replace("albums", "artist");
+                artistOutput.url = $(element).attr("href").replace("-albums", "-artist");
                 artistOutput.title = $(element).text();
 
                 artistOutputs[index] = artistOutput;
