@@ -5,6 +5,7 @@ import * as crypto from "crypto";
 
 import SongParser from "../../../parser/song_parser";
 import SongContent from "../../../content/song_content";
+import SaavnConstants from "../saavn_constants";
 import AlbumInput from "../../../input/album_input";
 import ArtistInput from "../../../input/artist_input";
 import AlbumOutput from "../../../output/album_output";
@@ -13,20 +14,7 @@ import ArtistOutput from "../../../output/artist_output";
 export default class SaavnSongParser extends SongParser {
     protected createContent(): Promise<SongContent> {
         return new Promise<SongContent>((resolve, reject) => {
-            request.get(this.input.url, {
-                headers: {
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-                    "Accept-Encoding": "gzip, deflate, br",
-                    "Accept-Language": "en,en-US;q=0.8",
-                    "Cache-Control": "max-age=0",
-                    "Connection": "keep-alive",
-                    "DNT": "1",
-                    "Host": "www.saavn.com",
-                    "Upgrade-Insecure-Requests": "1",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
-                },
-                gzip: true
-            })
+            request.get(this.input.url, SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     let content = new SongContent();
                     content.html = html;
@@ -87,7 +75,7 @@ export default class SaavnSongParser extends SongParser {
     }
 
     protected createMp3(): Promise<string> {
-        return new Promise<string>(resolve => {
+        return new Promise<string>((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
 
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
@@ -95,7 +83,33 @@ export default class SaavnSongParser extends SongParser {
             let buffer = Buffer.from(JSON.parse($("div.song-json").first().text()).url, "base64");
             buffer = Buffer.concat([cipher.update(buffer), cipher.final()]);
 
-            resolve("https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3");
+            let mp3 = "https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3";
+
+            request.get(mp3, {
+                headers: {
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Accept-Language": "en,en-US;q=0.8",
+                    "Cache-Control": "max-age=0",
+                    "Connection": "keep-alive",
+                    "DNT": "1",
+                    "Host": "h.saavncdn.com",
+                    "Upgrade-Insecure-Requests": "1",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
+                },
+                simple: false,
+                resolveWithFullResponse: true
+            })
+                .then(response => {
+                    if (response.statusCode != 403) {
+                        resolve(mp3);
+                    } else {
+                        resolve();
+                    }
+                })
+                .catch(error => {
+                    reject(error);
+                });
         });
     }
 
@@ -113,20 +127,7 @@ export default class SaavnSongParser extends SongParser {
 
             let id = JSON.parse($("div.song-json").first().text()).songid;
 
-            request.get(this.input.album.url, {
-                headers: {
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-                    "Accept-Encoding": "gzip, deflate, br",
-                    "Accept-Language": "en,en-US;q=0.8",
-                    "Cache-Control": "max-age=0",
-                    "Connection": "keep-alive",
-                    "DNT": "1",
-                    "Host": "www.saavn.com",
-                    "Upgrade-Insecure-Requests": "1",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
-                },
-                gzip: true
-            })
+            request.get(this.input.album.url, SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     let $ = cheerio.load(html);
 

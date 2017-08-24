@@ -5,6 +5,7 @@ const request = require("request-promise");
 const cheerio = require("cheerio");
 const album_parser_1 = require("../../../parser/album_parser");
 const album_content_1 = require("../../../content/album_content");
+const saavn_constants_1 = require("../saavn_constants");
 const artist_input_1 = require("../../../input/artist_input");
 const song_input_1 = require("../../../input/song_input");
 const artist_output_1 = require("../../../output/artist_output");
@@ -12,20 +13,7 @@ const song_output_1 = require("../../../output/song_output");
 class SaavnAlbumParser extends album_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
-            request.get(this.input.url, {
-                headers: {
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-                    "Accept-Encoding": "gzip, deflate, br",
-                    "Accept-Language": "en,en-US;q=0.8",
-                    "Cache-Control": "max-age=0",
-                    "Connection": "keep-alive",
-                    "DNT": "1",
-                    "Host": "www.saavn.com",
-                    "Upgrade-Insecure-Requests": "1",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
-                },
-                gzip: true
-            })
+            request.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let content = new album_content_1.default();
                 content.html = html;

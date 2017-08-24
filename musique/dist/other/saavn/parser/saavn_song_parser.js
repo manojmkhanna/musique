@@ -6,6 +6,7 @@ const cheerio = require("cheerio");
 const crypto = require("crypto");
 const song_parser_1 = require("../../../parser/song_parser");
 const song_content_1 = require("../../../content/song_content");
+const saavn_constants_1 = require("../saavn_constants");
 const album_input_1 = require("../../../input/album_input");
 const artist_input_1 = require("../../../input/artist_input");
 const album_output_1 = require("../../../output/album_output");
@@ -13,20 +14,7 @@ const artist_output_1 = require("../../../output/artist_output");
 class SaavnSongParser extends song_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
-            request.get(this.input.url, {
-                headers: {
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-                    "Accept-Encoding": "gzip, deflate, br",
-                    "Accept-Language": "en,en-US;q=0.8",
-                    "Cache-Control": "max-age=0",
-                    "Connection": "keep-alive",
-                    "DNT": "1",
-                    "Host": "www.saavn.com",
-                    "Upgrade-Insecure-Requests": "1",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
-                },
-                gzip: true
-            })
+            request.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let content = new song_content_1.default();
                 content.html = html;
@@ -76,12 +64,38 @@ class SaavnSongParser extends song_parser_1.default {
         });
     }
     createMp3() {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
             let buffer = Buffer.from(JSON.parse($("div.song-json").first().text()).url, "base64");
             buffer = Buffer.concat([cipher.update(buffer), cipher.final()]);
-            resolve("https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3");
+            let mp3 = "https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3";
+            request.get(mp3, {
+                headers: {
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Accept-Language": "en,en-US;q=0.8",
+                    "Cache-Control": "max-age=0",
+                    "Connection": "keep-alive",
+                    "DNT": "1",
+                    "Host": "h.saavncdn.com",
+                    "Upgrade-Insecure-Requests": "1",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
+                },
+                simple: false,
+                resolveWithFullResponse: true
+            })
+                .then(response => {
+                if (response.statusCode != 403) {
+                    resolve(mp3);
+                }
+                else {
+                    resolve();
+                }
+            })
+                .catch(error => {
+                reject(error);
+            });
         });
     }
     createTitle() {
@@ -94,20 +108,7 @@ class SaavnSongParser extends song_parser_1.default {
         return new Promise((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
             let id = JSON.parse($("div.song-json").first().text()).songid;
-            request.get(this.input.album.url, {
-                headers: {
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-                    "Accept-Encoding": "gzip, deflate, br",
-                    "Accept-Language": "en,en-US;q=0.8",
-                    "Cache-Control": "max-age=0",
-                    "Connection": "keep-alive",
-                    "DNT": "1",
-                    "Host": "www.saavn.com",
-                    "Upgrade-Insecure-Requests": "1",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
-                },
-                gzip: true
-            })
+            request.get(this.input.album.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let $ = cheerio.load(html);
                 resolve(parseInt($("li.song-wrap[data-songid=" + id + "]>div.index").first().text()));
