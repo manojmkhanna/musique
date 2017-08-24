@@ -38,8 +38,8 @@ export default class SaavnAlbumParser extends AlbumParser {
         });
     }
 
-    protected contentCreated(): Promise<any> {
-        return new Promise<any>(resolve => {
+    protected contentCreated(): Promise<void> {
+        return new Promise<void>(resolve => {
             let $ = cheerio.load(this.content.html);
 
             let artistInputs: ArtistInput[] = [];

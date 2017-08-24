@@ -6,7 +6,7 @@ import ArtistOutput from "../../../output/artist_output";
 import SongOutput from "../../../output/song_output";
 export default class SaavnAlbumParser extends AlbumParser {
     protected createContent(): Promise<AlbumContent>;
-    protected contentCreated(): Promise<any>;
+    protected contentCreated(): Promise<void>;
     protected createArt(): Promise<string>;
     protected createDuration(): Promise<string>;
     protected createLabel(): Promise<string>;

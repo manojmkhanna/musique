@@ -39,8 +39,8 @@ export default class SaavnSongParser extends SongParser {
         });
     }
 
-    protected contentCreated(): Promise<any> {
-        return new Promise<any>(resolve => {
+    protected contentCreated(): Promise<void> {
+        return new Promise<void>(resolve => {
             let $ = cheerio.load(this.content.html);
 
             let albumInput = new AlbumInput();

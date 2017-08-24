@@ -5,7 +5,15 @@ const request = require("request-promise");
 const cheerio = require("cheerio");
 const artist_parser_1 = require("../../../parser/artist_parser");
 const artist_content_1 = require("../../../content/artist_content");
+// import AlbumOutput from "../../../output/album_output";
+// import SongOutput from "../../../output/song_output";
+// import AlbumParser from "../../../parser/album_parser";
+// import SongParser from "../../../parser/song_parser";
 class SaavnArtistParser extends artist_parser_1.default {
+    // private albumPageIndex: number;
+    // private albumPageHtml: string[];
+    // private songPageIndex: number;
+    // private songPageHtml: string[];
     createContent() {
         return new Promise((resolve, reject) => {
             request.get(this.input.url, {
