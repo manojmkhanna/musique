@@ -1,5 +1,7 @@
 //TODO: Remove this file and change package.json later
 
+import * as musique from "./index";
+
 let startTime = new Date().getTime();
 
 // musique.parseSong("saavn", "https://www.saavn.com/s/song/hindi/Baadshaho/Mere-Rashke-Qamar/BiVdYgRTdms")
@@ -36,6 +38,17 @@ let startTime = new Date().getTime();
 //     });
 
 // musique.parsePlaylist("saavn", "https://www.saavn.com/s/playlist/cc247fcfabb27a5510270b9f7753062b/Starred_Songs/18CVwm1Pnxw_")
+//     .then(parser => parser.parse())
+//     .then(parser => {
+//         console.log(JSON.stringify(parser.output, null, 2));
+//         console.log("");
+//         console.log("Run time: " + (new Date().getTime() - startTime) / 1000 + "s");
+//     })
+//     .catch(error => {
+//         console.error(error);
+//     });
+
+// musique.parseSearch("saavn", "one")
 //     .then(parser => parser.parse())
 //     .then(parser => {
 //         console.log(JSON.stringify(parser.output, null, 2));

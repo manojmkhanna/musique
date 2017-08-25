@@ -42,5 +42,15 @@ let startTime = new Date().getTime();
 //     .catch(error => {
 //         console.error(error);
 //     });
+// musique.parseSearch("saavn", "one")
+//     .then(parser => parser.parse())
+//     .then(parser => {
+//         console.log(JSON.stringify(parser.output, null, 2));
+//         console.log("");
+//         console.log("Run time: " + (new Date().getTime() - startTime) / 1000 + "s");
+//     })
+//     .catch(error => {
+//         console.error(error);
+//     });
 
 //# sourceMappingURL=example.js.map
