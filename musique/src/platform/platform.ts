@@ -4,14 +4,24 @@ import ArtistParser from "../parser/artist_parser";
 import PlaylistParser from "../parser/playlist_parser";
 import SearchParser from "../parser/search_parser";
 
-export default abstract class Platform {
-    public abstract createSongParser(): SongParser;
+export default class Platform {
+    public createSongParser(): SongParser {
+        return new SongParser(this);
+    }
 
-    public abstract createAlbumParser(): AlbumParser;
+    public createAlbumParser(): AlbumParser {
+        return new AlbumParser(this);
+    }
 
-    public abstract createArtistParser(): ArtistParser;
+    public createArtistParser(): ArtistParser {
+        return new ArtistParser(this);
+    }
 
-    public abstract createPlaylistParser(): PlaylistParser;
+    public createPlaylistParser(): PlaylistParser {
+        return new PlaylistParser(this);
+    }
 
-    public abstract createSearchParser(): SearchParser;
+    public createSearchParser(): SearchParser {
+        return new SearchParser(this);
+    }
 }

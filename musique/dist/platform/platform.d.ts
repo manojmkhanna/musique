@@ -3,10 +3,10 @@ import AlbumParser from "../parser/album_parser";
 import ArtistParser from "../parser/artist_parser";
 import PlaylistParser from "../parser/playlist_parser";
 import SearchParser from "../parser/search_parser";
-export default abstract class Platform {
-    abstract createSongParser(): SongParser;
-    abstract createAlbumParser(): AlbumParser;
-    abstract createArtistParser(): ArtistParser;
-    abstract createPlaylistParser(): PlaylistParser;
-    abstract createSearchParser(): SearchParser;
+export default class Platform {
+    createSongParser(): SongParser;
+    createAlbumParser(): AlbumParser;
+    createArtistParser(): ArtistParser;
+    createPlaylistParser(): PlaylistParser;
+    createSearchParser(): SearchParser;
 }

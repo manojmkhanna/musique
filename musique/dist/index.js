@@ -1,18 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
+const deezer_platform_1 = require("./other/deezer/deezer_platform");
 const saavn_platform_1 = require("./other/saavn/saavn_platform");
 const song_input_1 = require("./input/song_input");
 const album_input_1 = require("./input/album_input");
 const artist_input_1 = require("./input/artist_input");
 const playlist_input_1 = require("./input/playlist_input");
 const search_input_1 = require("./input/search_input");
+let deezerPlatform;
+let saavnPlatform;
 function createPlatform(platformName) {
-    if (platformName === "saavn") {
-        return new saavn_platform_1.default();
+    if (platformName === "deezer") {
+        if (!deezerPlatform) {
+            deezerPlatform = new deezer_platform_1.default();
+        }
+        return deezerPlatform;
+    }
+    else if (platformName === "saavn") {
+        if (!saavnPlatform) {
+            saavnPlatform = new saavn_platform_1.default();
+        }
+        return saavnPlatform;
     }
     else {
-        throw new Error("platformName is invalid!");
+        throw new Error();
     }
 }
 function parseSong(platformName, url) {

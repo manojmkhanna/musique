@@ -75,7 +75,7 @@ export default class SaavnSongParser extends SongParser {
     }
 
     protected createMp3(): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
@@ -83,33 +83,7 @@ export default class SaavnSongParser extends SongParser {
             let buffer = Buffer.from(JSON.parse($("div.song-json").first().text()).url, "base64");
             buffer = Buffer.concat([cipher.update(buffer), cipher.final()]);
 
-            let mp3 = "https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3";
-
-            request.get(mp3, {
-                headers: {
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-                    "Accept-Encoding": "gzip, deflate, br",
-                    "Accept-Language": "en,en-US;q=0.8",
-                    "Cache-Control": "max-age=0",
-                    "Connection": "keep-alive",
-                    "DNT": "1",
-                    "Host": "h.saavncdn.com",
-                    "Upgrade-Insecure-Requests": "1",
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
-                },
-                simple: false,
-                resolveWithFullResponse: true
-            })
-                .then(response => {
-                    if (response.statusCode != 403) {
-                        resolve(mp3);
-                    } else {
-                        resolve();
-                    }
-                })
-                .catch(error => {
-                    reject(error);
-                });
+            resolve("https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3");
         });
     }
 

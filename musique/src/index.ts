@@ -1,6 +1,7 @@
 import * as Promise from "bluebird";
 
 import Platform from "./platform/platform";
+import DeezerPlatform from "./other/deezer/deezer_platform";
 import SaavnPlatform from "./other/saavn/saavn_platform";
 import SongParser from "./parser/song_parser";
 import SongInput from "./input/song_input";
@@ -13,13 +14,26 @@ import PlaylistInput from "./input/playlist_input";
 import SearchParser from "./parser/search_parser";
 import SearchInput from "./input/search_input";
 
-export type PlatformName = "saavn";
+let deezerPlatform: DeezerPlatform;
+let saavnPlatform: SaavnPlatform;
+
+export type PlatformName = "deezer" | "saavn";
 
 function createPlatform(platformName: PlatformName): Platform {
-    if (platformName === "saavn") {
-        return new SaavnPlatform();
+    if (platformName === "deezer") {
+        if (!deezerPlatform) {
+            deezerPlatform = new DeezerPlatform();
+        }
+
+        return deezerPlatform;
+    } else if (platformName === "saavn") {
+        if (!saavnPlatform) {
+            saavnPlatform = new SaavnPlatform();
+        }
+
+        return saavnPlatform;
     } else {
-        throw new Error("platformName is invalid!");
+        throw new Error();
     }
 }
 
