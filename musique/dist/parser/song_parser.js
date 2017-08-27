@@ -27,7 +27,6 @@ class SongParser extends base_parser_1.default {
             .then(() => this.parseGenre())
             .then(() => this.parseLyrics())
             .then(() => this.parseMp3())
-            .then(() => this.parseRating())
             .then(() => this.parseTitle())
             .then(() => this.parseTrack())
             .then(() => this.parseAlbum())
@@ -49,11 +48,6 @@ class SongParser extends base_parser_1.default {
         });
     }
     createMp3() {
-        return new Promise(resolve => {
-            resolve();
-        });
-    }
-    createRating() {
         return new Promise(resolve => {
             resolve();
         });
@@ -89,9 +83,6 @@ class SongParser extends base_parser_1.default {
     }
     parseMp3() {
         return this.parseValue("mp3", () => this.createMp3());
-    }
-    parseRating() {
-        return this.parseValue("rating", () => this.createRating());
     }
     parseTitle() {
         return this.parseValue("title", () => this.createTitle());

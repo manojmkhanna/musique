@@ -4,7 +4,6 @@ import SongOutput from "./song_output";
 
 export default class AlbumOutput extends BaseOutput {
     public art: string;
-    public duration: string;
     public label: string;
     public language: string;
     public released: string;

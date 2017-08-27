@@ -17,7 +17,6 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     protected createGenre(): Promise<string>;
     protected createLyrics(): Promise<string>;
     protected createMp3(): Promise<string>;
-    protected createRating(): Promise<number>;
     protected createTitle(): Promise<string>;
     protected createTrack(): Promise<number>;
     protected createAlbum(): Promise<AlbumOutput>;
@@ -26,7 +25,6 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     parseGenre(): Promise<this>;
     parseLyrics(): Promise<this>;
     parseMp3(): Promise<this>;
-    parseRating(): Promise<this>;
     parseTitle(): Promise<this>;
     parseTrack(): Promise<this>;
     parseAlbum(outputParser?: (childParser: AlbumParser) => Promise<any>): Promise<this>;

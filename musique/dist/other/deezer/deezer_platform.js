@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const platform_1 = require("../../platform/platform");
-// import SongParser from "../../parser/song_parser";
-// import DeezerSongParser from "./parser/saavn_song_parser";
+const deezer_song_parser_1 = require("./parser/deezer_song_parser");
 class DeezerPlatform extends platform_1.default {
+    createSongParser() {
+        return new deezer_song_parser_1.default(this);
+    }
 }
 exports.default = DeezerPlatform;
 

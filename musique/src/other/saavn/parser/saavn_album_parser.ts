@@ -64,14 +64,6 @@ export default class SaavnAlbumParser extends AlbumParser {
         });
     }
 
-    protected createDuration(): Promise<string> {
-        return new Promise<string>(resolve => {
-            let $ = cheerio.load(this.content.html);
-
-            resolve($("h2.page-subtitle").first().text().match(/ · .+ · (.+)$/)![1]);
-        });
-    }
-
     protected createLabel(): Promise<string> {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);

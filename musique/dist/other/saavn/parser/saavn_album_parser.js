@@ -50,12 +50,6 @@ class SaavnAlbumParser extends album_parser_1.default {
             resolve($("div.art>img").first().attr("src"));
         });
     }
-    createDuration() {
-        return new Promise(resolve => {
-            let $ = cheerio.load(this.content.html);
-            resolve($("h2.page-subtitle").first().text().match(/ · .+ · (.+)$/)[1]);
-        });
-    }
     createLabel() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);

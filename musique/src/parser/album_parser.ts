@@ -31,7 +31,6 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
     public parse(): Promise<this> {
         return super.parse()
             .then(() => this.parseArt())
-            .then(() => this.parseDuration())
             .then(() => this.parseLabel())
             .then(() => this.parseLanguage())
             .then(() => this.parseReleased())
@@ -41,12 +40,6 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
     }
 
     protected createArt(): Promise<string> {
-        return new Promise<string>(resolve => {
-            resolve();
-        });
-    }
-
-    protected createDuration(): Promise<string> {
         return new Promise<string>(resolve => {
             resolve();
         });
@@ -90,10 +83,6 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
 
     public parseArt(): Promise<this> {
         return this.parseValue("art", () => this.createArt());
-    }
-
-    public parseDuration(): Promise<this> {
-        return this.parseValue("duration", () => this.createDuration());
     }
 
     public parseLabel(): Promise<this> {

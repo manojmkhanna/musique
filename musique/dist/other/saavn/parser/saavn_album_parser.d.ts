@@ -8,7 +8,6 @@ export default class SaavnAlbumParser extends AlbumParser {
     protected createContent(): Promise<AlbumContent>;
     protected contentCreated(): Promise<void>;
     protected createArt(): Promise<string>;
-    protected createDuration(): Promise<string>;
     protected createLabel(): Promise<string>;
     protected createLanguage(): Promise<string>;
     protected createReleased(): Promise<string>;

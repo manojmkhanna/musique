@@ -24,7 +24,6 @@ class AlbumParser extends base_parser_1.default {
     parse() {
         return super.parse()
             .then(() => this.parseArt())
-            .then(() => this.parseDuration())
             .then(() => this.parseLabel())
             .then(() => this.parseLanguage())
             .then(() => this.parseReleased())
@@ -33,11 +32,6 @@ class AlbumParser extends base_parser_1.default {
             .then(() => this.parseSongs());
     }
     createArt() {
-        return new Promise(resolve => {
-            resolve();
-        });
-    }
-    createDuration() {
         return new Promise(resolve => {
             resolve();
         });
@@ -74,9 +68,6 @@ class AlbumParser extends base_parser_1.default {
     }
     parseArt() {
         return this.parseValue("art", () => this.createArt());
-    }
-    parseDuration() {
-        return this.parseValue("duration", () => this.createDuration());
     }
     parseLabel() {
         return this.parseValue("label", () => this.createLabel());

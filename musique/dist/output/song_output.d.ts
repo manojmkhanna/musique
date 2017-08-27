@@ -6,7 +6,6 @@ export default class SongOutput extends BaseOutput {
     genre: string;
     lyrics: string;
     mp3: string;
-    rating: number;
     title: string;
     track: number;
     album: AlbumOutput;

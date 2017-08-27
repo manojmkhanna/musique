@@ -14,7 +14,6 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
     protected createContent(): Promise<AlbumContent>;
     parse(): Promise<this>;
     protected createArt(): Promise<string>;
-    protected createDuration(): Promise<string>;
     protected createLabel(): Promise<string>;
     protected createLanguage(): Promise<string>;
     protected createReleased(): Promise<string>;
@@ -22,7 +21,6 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
     protected createArtists(): Promise<ArtistOutput[]>;
     protected createSongs(): Promise<SongOutput[]>;
     parseArt(): Promise<this>;
-    parseDuration(): Promise<this>;
     parseLabel(): Promise<this>;
     parseLanguage(): Promise<this>;
     parseReleased(): Promise<this>;
