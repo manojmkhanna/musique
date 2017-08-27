@@ -22,6 +22,7 @@ class SaavnSearchParser extends search_parser_1.default {
         return new Promise(resolve => {
             this.input.songs = [];
             this.input.albums = [];
+            this.input.artists = [];
             this.input.playlists = [];
             resolve();
         });
