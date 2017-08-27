@@ -6,10 +6,10 @@ import * as crypto from "crypto";
 import SongParser from "../../../parser/song_parser";
 import SongContent from "../../../content/song_content";
 import DeezerConstants from "../deezer_constants";
-import AlbumOutput from "../../../output/album_output";
-import ArtistOutput from "../../../output/artist_output";
 import AlbumInput from "../../../input/album_input";
 import ArtistInput from "../../../input/artist_input";
+import AlbumOutput from "../../../output/album_output";
+import ArtistOutput from "../../../output/artist_output";
 
 export default class DeezerSongParser extends SongParser {
     protected createContent(): Promise<SongContent> {
@@ -40,7 +40,7 @@ export default class DeezerSongParser extends SongParser {
 
             for (let i = 1; i < json.DATA.ARTISTS.length; i++) {
                 let artistInput = new ArtistInput();
-                artistInput.url = "http://www.deezer.com/artist/" + json.DATA.ARTISTS[i].ART_ID;
+                artistInput.url = "http://www.deezer.com/en/artist/" + json.DATA.ARTISTS[i].ART_ID;
 
                 artistInputs.push(artistInput);
             }
@@ -135,7 +135,7 @@ export default class DeezerSongParser extends SongParser {
                     artistOutput = new ArtistOutput();
                 }
 
-                artistOutput.url = "http://www.deezer.com/artist/" + json.DATA.ARTISTS[i].ART_ID;
+                artistOutput.url = "http://www.deezer.com/en/artist/" + json.DATA.ARTISTS[i].ART_ID;
                 artistOutput.title = json.DATA.ARTISTS[i].ART_NAME;
 
                 artistOutputs[i - 1] = artistOutput;

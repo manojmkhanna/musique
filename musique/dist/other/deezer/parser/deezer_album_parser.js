@@ -3,20 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
 const request = require("request-promise");
 const cheerio = require("cheerio");
-const crypto = require("crypto");
-const song_parser_1 = require("../../../parser/song_parser");
-const song_content_1 = require("../../../content/song_content");
+const moment = require("moment");
+const album_parser_1 = require("../../../parser/album_parser");
+const album_content_1 = require("../../../content/album_content");
 const deezer_constants_1 = require("../deezer_constants");
-const album_input_1 = require("../../../input/album_input");
 const artist_input_1 = require("../../../input/artist_input");
-const album_output_1 = require("../../../output/album_output");
+const song_input_1 = require("../../../input/song_input");
 const artist_output_1 = require("../../../output/artist_output");
-class DeezerSongParser extends song_parser_1.default {
+const song_output_1 = require("../../../output/song_output");
+class DeezerAlbumParser extends album_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
             request.get(this.input.url, deezer_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
-                let content = new song_content_1.default();
+                let content = new album_content_1.default();
                 content.html = html;
                 resolve(content);
             })
@@ -28,66 +28,51 @@ class DeezerSongParser extends song_parser_1.default {
     contentCreated() {
         return new Promise(resolve => {
             let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
-            let albumInput = new album_input_1.default();
-            albumInput.url = "http://www.deezer.com/en/album/" + json.DATA.ALB_ID;
-            this.input.album = albumInput;
             let artistInputs = [];
-            for (let i = 1; i < json.DATA.ARTISTS.length; i++) {
+            for (let i = 0; i < json.DATA.ARTISTS.length; i++) {
                 let artistInput = new artist_input_1.default();
                 artistInput.url = "http://www.deezer.com/en/artist/" + json.DATA.ARTISTS[i].ART_ID;
                 artistInputs.push(artistInput);
             }
             this.input.artists = artistInputs;
+            let songInputs = [];
+            for (let i = 0; i < json.SONGS.data.length; i++) {
+                let songInput = new song_input_1.default();
+                songInput.url = "http://www.deezer.com/en/track/" + json.SONGS.data[i].SNG_ID;
+                songInputs.push(songInput);
+            }
+            this.input.songs = songInputs;
             resolve();
         });
     }
-    createDuration() {
+    createArt() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("div.naboo_track_song").last().text().match(/Length : 0*(\d+:\d+)/)[1]);
+            resolve($("img#naboo_album_image").first().attr("src").replace("200x200", "512x512"));
         });
     }
-    createLyrics() {
+    createLabel() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("div:contains(Lyrics)+div").first().text());
+            resolve($("div.naboo-album-label").first().text().match(/\| \t+(.+?)\t+/)[1]);
         });
     }
-    createMp3() {
+    createLanguage() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
-            let mp3 = json.DATA.MD5_ORIGIN + "¤3¤" + json.DATA.SNG_ID + "¤" + json.DATA.MEDIA_VERSION;
-            mp3 = crypto.createHash("md5").update(mp3, "ascii").digest("hex") + "¤" + mp3 + "¤";
-            while (mp3.length % 16 > 0) {
-                mp3 += " ";
-            }
-            mp3 = "http://e-cdn-proxy-0.deezer.com/mobile/1/"
-                + crypto.createCipheriv("aes-128-ecb", "jo6aey6haid2Teih", "").update(mp3, "ascii", "hex");
-            resolve(mp3);
+            resolve("English");
+        });
+    }
+    createReleased() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            resolve(moment($("span#naboo_album_head_style")
+                .first().text().match(/\| (.+?)\t+/)[1], "DD-MM-YYYY").format("MMM DD YYYY"));
         });
     }
     createTitle() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("h1#naboo_track_title").first().text().trim());
-        });
-    }
-    createTrack() {
-        return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
-            resolve(parseInt(json.DATA.TRACK_NUMBER));
-        });
-    }
-    createAlbum() {
-        return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
-            let albumOutput = this.output.album;
-            if (!albumOutput) {
-                albumOutput = new album_output_1.default();
-            }
-            albumOutput.url = "http://www.deezer.com/en/album/" + json.DATA.ALB_ID;
-            albumOutput.title = json.DATA.ALB_TITLE;
-            resolve(albumOutput);
+            resolve($("h1#naboo_album_title").first().text().trim());
         });
     }
     createArtists() {
@@ -97,19 +82,38 @@ class DeezerSongParser extends song_parser_1.default {
             if (!artistOutputs) {
                 artistOutputs = [];
             }
-            for (let i = 1; i < json.DATA.ARTISTS.length; i++) {
+            for (let i = 0; i < json.DATA.ARTISTS.length; i++) {
                 let artistOutput = artistOutputs[i];
                 if (!artistOutput) {
                     artistOutput = new artist_output_1.default();
                 }
                 artistOutput.url = "http://www.deezer.com/en/artist/" + json.DATA.ARTISTS[i].ART_ID;
                 artistOutput.title = json.DATA.ARTISTS[i].ART_NAME;
-                artistOutputs[i - 1] = artistOutput;
+                artistOutputs[i] = artistOutput;
             }
             resolve(artistOutputs);
         });
     }
+    createSongs() {
+        return new Promise(resolve => {
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let songOutputs = this.output.songs;
+            if (!songOutputs) {
+                songOutputs = [];
+            }
+            for (let i = 0; i < json.SONGS.data.length; i++) {
+                let songOutput = songOutputs[i];
+                if (!songOutput) {
+                    songOutput = new song_output_1.default();
+                }
+                songOutput.url = "http://www.deezer.com/en/track/" + json.SONGS.data[i].SNG_ID;
+                songOutput.title = json.SONGS.data[i].SNG_TITLE;
+                songOutputs[i] = songOutput;
+            }
+            resolve(songOutputs);
+        });
+    }
 }
-exports.default = DeezerSongParser;
+exports.default = DeezerAlbumParser;
 
-//# sourceMappingURL=deezer_song_parser.js.map
+//# sourceMappingURL=deezer_album_parser.js.map

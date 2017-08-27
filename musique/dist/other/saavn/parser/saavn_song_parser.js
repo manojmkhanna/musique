@@ -48,7 +48,7 @@ class SaavnSongParser extends song_parser_1.default {
     createDuration() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("h2.page-subtitle").first().text().match(/ · (.+)$/)[1]);
+            resolve($("h2.page-subtitle").first().text().match(/ · (.+)/)[1]);
         });
     }
     createLyrics() {
