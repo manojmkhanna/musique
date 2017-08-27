@@ -81,7 +81,18 @@ let startTime = new Date().getTime();
 //         console.error(error);
 //     });
 
-musique.parseArtist("deezer", "http://www.deezer.com/en/artist/5828")
+// musique.parseArtist("deezer", "http://www.deezer.com/en/artist/5828")
+//     .then(parser => parser.parse())
+//     .then(parser => {
+//         console.log(JSON.stringify(parser.output, null, 2));
+//         console.log("");
+//         console.log("Run time: " + (new Date().getTime() - startTime) / 1000 + "s");
+//     })
+//     .catch(error => {
+//         console.error(error);
+//     });
+
+musique.parsePlaylist("deezer", "http://www.deezer.com/en/playlist/1043463931")
     .then(parser => parser.parse())
     .then(parser => {
         console.log(JSON.stringify(parser.output, null, 2));
