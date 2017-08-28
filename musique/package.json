@@ -1,8 +1,8 @@
 {
   "name": "musique",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "",
-  "main": "dist/example.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "gulp build",
@@ -18,7 +18,7 @@
     "bluebird": "^3.5.0",
     "cheerio": "^1.0.0-rc.2",
     "moment": "^2.18.1",
-    "parsque": "^1.0.6",
+    "parsque": "^1.0.7",
     "request": "^2.81.0",
     "request-promise": "^4.2.1"
   },
@@ -26,8 +26,8 @@
     "@types/bluebird": "^3.5.8",
     "@types/cheerio": "^0.22.2",
     "@types/moment": "^2.13.0",
-    "@types/node": "^8.0.20",
-    "@types/request": "^2.0.2",
+    "@types/node": "^8.0.25",
+    "@types/request": "^2.0.3",
     "@types/request-promise": "^4.1.37",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
