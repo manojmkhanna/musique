@@ -26,8 +26,8 @@ class AlbumParser extends base_parser_1.default {
             .then(() => this.parseArt())
             .then(() => this.parseLabel())
             .then(() => this.parseLanguage())
-            .then(() => this.parseReleased())
             .then(() => this.parseTitle())
+            .then(() => this.parseYear())
             .then(() => this.parseArtists())
             .then(() => this.parseSongs());
     }
@@ -46,12 +46,12 @@ class AlbumParser extends base_parser_1.default {
             resolve();
         });
     }
-    createReleased() {
+    createTitle() {
         return new Promise(resolve => {
             resolve();
         });
     }
-    createTitle() {
+    createYear() {
         return new Promise(resolve => {
             resolve();
         });
@@ -75,11 +75,11 @@ class AlbumParser extends base_parser_1.default {
     parseLanguage() {
         return this.parseValue("language", () => this.createLanguage());
     }
-    parseReleased() {
-        return this.parseValue("released", () => this.createReleased());
-    }
     parseTitle() {
         return this.parseValue("title", () => this.createTitle());
+    }
+    parseYear() {
+        return this.parseValue("year", () => this.createYear());
     }
     parseArtists(outputsParser, ...indexes) {
         if (outputsParser == undefined) {

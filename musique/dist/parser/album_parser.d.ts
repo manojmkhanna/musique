@@ -16,15 +16,15 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
     protected createArt(): Promise<string>;
     protected createLabel(): Promise<string>;
     protected createLanguage(): Promise<string>;
-    protected createReleased(): Promise<string>;
     protected createTitle(): Promise<string>;
+    protected createYear(): Promise<number>;
     protected createArtists(): Promise<ArtistOutput[]>;
     protected createSongs(): Promise<SongOutput[]>;
     parseArt(): Promise<this>;
     parseLabel(): Promise<this>;
     parseLanguage(): Promise<this>;
-    parseReleased(): Promise<this>;
     parseTitle(): Promise<this>;
+    parseYear(): Promise<this>;
     parseArtists(outputsParser?: (childParser: ArtistParser, index: number) => Promise<any>, ...indexes: number[]): Promise<this>;
     parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>, ...indexes: number[]): Promise<this>;
 }

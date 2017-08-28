@@ -80,19 +80,19 @@ export default class SaavnAlbumParser extends AlbumParser {
         });
     }
 
-    protected createReleased(): Promise<string> {
-        return new Promise<string>(resolve => {
-            let $ = cheerio.load(this.content.html);
-
-            resolve($("p.copyright").first().text().match(/Released (.+)©/)![1].replace(",", ""));
-        });
-    }
-
     protected createTitle(): Promise<string> {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
             resolve($("h1.page-title").first().text());
+        });
+    }
+
+    protected createYear(): Promise<number> {
+        return new Promise<number>(resolve => {
+            let $ = cheerio.load(this.content.html);
+
+            resolve(parseInt($("p.copyright>a").first().text()));
         });
     }
 

@@ -5,8 +5,8 @@ export default class AlbumOutput extends BaseOutput {
     art: string;
     label: string;
     language: string;
-    released: string;
     title: string;
+    year: string;
     artists: ArtistOutput[];
     songs: SongOutput[];
 }

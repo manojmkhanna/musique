@@ -62,16 +62,16 @@ class SaavnAlbumParser extends album_parser_1.default {
             resolve($("div.header-context>a").first().text());
         });
     }
-    createReleased() {
-        return new Promise(resolve => {
-            let $ = cheerio.load(this.content.html);
-            resolve($("p.copyright").first().text().match(/Released (.+)©/)[1].replace(",", ""));
-        });
-    }
     createTitle() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
             resolve($("h1.page-title").first().text());
+        });
+    }
+    createYear() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            resolve(parseInt($("p.copyright>a").first().text()));
         });
     }
     createArtists() {

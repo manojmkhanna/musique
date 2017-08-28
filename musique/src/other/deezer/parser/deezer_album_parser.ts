@@ -1,7 +1,6 @@
 import * as Promise from "bluebird";
 import * as request from "request-promise";
 import * as cheerio from "cheerio";
-import * as moment from "moment";
 
 import AlbumParser from "../../../parser/album_parser";
 import AlbumContent from "../../../content/album_content";
@@ -79,20 +78,19 @@ export default class DeezerAlbumParser extends AlbumParser {
         });
     }
 
-    protected createReleased(): Promise<string> {
-        return new Promise<string>(resolve => {
-            let $ = cheerio.load(this.content.html);
-
-            resolve(moment($("span#naboo_album_head_style")
-                .first().text().match(/\| (.+?)\t+/)![1], "DD-MM-YYYY").format("MMM DD YYYY"));
-        });
-    }
-
     protected createTitle(): Promise<string> {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
             resolve($("h1#naboo_album_title").first().text().trim());
+        });
+    }
+
+    protected createYear(): Promise<number> {
+        return new Promise<number>(resolve => {
+            let $ = cheerio.load(this.content.html);
+
+            resolve(parseInt($("div.naboo-album-label").first().text().match(/\t+(\d+?) \|/)![1]));
         });
     }
 

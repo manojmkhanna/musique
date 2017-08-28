@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
 const request = require("request-promise");
 const cheerio = require("cheerio");
-const moment = require("moment");
 const album_parser_1 = require("../../../parser/album_parser");
 const album_content_1 = require("../../../content/album_content");
 const deezer_constants_1 = require("../deezer_constants");
@@ -62,17 +61,16 @@ class DeezerAlbumParser extends album_parser_1.default {
             resolve("English");
         });
     }
-    createReleased() {
-        return new Promise(resolve => {
-            let $ = cheerio.load(this.content.html);
-            resolve(moment($("span#naboo_album_head_style")
-                .first().text().match(/\| (.+?)\t+/)[1], "DD-MM-YYYY").format("MMM DD YYYY"));
-        });
-    }
     createTitle() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
             resolve($("h1#naboo_album_title").first().text().trim());
+        });
+    }
+    createYear() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            resolve(parseInt($("div.naboo-album-label").first().text().match(/\t+(\d+?) \|/)[1]));
         });
     }
     createArtists() {

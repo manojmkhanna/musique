@@ -33,8 +33,8 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
             .then(() => this.parseArt())
             .then(() => this.parseLabel())
             .then(() => this.parseLanguage())
-            .then(() => this.parseReleased())
             .then(() => this.parseTitle())
+            .then(() => this.parseYear())
             .then(() => this.parseArtists())
             .then(() => this.parseSongs());
     }
@@ -57,14 +57,14 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
         });
     }
 
-    protected createReleased(): Promise<string> {
+    protected createTitle(): Promise<string> {
         return new Promise<string>(resolve => {
             resolve();
         });
     }
 
-    protected createTitle(): Promise<string> {
-        return new Promise<string>(resolve => {
+    protected createYear(): Promise<number> {
+        return new Promise<number>(resolve => {
             resolve();
         });
     }
@@ -93,12 +93,12 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
         return this.parseValue("language", () => this.createLanguage());
     }
 
-    public parseReleased(): Promise<this> {
-        return this.parseValue("released", () => this.createReleased());
-    }
-
     public parseTitle(): Promise<this> {
         return this.parseValue("title", () => this.createTitle());
+    }
+
+    public parseYear(): Promise<this> {
+        return this.parseValue("year", () => this.createYear());
     }
 
     public parseArtists(outputsParser?: (childParser: ArtistParser, index: number) => Promise<any>,
