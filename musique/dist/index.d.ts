@@ -1,10 +1,26 @@
 /// <reference types="bluebird" />
 import * as Promise from "bluebird";
+import SongInput from "./input/song_input";
+import SongOutput from "./output/song_output";
+import SongContent from "./content/song_content";
 import SongParser from "./parser/song_parser";
+import AlbumInput from "./input/album_input";
+import AlbumOutput from "./output/album_output";
+import AlbumContent from "./content/album_content";
 import AlbumParser from "./parser/album_parser";
+import ArtistInput from "./input/artist_input";
+import ArtistOutput from "./output/artist_output";
+import ArtistContent from "./content/artist_content";
 import ArtistParser from "./parser/artist_parser";
+import PlaylistInput from "./input/playlist_input";
+import PlaylistOutput from "./output/playlist_output";
+import PlaylistContent from "./content/playlist_content";
 import PlaylistParser from "./parser/playlist_parser";
+import SearchInput from "./input/search_input";
+import SearchOutput from "./output/search_output";
+import SearchContent from "./content/search_content";
 import SearchParser from "./parser/search_parser";
+export { SongInput, SongOutput, SongContent, SongParser, AlbumInput, AlbumOutput, AlbumContent, AlbumParser, ArtistInput, ArtistOutput, ArtistContent, ArtistParser, PlaylistInput, PlaylistOutput, PlaylistContent, PlaylistParser, SearchInput, SearchOutput, SearchContent, SearchParser };
 export declare type PlatformName = "deezer" | "saavn";
 export declare function parseSong(platformName: PlatformName, url: string): Promise<SongParser>;
 export declare function parseAlbum(platformName: PlatformName, url: string): Promise<AlbumParser>;

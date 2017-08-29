@@ -1,23 +1,41 @@
 import * as Promise from "bluebird";
 
+import SongInput from "./input/song_input";
+import SongOutput from "./output/song_output";
+import SongContent from "./content/song_content";
+import SongParser from "./parser/song_parser";
+import AlbumInput from "./input/album_input";
+import AlbumOutput from "./output/album_output";
+import AlbumContent from "./content/album_content";
+import AlbumParser from "./parser/album_parser";
+import ArtistInput from "./input/artist_input";
+import ArtistOutput from "./output/artist_output";
+import ArtistContent from "./content/artist_content";
+import ArtistParser from "./parser/artist_parser";
+import PlaylistInput from "./input/playlist_input";
+import PlaylistOutput from "./output/playlist_output";
+import PlaylistContent from "./content/playlist_content";
+import PlaylistParser from "./parser/playlist_parser";
+import SearchInput from "./input/search_input";
+import SearchOutput from "./output/search_output";
+import SearchContent from "./content/search_content";
+import SearchParser from "./parser/search_parser";
 import Platform from "./platform/platform";
 import DeezerPlatform from "./other/deezer/deezer_platform";
 import SaavnPlatform from "./other/saavn/saavn_platform";
-import SongParser from "./parser/song_parser";
-import SongInput from "./input/song_input";
-import AlbumParser from "./parser/album_parser";
-import AlbumInput from "./input/album_input";
-import ArtistParser from "./parser/artist_parser";
-import ArtistInput from "./input/artist_input";
-import PlaylistParser from "./parser/playlist_parser";
-import PlaylistInput from "./input/playlist_input";
-import SearchParser from "./parser/search_parser";
-import SearchInput from "./input/search_input";
+
+export {
+    SongInput, SongOutput, SongContent, SongParser,
+    AlbumInput, AlbumOutput, AlbumContent, AlbumParser,
+    ArtistInput, ArtistOutput, ArtistContent, ArtistParser,
+    PlaylistInput, PlaylistOutput, PlaylistContent, PlaylistParser,
+    SearchInput, SearchOutput, SearchContent, SearchParser
+};
+
+export type PlatformName = "deezer" | "saavn";
 
 let deezerPlatform: DeezerPlatform;
 let saavnPlatform: SaavnPlatform;
-
-export type PlatformName = "deezer" | "saavn";
 
 function createPlatform(platformName: PlatformName): Platform {
     if (platformName === "deezer") {
