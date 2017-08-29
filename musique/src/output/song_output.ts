@@ -8,7 +8,7 @@ export default class SongOutput extends BaseOutput {
     public lyrics: string;
     public mp3: string;
     public title: string;
-    public track: number;
+    public track: string;
     public album: AlbumOutput;
     public artists: ArtistOutput[];
 }

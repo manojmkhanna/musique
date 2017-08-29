@@ -95,8 +95,8 @@ export default class SaavnSongParser extends SongParser {
         });
     }
 
-    protected createTrack(): Promise<number> {
-        return new Promise<number>((resolve, reject) => {
+    protected createTrack(): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
 
             let id = JSON.parse($("div.song-json").first().text()).songid;
@@ -105,7 +105,7 @@ export default class SaavnSongParser extends SongParser {
                 .then(html => {
                     let $ = cheerio.load(html);
 
-                    resolve(parseInt($("li.song-wrap[data-songid=" + id + "]>div.index").first().text()));
+                    resolve($("li.song-wrap[data-songid=" + id + "]>div.index").first().text());
                 })
                 .catch(error => {
                     reject(error);

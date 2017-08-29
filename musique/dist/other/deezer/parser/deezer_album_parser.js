@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
 const request = require("request-promise");
 const cheerio = require("cheerio");
+const moment = require("moment");
 const album_parser_1 = require("../../../parser/album_parser");
 const album_content_1 = require("../../../content/album_content");
 const deezer_constants_1 = require("../deezer_constants");
@@ -48,6 +49,13 @@ class DeezerAlbumParser extends album_parser_1.default {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
             resolve($("img#naboo_album_image").first().attr("src").replace("200x200", "512x512"));
+        });
+    }
+    createDate() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            resolve(moment($("span#naboo_album_head_style")
+                .first().text().match(/\| (.+?)\t+/)[1], "DD-MM-YYYY").format("YYYY-MM-DD"));
         });
     }
     createLabel() {

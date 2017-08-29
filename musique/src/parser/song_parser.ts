@@ -70,8 +70,8 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
         });
     }
 
-    protected createTrack(): Promise<number> {
-        return new Promise<number>(resolve => {
+    protected createTrack(): Promise<string> {
+        return new Promise<string>(resolve => {
             resolve();
         });
     }

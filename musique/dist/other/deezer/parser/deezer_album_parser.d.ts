@@ -8,6 +8,7 @@ export default class DeezerAlbumParser extends AlbumParser {
     protected createContent(): Promise<AlbumContent>;
     protected contentCreated(): Promise<void>;
     protected createArt(): Promise<string>;
+    protected createDate(): Promise<string>;
     protected createLabel(): Promise<string>;
     protected createLanguage(): Promise<string>;
     protected createTitle(): Promise<string>;

@@ -31,6 +31,7 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
     public parse(): Promise<this> {
         return super.parse()
             .then(() => this.parseArt())
+            .then(() => this.parseDate())
             .then(() => this.parseLabel())
             .then(() => this.parseLanguage())
             .then(() => this.parseTitle())
@@ -40,6 +41,12 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
     }
 
     protected createArt(): Promise<string> {
+        return new Promise<string>(resolve => {
+            resolve();
+        });
+    }
+
+    protected createDate(): Promise<string> {
         return new Promise<string>(resolve => {
             resolve();
         });
@@ -63,8 +70,8 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
         });
     }
 
-    protected createYear(): Promise<number> {
-        return new Promise<number>(resolve => {
+    protected createYear(): Promise<string> {
+        return new Promise<string>(resolve => {
             resolve();
         });
     }
@@ -83,6 +90,10 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
 
     public parseArt(): Promise<this> {
         return this.parseValue("art", () => this.createArt());
+    }
+
+    public parseDate(): Promise<this> {
+        return this.parseValue("date", () => this.createDate());
     }
 
     public parseLabel(): Promise<this> {

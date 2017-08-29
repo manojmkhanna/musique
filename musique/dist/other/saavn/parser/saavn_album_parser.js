@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
 const request = require("request-promise");
 const cheerio = require("cheerio");
+const moment = require("moment");
 const album_parser_1 = require("../../../parser/album_parser");
 const album_content_1 = require("../../../content/album_content");
 const saavn_constants_1 = require("../saavn_constants");
@@ -48,6 +49,13 @@ class SaavnAlbumParser extends album_parser_1.default {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
             resolve($("div.art>img").first().attr("src"));
+        });
+    }
+    createDate() {
+        return new Promise(resolve => {
+            let $ = cheerio.load(this.content.html);
+            resolve(moment($("p.copyright").first().text()
+                .match(/Released (.+)©/)[1], "MMM DD, YYYY").format("YYYY-MM-DD"));
         });
     }
     createLabel() {

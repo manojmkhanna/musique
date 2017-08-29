@@ -93,11 +93,11 @@ export default class DeezerSongParser extends SongParser {
         });
     }
 
-    protected createTrack(): Promise<number> {
-        return new Promise<number>(resolve => {
+    protected createTrack(): Promise<string> {
+        return new Promise<string>(resolve => {
             let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)![1]);
 
-            resolve(parseInt(json.DATA.TRACK_NUMBER));
+            resolve(json.DATA.TRACK_NUMBER);
         });
     }
 
