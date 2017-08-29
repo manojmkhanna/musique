@@ -75,7 +75,7 @@ class DeezerSongParser extends song_parser_1.default {
     createTrack() {
         return new Promise(resolve => {
             let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
-            resolve(parseInt(json.DATA.TRACK_NUMBER));
+            resolve(json.DATA.TRACK_NUMBER);
         });
     }
     createAlbum() {

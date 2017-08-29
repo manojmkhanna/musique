@@ -18,7 +18,7 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     protected createLyrics(): Promise<string>;
     protected createMp3(): Promise<string>;
     protected createTitle(): Promise<string>;
-    protected createTrack(): Promise<number>;
+    protected createTrack(): Promise<string>;
     protected createAlbum(): Promise<AlbumOutput>;
     protected createArtists(): Promise<ArtistOutput[]>;
     parseDuration(): Promise<this>;

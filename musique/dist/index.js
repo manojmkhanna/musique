@@ -72,13 +72,5 @@ function parseSearch(platformName, query) {
     }));
 }
 exports.parseSearch = parseSearch;
-parseAlbum("deezer", "http://www.deezer.com/en/album/43480531")
-    .then(parser => parser.parse())
-    .then(parser => {
-    console.log(JSON.stringify(parser.output, null, 2));
-})
-    .catch(error => {
-    console.error(error);
-});
 
 //# sourceMappingURL=index.js.map

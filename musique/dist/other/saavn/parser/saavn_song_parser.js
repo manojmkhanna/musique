@@ -85,7 +85,7 @@ class SaavnSongParser extends song_parser_1.default {
             request.get(this.input.album.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let $ = cheerio.load(html);
-                resolve(parseInt($("li.song-wrap[data-songid=" + id + "]>div.index").first().text()));
+                resolve($("li.song-wrap[data-songid=" + id + "]>div.index").first().text());
             })
                 .catch(error => {
                 reject(error);

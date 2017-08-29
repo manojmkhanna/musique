@@ -79,7 +79,7 @@ class SaavnAlbumParser extends album_parser_1.default {
     createYear() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve(parseInt($("p.copyright>a").first().text()));
+            resolve($("p.copyright>a").first().text());
         });
     }
     createArtists() {

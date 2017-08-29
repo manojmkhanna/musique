@@ -78,7 +78,7 @@ class DeezerAlbumParser extends album_parser_1.default {
     createYear() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve(parseInt($("div.naboo-album-label").first().text().match(/\t+(\d+?) \|/)[1]));
+            resolve($("div.naboo-album-label").first().text().match(/\t+(\d+?) \|/)[1]);
         });
     }
     createArtists() {
