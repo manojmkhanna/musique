@@ -2,10 +2,11 @@ import * as Promise from "bluebird";
 import * as mkdirp from "mkdirp";
 import * as fs from "fs";
 import * as request from "request";
-import * as Jimp from "jimp";
+import * as jimp from "jimp";
 import * as musique from "musique";
 
-const nodeID3 = require("node-id3");
+const nodeID3v23 = require("node-id3");
+const nodeID3v24 = require("node-id3v2.4");
 
 function downloadMp3(songOutput: any, albumOutput: any): Promise<void> {
     let dirName: string, mp3Name: string, artName: string;
@@ -26,7 +27,7 @@ function downloadMp3(songOutput: any, albumOutput: any): Promise<void> {
             resolve();
         });
     }).then(() => {
-        mp3Name = dirName + songOutput.title + ".mp3";
+        mp3Name = dirName + songOutput.track + " - " + songOutput.title + ".mp3";
         mp3Name = mp3Name.replace(/[\\:*?"<>|]/g, "");
 
         return new Promise<void>((resolve, reject) => {
@@ -40,7 +41,7 @@ function downloadMp3(songOutput: any, albumOutput: any): Promise<void> {
                 });
         });
     }).then(() => {
-        artName = dirName + songOutput.title + ".png";
+        artName = dirName + songOutput.track + " - " + songOutput.title + ".png";
         artName = artName.replace(/[\\:*?"<>|]/g, "");
 
         return new Promise<void>((resolve, reject) => {
@@ -50,9 +51,9 @@ function downloadMp3(songOutput: any, albumOutput: any): Promise<void> {
                 })
                 .pipe(fs.createWriteStream(artName))
                 .on("finish", () => {
-                    Jimp.read(artName)
+                    jimp.read(artName)
                         .then(image => {
-                            image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
+                            image.resize(512, 512, jimp.RESIZE_NEAREST_NEIGHBOR)
                                 .write(artName, error => {
                                     if (error) {
                                         reject(error);
@@ -68,9 +69,9 @@ function downloadMp3(songOutput: any, albumOutput: any): Promise<void> {
                 });
         });
     }).then(() => {
-        nodeID3.removeTags(mp3Name);
+        nodeID3v23.removeTags(mp3Name);
 
-        nodeID3.write({
+        nodeID3v23.write({
             album: albumOutput.title,
             artist: songOutput.artists.map((artist: any) => artist.title).join("; "),
             genre: songOutput.genre,
@@ -81,9 +82,11 @@ function downloadMp3(songOutput: any, albumOutput: any): Promise<void> {
             title: songOutput.title,
             trackNumber: songOutput.track,
             year: albumOutput.year,
-        }, mp3Name)
+        }, mp3Name);
 
-        //TODO
+        let tag = nodeID3v24.readTag(mp3Name);
+        tag.addFrame("TDRL", [albumOutput.date]);
+        tag.write();
     }).then(() => {
         return new Promise<void>((resolve, reject) => {
             fs.unlink(artName, error => {
