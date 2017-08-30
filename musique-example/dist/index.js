@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const musique = require("musique");
 const Promise = require("bluebird");
 const mkdirp = require("mkdirp");
 const fs = require("fs");
 const request = require("request");
 const jimp = require("jimp");
-const musique = require("musique");
 const nodeID3v23 = require("node-id3");
 const nodeID3v24 = require("node-id3v2.4");
 function downloadMp3(songOutput, albumOutput) {
-    let dirName, mp3Name, artName;
+    let dirName, mp3FileName, artFileName;
     return new Promise((resolve, reject) => {
         dirName = "./Songs/"
             + albumOutput.language + "/"
@@ -23,33 +23,35 @@ function downloadMp3(songOutput, albumOutput) {
             }
             resolve();
         });
-    }).then(() => {
-        mp3Name = dirName + songOutput.track + " - " + songOutput.title + ".mp3";
-        mp3Name = mp3Name.replace(/[\\:*?"<>|]/g, "");
-        // return new Promise<void>((resolve, reject) => {
-        //     request.get(songOutput.mp3)
-        //         .on("error", error => {
-        //             reject(error);
-        //         })
-        //         .pipe(fs.createWriteStream(mp3Name))
-        //         .on("finish", () => {
-        //             resolve();
-        //         });
-        // });
-    }).then(() => {
-        artName = dirName + songOutput.track + " - " + songOutput.title + ".png";
-        artName = artName.replace(/[\\:*?"<>|]/g, "");
+    })
+        .then(() => {
+        mp3FileName = dirName + songOutput.track + " - " + songOutput.title + ".mp3";
+        mp3FileName = mp3FileName.replace(/[\\:*?"<>|]/g, "");
+        return new Promise((resolve, reject) => {
+            request.get(songOutput.mp3)
+                .on("error", error => {
+                reject(error);
+            })
+                .pipe(fs.createWriteStream(mp3FileName))
+                .on("finish", () => {
+                resolve();
+            });
+        });
+    })
+        .then(() => {
+        artFileName = dirName + songOutput.track + " - " + songOutput.title + ".png";
+        artFileName = artFileName.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
             request.get(albumOutput.art)
                 .on("error", error => {
                 reject(error);
             })
-                .pipe(fs.createWriteStream(artName))
+                .pipe(fs.createWriteStream(artFileName))
                 .on("finish", () => {
-                jimp.read(artName)
+                jimp.read(artFileName)
                     .then(image => {
                     image.resize(512, 512, jimp.RESIZE_NEAREST_NEIGHBOR)
-                        .write(artName, error => {
+                        .write(artFileName, error => {
                         if (error) {
                             reject(error);
                             return;
@@ -62,27 +64,28 @@ function downloadMp3(songOutput, albumOutput) {
                 });
             });
         });
-    }).then(() => {
-        nodeID3v23.removeTags(mp3Name);
+    })
+        .then(() => {
+        nodeID3v23.removeTags(mp3FileName);
         nodeID3v23.write({
             album: albumOutput.title,
             artist: songOutput.artists.map((artist) => artist.title).join("; "),
             genre: songOutput.genre,
-            image: artName,
+            image: artFileName,
             language: albumOutput.language,
             performerInfo: albumOutput.artists.map((artist) => artist.title).join("; "),
             publisher: albumOutput.label,
             title: songOutput.title,
-            trackNumber: songOutput.track + "/4",
+            trackNumber: songOutput.track,
             year: albumOutput.year,
-        }, mp3Name);
-        let tag = nodeID3v24.readTag(mp3Name);
-        tag.addFrame("TDRL", ["2017-07-15"]);
+        }, mp3FileName);
+        let tag = nodeID3v24.readTag(mp3FileName);
+        tag.addFrame("TDRL", [albumOutput.date]);
         tag.write();
-        console.log(nodeID3v24.readTag(mp3Name).list());
-    }).then(() => {
+    })
+        .then(() => {
         return new Promise((resolve, reject) => {
-            fs.unlink(artName, error => {
+            fs.unlink(artFileName, error => {
                 if (error) {
                     reject(error);
                     return;
