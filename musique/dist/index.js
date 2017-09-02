@@ -63,7 +63,8 @@ function createPlatform(platformName) {
     }
 }
 function parseSong(platformName, url) {
-    return createPlatform(platformName).createSongParser()
+    return createPlatform(platformName)
+        .createSongParser()
         .create(() => new Promise(resolve => {
         let input = new song_input_1.default();
         input.url = url;
@@ -72,7 +73,8 @@ function parseSong(platformName, url) {
 }
 exports.parseSong = parseSong;
 function parseAlbum(platformName, url) {
-    return createPlatform(platformName).createAlbumParser()
+    return createPlatform(platformName)
+        .createAlbumParser()
         .create(() => new Promise(resolve => {
         let input = new album_input_1.default();
         input.url = url;
@@ -81,7 +83,8 @@ function parseAlbum(platformName, url) {
 }
 exports.parseAlbum = parseAlbum;
 function parseArtist(platformName, url) {
-    return createPlatform(platformName).createArtistParser()
+    return createPlatform(platformName)
+        .createArtistParser()
         .create(() => new Promise(resolve => {
         let input = new artist_input_1.default();
         input.url = url;
@@ -90,7 +93,8 @@ function parseArtist(platformName, url) {
 }
 exports.parseArtist = parseArtist;
 function parsePlaylist(platformName, url) {
-    return createPlatform(platformName).createPlaylistParser()
+    return createPlatform(platformName)
+        .createPlaylistParser()
         .create(() => new Promise(resolve => {
         let input = new playlist_input_1.default();
         input.url = url;
@@ -99,7 +103,8 @@ function parsePlaylist(platformName, url) {
 }
 exports.parsePlaylist = parsePlaylist;
 function parseSearch(platformName, query) {
-    return createPlatform(platformName).createSearchParser()
+    return createPlatform(platformName)
+        .createSearchParser()
         .create(() => new Promise(resolve => {
         let input = new search_input_1.default();
         input.query = query;

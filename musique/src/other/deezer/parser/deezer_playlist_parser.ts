@@ -34,7 +34,7 @@ export default class DeezerPlaylistParser extends PlaylistParser {
                 let songInput = new SongInput();
                 songInput.url = "http://www.deezer.com/en/track/" + json.SONGS.data[i].SNG_ID;
 
-                songInputs.push(songInput);
+                songInputs[i] = songInput;
             }
 
             this.input.songs = songInputs;

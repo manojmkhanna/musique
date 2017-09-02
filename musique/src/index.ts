@@ -21,6 +21,7 @@ import SearchOutput from "./output/search_output";
 import SearchContent from "./content/search_content";
 import SearchParser from "./parser/search_parser";
 import Platform from "./platform/platform";
+import {PlatformName} from "./platform/platform_name";
 import DeezerPlatform from "./other/deezer/deezer_platform";
 import SaavnPlatform from "./other/saavn/saavn_platform";
 
@@ -31,8 +32,6 @@ export {
     PlaylistInput, PlaylistOutput, PlaylistContent, PlaylistParser,
     SearchInput, SearchOutput, SearchContent, SearchParser
 };
-
-export type PlatformName = "deezer" | "saavn";
 
 let deezerPlatform: DeezerPlatform;
 let saavnPlatform: SaavnPlatform;
@@ -55,8 +54,10 @@ function createPlatform(platformName: PlatformName): Platform {
     }
 }
 
-export function parseSong(platformName: PlatformName, url: string): Promise<SongParser> {
-    return createPlatform(platformName).createSongParser()
+export function parseSong(platformName: PlatformName,
+                          url: string): Promise<SongParser> {
+    return createPlatform(platformName)
+        .createSongParser()
         .create(() => new Promise<SongInput>(resolve => {
             let input = new SongInput();
             input.url = url;
@@ -65,8 +66,10 @@ export function parseSong(platformName: PlatformName, url: string): Promise<Song
         }));
 }
 
-export function parseAlbum(platformName: PlatformName, url: string): Promise<AlbumParser> {
-    return createPlatform(platformName).createAlbumParser()
+export function parseAlbum(platformName: PlatformName,
+                           url: string): Promise<AlbumParser> {
+    return createPlatform(platformName)
+        .createAlbumParser()
         .create(() => new Promise<AlbumInput>(resolve => {
             let input = new AlbumInput();
             input.url = url;
@@ -75,8 +78,10 @@ export function parseAlbum(platformName: PlatformName, url: string): Promise<Alb
         }));
 }
 
-export function parseArtist(platformName: PlatformName, url: string): Promise<ArtistParser> {
-    return createPlatform(platformName).createArtistParser()
+export function parseArtist(platformName: PlatformName,
+                            url: string): Promise<ArtistParser> {
+    return createPlatform(platformName)
+        .createArtistParser()
         .create(() => new Promise<ArtistInput>(resolve => {
             let input = new ArtistInput();
             input.url = url;
@@ -85,8 +90,10 @@ export function parseArtist(platformName: PlatformName, url: string): Promise<Ar
         }));
 }
 
-export function parsePlaylist(platformName: PlatformName, url: string): Promise<PlaylistParser> {
-    return createPlatform(platformName).createPlaylistParser()
+export function parsePlaylist(platformName: PlatformName,
+                              url: string): Promise<PlaylistParser> {
+    return createPlatform(platformName)
+        .createPlaylistParser()
         .create(() => new Promise<PlaylistInput>(resolve => {
             let input = new PlaylistInput();
             input.url = url;
@@ -95,8 +102,10 @@ export function parsePlaylist(platformName: PlatformName, url: string): Promise<
         }));
 }
 
-export function parseSearch(platformName: PlatformName, query: string): Promise<SearchParser> {
-    return createPlatform(platformName).createSearchParser()
+export function parseSearch(platformName: PlatformName,
+                            query: string): Promise<SearchParser> {
+    return createPlatform(platformName)
+        .createSearchParser()
         .create(() => new Promise<SearchInput>(resolve => {
             let input = new SearchInput();
             input.query = query;

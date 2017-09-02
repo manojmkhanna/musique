@@ -1,6 +1,6 @@
 {
   "name": "musique",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "bluebird": "^3.5.0",
     "cheerio": "^1.0.0-rc.2",
     "moment": "^2.18.1",
-    "parsque": "^1.0.9",
+    "parsque": "^1.0.10",
     "request": "^2.81.0",
     "request-promise": "^4.2.1"
   },
@@ -32,6 +32,6 @@
     "gulp-nodemon": "^2.2.1",
     "gulp-sourcemaps": "^2.6.1",
     "gulp-typescript": "^3.2.2",
-    "typescript": "^2.5.1"
+    "typescript": "^2.5.2"
   }
 }

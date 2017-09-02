@@ -7,6 +7,9 @@ const saavn_artist_parser_1 = require("./parser/saavn_artist_parser");
 const saavn_playlist_parser_1 = require("./parser/saavn_playlist_parser");
 const saavn_search_parser_1 = require("./parser/saavn_search_parser");
 class SaavnPlatform extends platform_1.default {
+    constructor() {
+        super("saavn");
+    }
     createSongParser() {
         return new saavn_song_parser_1.default(this);
     }

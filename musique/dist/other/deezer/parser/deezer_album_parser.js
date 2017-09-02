@@ -32,14 +32,14 @@ class DeezerAlbumParser extends album_parser_1.default {
             for (let i = 0; i < json.DATA.ARTISTS.length; i++) {
                 let artistInput = new artist_input_1.default();
                 artistInput.url = "http://www.deezer.com/en/artist/" + json.DATA.ARTISTS[i].ART_ID;
-                artistInputs.push(artistInput);
+                artistInputs[i] = artistInput;
             }
             this.input.artists = artistInputs;
             let songInputs = [];
             for (let i = 0; i < json.SONGS.data.length; i++) {
                 let songInput = new song_input_1.default();
                 songInput.url = "http://www.deezer.com/en/track/" + json.SONGS.data[i].SNG_ID;
-                songInputs.push(songInput);
+                songInputs[i] = songInput;
             }
             this.input.songs = songInputs;
             resolve();

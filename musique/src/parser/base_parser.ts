@@ -8,7 +8,7 @@ import Platform from "../platform/platform";
 
 export default class BaseParser<I extends BaseInput,
     O extends BaseOutput, C extends BaseContent> extends Parser<I, O, C> {
-    public constructor(protected platform: Platform) {
+    public constructor(protected readonly platform: Platform) {
         super();
     }
 

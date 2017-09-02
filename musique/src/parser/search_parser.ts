@@ -6,16 +6,16 @@ import SearchOutput from "../output/search_output";
 import SearchContent from "../content/search_content";
 import Platform from "../platform/platform";
 import SongOutput from "../output/song_output";
-import SongParser from "./song_parser";
 import AlbumOutput from "../output/album_output";
-import AlbumParser from "./album_parser";
 import ArtistOutput from "../output/artist_output";
-import ArtistParser from "./artist_parser";
 import PlaylistOutput from "../output/playlist_output";
+import SongParser from "./song_parser";
+import AlbumParser from "./album_parser";
+import ArtistParser from "./artist_parser";
 import PlaylistParser from "./playlist_parser";
 
 export default class SearchParser extends Parser<SearchInput, SearchOutput, SearchContent> {
-    public constructor(protected platform: Platform) {
+    public constructor(protected readonly platform: Platform) {
         super();
     }
 

@@ -9,6 +9,7 @@ const song_content_1 = require("../../../content/song_content");
 const saavn_constants_1 = require("../saavn_constants");
 const album_input_1 = require("../../../input/album_input");
 const artist_input_1 = require("../../../input/artist_input");
+const album_content_1 = require("../../../content/album_content");
 const album_output_1 = require("../../../output/album_output");
 const artist_output_1 = require("../../../output/artist_output");
 class SaavnSongParser extends song_parser_1.default {
@@ -66,10 +67,10 @@ class SaavnSongParser extends song_parser_1.default {
     createMp3() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
+            let hash = JSON.parse($("div.song-json").first().text()).url;
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
-            let buffer = Buffer.from(JSON.parse($("div.song-json").first().text()).url, "base64");
-            buffer = Buffer.concat([cipher.update(buffer), cipher.final()]);
-            resolve("https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3");
+            hash = cipher.update(hash, "base64", "ascii") + cipher.final("ascii");
+            resolve("https://h.saavncdn.com" + hash.substr(10) + "_320.mp3");
         });
     }
     createTitle() {
@@ -84,8 +85,29 @@ class SaavnSongParser extends song_parser_1.default {
             let id = JSON.parse($("div.song-json").first().text()).songid;
             request.get(this.input.album.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
+                let albumContent = new album_content_1.default();
+                albumContent.html = html;
+                this.content.album = albumContent;
                 let $ = cheerio.load(html);
                 resolve($("li.song-wrap[data-songid=" + id + "]>div.index").first().text());
+            })
+                .catch(error => {
+                reject(error);
+            });
+        });
+    }
+    createFile() {
+        return new Promise((resolve, reject) => {
+            let $ = cheerio.load(this.content.html);
+            let hash = JSON.parse($("div.song-json").first().text()).url;
+            let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
+            hash = cipher.update(hash, "base64", "ascii") + cipher.final("ascii");
+            let mp3 = "https://h.saavncdn.com" + hash.substr(10) + "_320.mp3";
+            request.get(mp3, {
+                encoding: null,
+            })
+                .then(buffer => {
+                resolve(buffer);
             })
                 .catch(error => {
                 reject(error);

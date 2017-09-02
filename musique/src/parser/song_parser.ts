@@ -5,8 +5,8 @@ import SongInput from "../input/song_input";
 import SongOutput from "../output/song_output";
 import SongContent from "../content/song_content";
 import AlbumOutput from "../output/album_output";
-import AlbumParser from "./album_parser";
 import ArtistOutput from "../output/artist_output";
+import AlbumParser from "./album_parser";
 import ArtistParser from "./artist_parser";
 
 export default class SongParser extends BaseParser<SongInput, SongOutput, SongContent> {
@@ -76,6 +76,12 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
         });
     }
 
+    protected createFile(): Promise<Buffer> {
+        return new Promise<Buffer>(resolve => {
+            resolve();
+        });
+    }
+
     protected createAlbum(): Promise<AlbumOutput> {
         return new Promise<AlbumOutput>(resolve => {
             resolve();
@@ -110,6 +116,10 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
 
     public parseTrack(): Promise<this> {
         return this.parseValue("track", () => this.createTrack());
+    }
+
+    public parseFile(): Promise<this> {
+        return this.parseValue("file", () => this.createFile());
     }
 
     public parseAlbum(outputParser?: (childParser: AlbumParser) => Promise<any>): Promise<this> {

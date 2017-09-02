@@ -6,7 +6,7 @@ import BaseOutput from "../output/base_output";
 import BaseContent from "../content/base_content";
 import Platform from "../platform/platform";
 export default class BaseParser<I extends BaseInput, O extends BaseOutput, C extends BaseContent> extends Parser<I, O, C> {
-    protected platform: Platform;
+    protected readonly platform: Platform;
     constructor(platform: Platform);
     parse(): Promise<this>;
     protected createUrl(): Promise<string>;

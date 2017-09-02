@@ -8,6 +8,7 @@ import SongContent from "../../../content/song_content";
 import SaavnConstants from "../saavn_constants";
 import AlbumInput from "../../../input/album_input";
 import ArtistInput from "../../../input/artist_input";
+import AlbumContent from "../../../content/album_content";
 import AlbumOutput from "../../../output/album_output";
 import ArtistOutput from "../../../output/artist_output";
 
@@ -78,12 +79,13 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
+            let hash = JSON.parse($("div.song-json").first().text()).url;
+
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
 
-            let buffer = Buffer.from(JSON.parse($("div.song-json").first().text()).url, "base64");
-            buffer = Buffer.concat([cipher.update(buffer), cipher.final()]);
+            hash = cipher.update(hash, "base64", "ascii") + cipher.final("ascii");
 
-            resolve("https://h.saavncdn.com" + buffer.toString().substr(10) + "_320.mp3");
+            resolve("https://h.saavncdn.com" + hash.substr(10) + "_320.mp3");
         });
     }
 
@@ -103,9 +105,38 @@ export default class SaavnSongParser extends SongParser {
 
             request.get(this.input.album.url, SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
+                    let albumContent = new AlbumContent();
+                    albumContent.html = html;
+
+                    this.content.album = albumContent;
+
                     let $ = cheerio.load(html);
 
                     resolve($("li.song-wrap[data-songid=" + id + "]>div.index").first().text());
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+    }
+
+    protected createFile(): Promise<Buffer> {
+        return new Promise<Buffer>((resolve, reject) => {
+            let $ = cheerio.load(this.content.html);
+
+            let hash = JSON.parse($("div.song-json").first().text()).url;
+
+            let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
+
+            hash = cipher.update(hash, "base64", "ascii") + cipher.final("ascii");
+
+            let mp3 = "https://h.saavncdn.com" + hash.substr(10) + "_320.mp3";
+
+            request.get(mp3, {
+                encoding: null,
+            })
+                .then(buffer => {
+                    resolve(buffer);
                 })
                 .catch(error => {
                     reject(error);

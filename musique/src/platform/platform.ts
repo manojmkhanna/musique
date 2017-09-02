@@ -5,6 +5,9 @@ import PlaylistParser from "../parser/playlist_parser";
 import SearchParser from "../parser/search_parser";
 
 export default class Platform {
+    public constructor(protected readonly platformName: string) {
+    }
+
     public createSongParser(): SongParser {
         return new SongParser(this);
     }
