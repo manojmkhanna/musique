@@ -6,8 +6,10 @@ import ArtistOutput from "../output/artist_output";
 import ArtistContent from "../content/artist_content";
 import AlbumOutput from "../output/album_output";
 import SongOutput from "../output/song_output";
+import PlaylistOutput from "../output/playlist_output";
 import AlbumParser from "./album_parser";
 import SongParser from "./song_parser";
+import PlaylistParser from "./playlist_parser";
 
 export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, ArtistContent> {
     protected createInput(): Promise<ArtistInput> {
@@ -53,6 +55,12 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
         });
     }
 
+    protected createPlaylists(): Promise<PlaylistOutput[]> {
+        return new Promise<PlaylistOutput[]>(resolve => {
+            resolve();
+        });
+    }
+
     public parseTitle(): Promise<this> {
         return this.parseValue("title", () => this.createTitle());
     }
@@ -75,6 +83,17 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
         } else {
             return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {
                 resolve(this.platform.createSongParser());
+            }), outputsParser, ...indexes);
+        }
+    }
+
+    public parsePlaylists(outputsParser?: (childParser: PlaylistParser, index: number) => Promise<any>,
+                          ...indexes: number[]): Promise<this> {
+        if (outputsParser == undefined) {
+            return this.parseValue("playlists", () => this.createPlaylists());
+        } else {
+            return this.parseOutputs("playlists", () => new Promise<PlaylistParser>(resolve => {
+                resolve(this.platform.createPlaylistParser());
             }), outputsParser, ...indexes);
         }
     }

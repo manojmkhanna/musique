@@ -6,8 +6,10 @@ import ArtistOutput from "../output/artist_output";
 import ArtistContent from "../content/artist_content";
 import AlbumOutput from "../output/album_output";
 import SongOutput from "../output/song_output";
+import PlaylistOutput from "../output/playlist_output";
 import AlbumParser from "./album_parser";
 import SongParser from "./song_parser";
+import PlaylistParser from "./playlist_parser";
 export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, ArtistContent> {
     protected createInput(): Promise<ArtistInput>;
     protected createOutput(): Promise<ArtistOutput>;
@@ -16,7 +18,9 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
     protected createTitle(): Promise<string>;
     protected createAlbums(): Promise<AlbumOutput[]>;
     protected createSongs(): Promise<SongOutput[]>;
+    protected createPlaylists(): Promise<PlaylistOutput[]>;
     parseTitle(): Promise<this>;
     parseAlbums(outputsParser?: (childParser: AlbumParser, index: number) => Promise<any>, ...indexes: number[]): Promise<this>;
     parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>, ...indexes: number[]): Promise<this>;
+    parsePlaylists(outputsParser?: (childParser: PlaylistParser, index: number) => Promise<any>, ...indexes: number[]): Promise<this>;
 }

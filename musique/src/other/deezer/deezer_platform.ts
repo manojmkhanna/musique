@@ -7,6 +7,8 @@ import ArtistParser from "../../parser/artist_parser";
 import DeezerArtistParser from "./parser/deezer_artist_parser";
 import PlaylistParser from "../../parser/playlist_parser";
 import DeezerPlaylistParser from "./parser/deezer_playlist_parser";
+import SearchParser from "../../parser/search_parser";
+import DeezerSearchParser from "./parser/deezer_search_parser";
 
 export default class DeezerPlatform extends Platform {
     public createSongParser(): SongParser {
@@ -23,5 +25,9 @@ export default class DeezerPlatform extends Platform {
 
     public createPlaylistParser(): PlaylistParser {
         return new DeezerPlaylistParser(this);
+    }
+
+    public createSearchParser(): SearchParser {
+        return new DeezerSearchParser(this);
     }
 }

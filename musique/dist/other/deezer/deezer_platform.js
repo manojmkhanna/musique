@@ -5,6 +5,7 @@ const deezer_song_parser_1 = require("./parser/deezer_song_parser");
 const deezer_album_parser_1 = require("./parser/deezer_album_parser");
 const deezer_artist_parser_1 = require("./parser/deezer_artist_parser");
 const deezer_playlist_parser_1 = require("./parser/deezer_playlist_parser");
+const deezer_search_parser_1 = require("./parser/deezer_search_parser");
 class DeezerPlatform extends platform_1.default {
     createSongParser() {
         return new deezer_song_parser_1.default(this);
@@ -17,6 +18,9 @@ class DeezerPlatform extends platform_1.default {
     }
     createPlaylistParser() {
         return new deezer_playlist_parser_1.default(this);
+    }
+    createSearchParser() {
+        return new deezer_search_parser_1.default(this);
     }
 }
 exports.default = DeezerPlatform;

@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/other/deezer/parser/deezer_search_parser.ts"],"names":[],"mappings":";;AAAA,iEAAyD;AAEzD,wBAAwC,SAAQ,uBAAY;CAE3D;AAFD,qCAEC","file":"deezer_search_parser.js","sourcesContent":["import SearchParser from \"../../../parser/search_parser\";\r\n\r\nexport default class DeezerSearchParser extends SearchParser {\r\n    //TODO\r\n}\r\n"]}

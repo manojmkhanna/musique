@@ -5,6 +5,7 @@ import * as cheerio from "cheerio";
 import ArtistParser from "../../../parser/artist_parser";
 import ArtistContent from "../../../content/artist_content";
 import DeezerConstants from "../deezer_constants";
+import PlaylistOutput from "../../../output/playlist_output";
 
 export default class DeezerArtistParser extends ArtistParser {
     protected createContent(): Promise<ArtistContent> {
@@ -38,5 +39,9 @@ export default class DeezerArtistParser extends ArtistParser {
 
             resolve($("h1#naboo_artist_name").first().text().trim());
         });
+    }
+
+    protected createPlaylists(): Promise<PlaylistOutput[]> {
+        return super.createPlaylists(); //TODO
     }
 }

@@ -42,6 +42,11 @@ class ArtistParser extends base_parser_1.default {
             resolve();
         });
     }
+    createPlaylists() {
+        return new Promise(resolve => {
+            resolve();
+        });
+    }
     parseTitle() {
         return this.parseValue("title", () => this.createTitle());
     }
@@ -62,6 +67,16 @@ class ArtistParser extends base_parser_1.default {
         else {
             return this.parseOutputs("songs", () => new Promise(resolve => {
                 resolve(this.platform.createSongParser());
+            }), outputsParser, ...indexes);
+        }
+    }
+    parsePlaylists(outputsParser, ...indexes) {
+        if (outputsParser == undefined) {
+            return this.parseValue("playlists", () => this.createPlaylists());
+        }
+        else {
+            return this.parseOutputs("playlists", () => new Promise(resolve => {
+                resolve(this.platform.createPlaylistParser());
             }), outputsParser, ...indexes);
         }
     }

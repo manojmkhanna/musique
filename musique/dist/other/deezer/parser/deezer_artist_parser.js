@@ -33,6 +33,9 @@ class DeezerArtistParser extends artist_parser_1.default {
             resolve($("h1#naboo_artist_name").first().text().trim());
         });
     }
+    createPlaylists() {
+        return super.createPlaylists(); //TODO
+    }
 }
 exports.default = DeezerArtistParser;
 
