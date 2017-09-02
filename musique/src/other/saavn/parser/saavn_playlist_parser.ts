@@ -17,7 +17,7 @@ export default class SaavnPlaylistParser extends PlaylistParser {
                     return;
                 }
 
-                let content = new PlaylistContent();
+                let content: PlaylistContent = new PlaylistContent();
                 content.html = body;
 
                 resolve(content);
@@ -32,7 +32,7 @@ export default class SaavnPlaylistParser extends PlaylistParser {
             let songInputs: SongInput[] = [];
 
             $("span.title>a").each((index, element) => {
-                let songInput = new SongInput();
+                let songInput: SongInput = new SongInput();
                 songInput.url = $(element).attr("href");
 
                 songInputs[index] = songInput;
@@ -63,7 +63,7 @@ export default class SaavnPlaylistParser extends PlaylistParser {
             }
 
             $("span.title>a").each((index, element) => {
-                let songOutput = songOutputs[index];
+                let songOutput: SongOutput = songOutputs[index];
 
                 if (!songOutput) {
                     songOutput = new SongOutput();

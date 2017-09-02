@@ -24,7 +24,7 @@ export default class SaavnArtistParser extends ArtistParser {
                     return;
                 }
 
-                let content = new ArtistContent();
+                let content: ArtistContent = new ArtistContent();
                 content.html = body;
 
                 resolve(content);
@@ -52,7 +52,7 @@ export default class SaavnArtistParser extends ArtistParser {
     protected createAlbums(): Promise<AlbumOutput[]> {
         return this.createAlbumPage()
             .then(() => {
-                let albumOutputs = this.output.albums;
+                let albumOutputs: AlbumOutput[] = this.output.albums;
 
                 if (!albumOutputs) {
                     albumOutputs = [];
@@ -62,7 +62,7 @@ export default class SaavnArtistParser extends ArtistParser {
                     let $ = cheerio.load(albumPageHtml);
 
                     $("h3.title>a").each((index, element) => {
-                        let albumOutput = albumOutputs[index];
+                        let albumOutput: AlbumOutput = albumOutputs[index];
 
                         if (!albumOutput) {
                             albumOutput = new AlbumOutput();
@@ -82,7 +82,7 @@ export default class SaavnArtistParser extends ArtistParser {
     protected createSongs(): Promise<SongOutput[]> {
         return this.createSongPage()
             .then(() => {
-                let songOutputs = this.output.songs;
+                let songOutputs: SongOutput[] = this.output.songs;
 
                 if (!songOutputs) {
                     songOutputs = [];
@@ -92,7 +92,7 @@ export default class SaavnArtistParser extends ArtistParser {
                     let $ = cheerio.load(songPageHtml);
 
                     $("span.title>a").each((index, element) => {
-                        let songOutput = songOutputs[index];
+                        let songOutput: SongOutput = songOutputs[index];
 
                         if (!songOutput) {
                             songOutput = new SongOutput();
@@ -111,14 +111,14 @@ export default class SaavnArtistParser extends ArtistParser {
 
     public parseAlbums(outputsParser?: (childParser: AlbumParser, index: number) => Promise<any>,
                        ...indexes: number[]): Promise<this> {
-        let promise = new Promise<any>(resolve => {
+        let promise: Promise<any> = new Promise<any>(resolve => {
             resolve();
         });
 
         if (indexes.length == 0) {
             promise = promise.then(() => this.createAlbumPage());
         } else {
-            let lastIndex = indexes.sort()[indexes.length - 1];
+            let lastIndex: number = indexes.sort()[indexes.length - 1];
 
             for (let i = this.albumPageHtmls.length; i <= Math.floor(lastIndex / 12) + 1; i++) {
                 promise = promise.then(() => this.createAlbumPage());
@@ -130,14 +130,14 @@ export default class SaavnArtistParser extends ArtistParser {
 
     public parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>,
                       ...indexes: number[]): Promise<this> {
-        let promise = new Promise<any>(resolve => {
+        let promise: Promise<any> = new Promise<any>(resolve => {
             resolve();
         });
 
         if (indexes.length == 0) {
             promise = promise.then(() => this.createSongPage());
         } else {
-            let lastIndex = indexes.sort()[indexes.length - 1];
+            let lastIndex: number = indexes.sort()[indexes.length - 1];
 
             for (let i = this.songPageHtmls.length; i <= Math.floor(lastIndex / 10) + 1; i++) {
                 promise = promise.then(() => this.createSongPage());
@@ -161,7 +161,7 @@ export default class SaavnArtistParser extends ArtistParser {
                     let $ = cheerio.load(body);
 
                     $("h3.title>a").each((index, element) => {
-                        let albumInput = new AlbumInput();
+                        let albumInput: AlbumInput = new AlbumInput();
                         albumInput.url = $(element).attr("href");
 
                         this.input.albums.push(albumInput);
@@ -186,7 +186,7 @@ export default class SaavnArtistParser extends ArtistParser {
                     let $ = cheerio.load(body);
 
                     $("span.title>a").each((index, element) => {
-                        let songInput = new SongInput();
+                        let songInput: SongInput = new SongInput();
                         songInput.url = $(element).attr("href");
 
                         this.input.songs.push(songInput);

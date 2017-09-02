@@ -16,7 +16,7 @@ export default class DeezerArtistParser extends ArtistParser {
                     return;
                 }
 
-                let content = new ArtistContent();
+                let content: ArtistContent = new ArtistContent();
                 content.html = body;
 
                 resolve(content);

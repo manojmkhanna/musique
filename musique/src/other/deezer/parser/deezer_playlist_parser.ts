@@ -17,7 +17,7 @@ export default class DeezerPlaylistParser extends PlaylistParser {
                     return;
                 }
 
-                let content = new PlaylistContent();
+                let content: PlaylistContent = new PlaylistContent();
                 content.html = body;
 
                 resolve(content);
@@ -27,12 +27,12 @@ export default class DeezerPlaylistParser extends PlaylistParser {
 
     protected contentCreated(): Promise<void> {
         return new Promise<void>(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)![1]);
 
             let songInputs: SongInput[] = [];
 
             for (let i = 0; i < json.SONGS.data.length; i++) {
-                let songInput = new SongInput();
+                let songInput: SongInput = new SongInput();
                 songInput.url = "http://www.deezer.com/en/track/" + json.SONGS.data[i].SNG_ID;
 
                 songInputs[i] = songInput;
@@ -54,7 +54,7 @@ export default class DeezerPlaylistParser extends PlaylistParser {
 
     protected createSongs(): Promise<SongOutput[]> {
         return new Promise<SongOutput[]>(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)![1]);
 
             let songOutputs: SongOutput[] = this.output.songs;
 
@@ -63,7 +63,7 @@ export default class DeezerPlaylistParser extends PlaylistParser {
             }
 
             for (let i = 0; i < json.SONGS.data.length; i++) {
-                let songOutput = songOutputs[i];
+                let songOutput: SongOutput = songOutputs[i];
 
                 if (!songOutput) {
                     songOutput = new SongOutput();

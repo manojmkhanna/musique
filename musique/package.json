@@ -18,7 +18,7 @@
     "bluebird": "^3.5.0",
     "cheerio": "^1.0.0-rc.2",
     "moment": "^2.18.1",
-    "parsque": "^1.0.10",
+    "parsque": "^1.0.11",
     "request": "^2.81.0",
     "request-progress": "^3.0.0"
   },

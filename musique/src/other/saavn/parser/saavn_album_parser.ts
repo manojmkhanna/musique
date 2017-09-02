@@ -20,7 +20,7 @@ export default class SaavnAlbumParser extends AlbumParser {
                     return;
                 }
 
-                let content = new AlbumContent();
+                let content: AlbumContent = new AlbumContent();
                 content.html = body;
 
                 resolve(content);
@@ -35,7 +35,7 @@ export default class SaavnAlbumParser extends AlbumParser {
             let artistInputs: ArtistInput[] = [];
 
             $("h2.page-subtitle>a").each((index, element) => {
-                let artistInput = new ArtistInput();
+                let artistInput: ArtistInput = new ArtistInput();
                 artistInput.url = $(element).attr("href").replace("-albums", "-artist");
 
                 artistInputs[index] = artistInput;
@@ -46,7 +46,7 @@ export default class SaavnAlbumParser extends AlbumParser {
             let songInputs: SongInput[] = [];
 
             $("span.title>a").each((index, element) => {
-                let songInput = new SongInput();
+                let songInput: SongInput = new SongInput();
                 songInput.url = $(element).attr("href");
 
                 songInputs[index] = songInput;
@@ -118,7 +118,7 @@ export default class SaavnAlbumParser extends AlbumParser {
             }
 
             $("h2.page-subtitle>a").each((index, element) => {
-                let artistOutput = artistOutputs[index];
+                let artistOutput: ArtistOutput = artistOutputs[index];
 
                 if (!artistOutput) {
                     artistOutput = new ArtistOutput();
@@ -145,7 +145,7 @@ export default class SaavnAlbumParser extends AlbumParser {
             }
 
             $("span.title>a").each((index, element) => {
-                let songOutput = songOutputs[index];
+                let songOutput: SongOutput = songOutputs[index];
 
                 if (!songOutput) {
                     songOutput = new SongOutput();

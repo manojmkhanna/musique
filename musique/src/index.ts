@@ -30,13 +30,13 @@ export {
     SearchInput, SearchOutput, SearchContent, SearchParser
 };
 
-let platforms = new Platforms();
+let platforms: Platforms = new Platforms();
 
 export function parseSong(platformName: keyof Platforms,
                           url: string): Promise<SongParser> {
     return platforms[platformName].createSongParser()
         .create(() => new Promise<SongInput>(resolve => {
-            let input = new SongInput();
+            let input: SongInput = new SongInput();
             input.url = url;
 
             resolve(input);
@@ -47,7 +47,7 @@ export function parseAlbum(platformName: keyof Platforms,
                            url: string): Promise<AlbumParser> {
     return platforms[platformName].createAlbumParser()
         .create(() => new Promise<AlbumInput>(resolve => {
-            let input = new AlbumInput();
+            let input: AlbumInput = new AlbumInput();
             input.url = url;
 
             resolve(input);
@@ -58,7 +58,7 @@ export function parseArtist(platformName: keyof Platforms,
                             url: string): Promise<ArtistParser> {
     return platforms[platformName].createArtistParser()
         .create(() => new Promise<ArtistInput>(resolve => {
-            let input = new ArtistInput();
+            let input: ArtistInput = new ArtistInput();
             input.url = url;
 
             resolve(input);
@@ -69,7 +69,7 @@ export function parsePlaylist(platformName: keyof Platforms,
                               url: string): Promise<PlaylistParser> {
     return platforms[platformName].createPlaylistParser()
         .create(() => new Promise<PlaylistInput>(resolve => {
-            let input = new PlaylistInput();
+            let input: PlaylistInput = new PlaylistInput();
             input.url = url;
 
             resolve(input);
@@ -80,7 +80,7 @@ export function parseSearch(platformName: keyof Platforms,
                             query: string): Promise<SearchParser> {
     return platforms[platformName].createSearchParser()
         .create(() => new Promise<SearchInput>(resolve => {
-            let input = new SearchInput();
+            let input: SearchInput = new SearchInput();
             input.query = query;
 
             resolve(input);

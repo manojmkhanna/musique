@@ -23,7 +23,7 @@ export default class SaavnSongParser extends SongParser {
                     return;
                 }
 
-                let content = new SongContent();
+                let content: SongContent = new SongContent();
                 content.html = body;
 
                 resolve(content);
@@ -35,14 +35,14 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<void>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            let albumInput = new AlbumInput();
+            let albumInput: AlbumInput = new AlbumInput();
             let artistInputs: ArtistInput[] = [];
 
             $("h2.page-subtitle>a").each((index, element) => {
                 if (index == 0) {
                     albumInput.url = $(element).attr("href");
                 } else {
-                    let artistInput = new ArtistInput();
+                    let artistInput: ArtistInput = new ArtistInput();
                     artistInput.url = $(element).attr("href").replace("-albums", "-artist");
 
                     artistInputs[index - 1] = artistInput;
@@ -68,7 +68,7 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            let lyrics = $("h2.page-subtitle:contains(Lyrics)+p").first().html();
+            let lyrics: string = $("h2.page-subtitle:contains(Lyrics)+p").first().html();
 
             if (lyrics) {
                 resolve(lyrics.replace(/(<br>){2,}/g, "\n\n").replace(/<br>/g, "\n"));
@@ -82,7 +82,7 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            let hash = JSON.parse($("div.song-json").first().text()).url;
+            let hash: string = JSON.parse($("div.song-json").first().text()).url;
 
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
 
@@ -104,7 +104,7 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<string>((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
 
-            let id = JSON.parse($("div.song-json").first().text()).songid;
+            let id: string = JSON.parse($("div.song-json").first().text()).songid;
 
             request(this.input.album.url, SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
                 if (error) {
@@ -112,7 +112,7 @@ export default class SaavnSongParser extends SongParser {
                     return;
                 }
 
-                let albumContent = new AlbumContent();
+                let albumContent: AlbumContent = new AlbumContent();
                 albumContent.html = body;
 
                 this.content.album = albumContent;
@@ -128,13 +128,13 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<Buffer>((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
 
-            let hash = JSON.parse($("div.song-json").first().text()).url;
+            let hash: string = JSON.parse($("div.song-json").first().text()).url;
 
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
 
             hash = cipher.update(hash, "base64", "ascii") + cipher.final("ascii");
 
-            let mp3 = "https://h.saavncdn.com" + hash.substr(10) + "_320.mp3";
+            let mp3: string = "https://h.saavncdn.com" + hash.substr(10) + "_320.mp3";
 
             progress(request(mp3, {
                 encoding: null
@@ -158,7 +158,7 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<AlbumOutput>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            let albumOutput = this.output.album;
+            let albumOutput: AlbumOutput = this.output.album;
 
             if (!albumOutput) {
                 albumOutput = new AlbumOutput();
@@ -185,7 +185,7 @@ export default class SaavnSongParser extends SongParser {
 
             $("h2.page-subtitle>a").each((index, element) => {
                 if (index > 0) {
-                    let artistOutput = artistOutputs[index];
+                    let artistOutput: ArtistOutput = artistOutputs[index];
 
                     if (!artistOutput) {
                         artistOutput = new ArtistOutput();
