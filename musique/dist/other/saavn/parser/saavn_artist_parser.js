@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const request = require("request-promise");
+const rp = require("request-promise");
 const cheerio = require("cheerio");
 const artist_parser_1 = require("../../../parser/artist_parser");
 const artist_content_1 = require("../../../content/artist_content");
@@ -18,7 +18,7 @@ class SaavnArtistParser extends artist_parser_1.default {
     }
     createContent() {
         return new Promise((resolve, reject) => {
-            request.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
+            rp.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let content = new artist_content_1.default();
                 content.html = html;
@@ -118,7 +118,7 @@ class SaavnArtistParser extends artist_parser_1.default {
     }
     createAlbumPage() {
         return new Promise((resolve, reject) => {
-            request.get(this.input.url.replace("-artist", "-albums")
+            rp.get(this.input.url.replace("-artist", "-albums")
                 + "?page=" + this.albumPageHtmls.length, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 this.albumPageHtmls.push(html);
@@ -137,7 +137,7 @@ class SaavnArtistParser extends artist_parser_1.default {
     }
     createSongPage() {
         return new Promise((resolve, reject) => {
-            request.get(this.input.url.replace("-artist", "-songs")
+            rp.get(this.input.url.replace("-artist", "-songs")
                 + "?page=" + this.songPageHtmls.length, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 this.songPageHtmls.push(html);

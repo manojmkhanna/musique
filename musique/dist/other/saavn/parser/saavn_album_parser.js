@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const request = require("request-promise");
+const rp = require("request-promise");
 const cheerio = require("cheerio");
 const moment = require("moment");
 const album_parser_1 = require("../../../parser/album_parser");
@@ -14,7 +14,7 @@ const song_output_1 = require("../../../output/song_output");
 class SaavnAlbumParser extends album_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
-            request.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
+            rp.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let content = new album_content_1.default();
                 content.html = html;

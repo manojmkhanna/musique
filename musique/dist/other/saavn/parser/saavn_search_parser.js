@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const request = require("request-promise");
+const rp = require("request-promise");
 const cheerio = require("cheerio");
 const search_parser_1 = require("../../../parser/search_parser");
 const song_output_1 = require("../../../output/song_output");
@@ -140,7 +140,7 @@ class SaavnSearchParser extends search_parser_1.default {
     }
     createSongPage() {
         return new Promise((resolve, reject) => {
-            request.get("https://www.saavn.com/search/song/" + this.input.query
+            rp.get("https://www.saavn.com/search/song/" + this.input.query
                 + "?p=" + (this.songPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 this.songPageHtmls.push(html);
@@ -159,7 +159,7 @@ class SaavnSearchParser extends search_parser_1.default {
     }
     createAlbumPage() {
         return new Promise((resolve, reject) => {
-            request.get("https://www.saavn.com/search/album/" + this.input.query
+            rp.get("https://www.saavn.com/search/album/" + this.input.query
                 + "?p=" + (this.albumPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 this.albumPageHtmls.push(html);
@@ -178,7 +178,7 @@ class SaavnSearchParser extends search_parser_1.default {
     }
     createPlaylistPage() {
         return new Promise((resolve, reject) => {
-            request.get("https://www.saavn.com/search/playlist/" + this.input.query
+            rp.get("https://www.saavn.com/search/playlist/" + this.input.query
                 + "?p=" + (this.playlistPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 this.playlistPageHtmls.push(html);

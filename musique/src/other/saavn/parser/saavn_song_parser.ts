@@ -1,7 +1,8 @@
 import * as Promise from "bluebird";
-import * as request from "request-promise";
+import * as rp from "request-promise";
 import * as cheerio from "cheerio";
 import * as crypto from "crypto";
+import * as request from "request";
 
 import SongParser from "../../../parser/song_parser";
 import SongContent from "../../../content/song_content";
@@ -12,10 +13,12 @@ import AlbumContent from "../../../content/album_content";
 import AlbumOutput from "../../../output/album_output";
 import ArtistOutput from "../../../output/artist_output";
 
+const progress = require("request-progress");
+
 export default class SaavnSongParser extends SongParser {
     protected createContent(): Promise<SongContent> {
         return new Promise<SongContent>((resolve, reject) => {
-            request.get(this.input.url, SaavnConstants.REQUEST_OPTIONS)
+            rp.get(this.input.url, SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     let content = new SongContent();
                     content.html = html;
@@ -103,7 +106,7 @@ export default class SaavnSongParser extends SongParser {
 
             let id = JSON.parse($("div.song-json").first().text()).songid;
 
-            request.get(this.input.album.url, SaavnConstants.REQUEST_OPTIONS)
+            rp.get(this.input.album.url, SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     let albumContent = new AlbumContent();
                     albumContent.html = html;
@@ -120,7 +123,7 @@ export default class SaavnSongParser extends SongParser {
         });
     }
 
-    protected createFile(): Promise<Buffer> {
+    protected createFile(progressCallback: (progress: object) => void): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
 
@@ -132,14 +135,20 @@ export default class SaavnSongParser extends SongParser {
 
             let mp3 = "https://h.saavncdn.com" + hash.substr(10) + "_320.mp3";
 
-            request.get(mp3, {
-                encoding: null,
-            })
-                .then(buffer => {
-                    resolve(buffer);
-                })
-                .catch(error => {
+            progress(request(mp3, {
+                encoding: null
+            }, (error, response, body) => {
+                if (error) {
                     reject(error);
+                    return;
+                }
+
+                resolve(body);
+            }), {
+                throttle: 33
+            })
+                .on("progress", (state: object) => {
+                    progressCallback(state);
                 });
         });
     }

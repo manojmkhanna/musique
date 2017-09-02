@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import * as request from "request-promise";
+import * as rp from "request-promise";
 import * as cheerio from "cheerio";
 
 import SearchParser from "../../../parser/search_parser";
@@ -179,7 +179,7 @@ export default class SaavnSearchParser extends SearchParser {
 
     private createSongPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            request.get("https://www.saavn.com/search/song/" + this.input.query
+            rp.get("https://www.saavn.com/search/song/" + this.input.query
                 + "?p=" + (this.songPageHtmls.length + 1), SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     this.songPageHtmls.push(html);
@@ -203,7 +203,7 @@ export default class SaavnSearchParser extends SearchParser {
 
     private createAlbumPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            request.get("https://www.saavn.com/search/album/" + this.input.query
+            rp.get("https://www.saavn.com/search/album/" + this.input.query
                 + "?p=" + (this.albumPageHtmls.length + 1), SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     this.albumPageHtmls.push(html);
@@ -227,7 +227,7 @@ export default class SaavnSearchParser extends SearchParser {
 
     private createPlaylistPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            request.get("https://www.saavn.com/search/playlist/" + this.input.query
+            rp.get("https://www.saavn.com/search/playlist/" + this.input.query
                 + "?p=" + (this.playlistPageHtmls.length + 1), SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     this.playlistPageHtmls.push(html);

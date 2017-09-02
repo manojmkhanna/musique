@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import * as request from "request-promise";
+import * as rp from "request-promise";
 import * as cheerio from "cheerio";
 
 import ArtistParser from "../../../parser/artist_parser";
@@ -18,7 +18,7 @@ export default class SaavnArtistParser extends ArtistParser {
 
     protected createContent(): Promise<ArtistContent> {
         return new Promise<ArtistContent>((resolve, reject) => {
-            request.get(this.input.url, SaavnConstants.REQUEST_OPTIONS)
+            rp.get(this.input.url, SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     let content = new ArtistContent();
                     content.html = html;
@@ -148,7 +148,7 @@ export default class SaavnArtistParser extends ArtistParser {
 
     private createAlbumPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            request.get(this.input.url.replace("-artist", "-albums")
+            rp.get(this.input.url.replace("-artist", "-albums")
                 + "?page=" + this.albumPageHtmls.length, SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     this.albumPageHtmls.push(html);
@@ -172,7 +172,7 @@ export default class SaavnArtistParser extends ArtistParser {
 
     private createSongPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            request.get(this.input.url.replace("-artist", "-songs")
+            rp.get(this.input.url.replace("-artist", "-songs")
                 + "?page=" + this.songPageHtmls.length, SaavnConstants.REQUEST_OPTIONS)
                 .then(html => {
                     this.songPageHtmls.push(html);

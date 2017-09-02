@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const request = require("request-promise");
+const rp = require("request-promise");
 const cheerio = require("cheerio");
 const playlist_parser_1 = require("../../../parser/playlist_parser");
 const playlist_content_1 = require("../../../content/playlist_content");
@@ -11,7 +11,7 @@ const song_output_1 = require("../../../output/song_output");
 class SaavnPlaylistParser extends playlist_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
-            request.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
+            rp.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let content = new playlist_content_1.default();
                 content.html = html;

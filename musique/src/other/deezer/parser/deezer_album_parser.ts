@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import * as request from "request-promise";
+import * as rp from "request-promise";
 import * as cheerio from "cheerio";
 import * as moment from "moment";
 
@@ -14,7 +14,7 @@ import SongOutput from "../../../output/song_output";
 export default class DeezerAlbumParser extends AlbumParser {
     protected createContent(): Promise<AlbumContent> {
         return new Promise<AlbumContent>((resolve, reject) => {
-            request.get(this.input.url, DeezerConstants.REQUEST_OPTIONS)
+            rp.get(this.input.url, DeezerConstants.REQUEST_OPTIONS)
                 .then(html => {
                     let content = new AlbumContent();
                     content.html = html;

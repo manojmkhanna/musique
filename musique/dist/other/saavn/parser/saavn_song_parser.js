@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const request = require("request-promise");
+const rp = require("request-promise");
 const cheerio = require("cheerio");
 const crypto = require("crypto");
+const request = require("request");
 const song_parser_1 = require("../../../parser/song_parser");
 const song_content_1 = require("../../../content/song_content");
 const saavn_constants_1 = require("../saavn_constants");
@@ -12,10 +13,11 @@ const artist_input_1 = require("../../../input/artist_input");
 const album_content_1 = require("../../../content/album_content");
 const album_output_1 = require("../../../output/album_output");
 const artist_output_1 = require("../../../output/artist_output");
+const progress = require("request-progress");
 class SaavnSongParser extends song_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
-            request.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
+            rp.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let content = new song_content_1.default();
                 content.html = html;
@@ -83,7 +85,7 @@ class SaavnSongParser extends song_parser_1.default {
         return new Promise((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
             let id = JSON.parse($("div.song-json").first().text()).songid;
-            request.get(this.input.album.url, saavn_constants_1.default.REQUEST_OPTIONS)
+            rp.get(this.input.album.url, saavn_constants_1.default.REQUEST_OPTIONS)
                 .then(html => {
                 let albumContent = new album_content_1.default();
                 albumContent.html = html;
@@ -96,21 +98,26 @@ class SaavnSongParser extends song_parser_1.default {
             });
         });
     }
-    createFile() {
+    createFile(progressCallback) {
         return new Promise((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
             let hash = JSON.parse($("div.song-json").first().text()).url;
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
             hash = cipher.update(hash, "base64", "ascii") + cipher.final("ascii");
             let mp3 = "https://h.saavncdn.com" + hash.substr(10) + "_320.mp3";
-            request.get(mp3, {
-                encoding: null,
+            progress(request(mp3, {
+                encoding: null
+            }, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(body);
+            }), {
+                throttle: 33
             })
-                .then(buffer => {
-                resolve(buffer);
-            })
-                .catch(error => {
-                reject(error);
+                .on("progress", (state) => {
+                progressCallback(state);
             });
         });
     }

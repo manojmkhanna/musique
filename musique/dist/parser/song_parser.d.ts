@@ -20,7 +20,7 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     protected createMp3(): Promise<string>;
     protected createTitle(): Promise<string>;
     protected createTrack(): Promise<string>;
-    protected createFile(): Promise<Buffer>;
+    protected createFile(progressCallback: (progress: object) => void): Promise<Buffer>;
     protected createAlbum(): Promise<AlbumOutput>;
     protected createArtists(): Promise<ArtistOutput[]>;
     parseDuration(): Promise<this>;
@@ -29,7 +29,7 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     parseMp3(): Promise<this>;
     parseTitle(): Promise<this>;
     parseTrack(): Promise<this>;
-    parseFile(): Promise<this>;
+    parseFile(progressCallback: (progress: object) => void): Promise<this>;
     parseAlbum(outputParser?: (childParser: AlbumParser) => Promise<any>): Promise<this>;
     parseArtists(outputsParser?: (childParser: ArtistParser, index: number) => Promise<any>, ...indexes: number[]): Promise<this>;
 }

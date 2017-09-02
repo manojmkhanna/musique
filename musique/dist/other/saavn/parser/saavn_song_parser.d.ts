@@ -13,7 +13,7 @@ export default class SaavnSongParser extends SongParser {
     protected createMp3(): Promise<string>;
     protected createTitle(): Promise<string>;
     protected createTrack(): Promise<string>;
-    protected createFile(): Promise<Buffer>;
+    protected createFile(progressCallback: (progress: object) => void): Promise<Buffer>;
     protected createAlbum(): Promise<AlbumOutput>;
     protected createArtists(): Promise<ArtistOutput[]>;
 }

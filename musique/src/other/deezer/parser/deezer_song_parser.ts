@@ -1,7 +1,8 @@
 import * as Promise from "bluebird";
-import * as request from "request-promise";
+import * as rp from "request-promise";
 import * as cheerio from "cheerio";
 import * as crypto from "crypto";
+import * as request from "request";
 
 import SongParser from "../../../parser/song_parser";
 import SongContent from "../../../content/song_content";
@@ -11,10 +12,12 @@ import ArtistInput from "../../../input/artist_input";
 import AlbumOutput from "../../../output/album_output";
 import ArtistOutput from "../../../output/artist_output";
 
+const progress = require("request-progress");
+
 export default class DeezerSongParser extends SongParser {
     protected createContent(): Promise<SongContent> {
         return new Promise<SongContent>((resolve, reject) => {
-            request.get(this.input.url, DeezerConstants.REQUEST_OPTIONS)
+            rp.get(this.input.url, DeezerConstants.REQUEST_OPTIONS)
                 .then(html => {
                     let content = new SongContent();
                     content.html = html;
@@ -100,7 +103,7 @@ export default class DeezerSongParser extends SongParser {
         });
     }
 
-    protected createFile(): Promise<Buffer> {
+    protected createFile(progressCallback: (state: object) => void): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
             let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)![1]);
 
@@ -115,36 +118,44 @@ export default class DeezerSongParser extends SongParser {
             let mp3 = "http://e-cdn-proxy-" + json.DATA.MD5_ORIGIN.substr(0, 1)
                 + ".deezer.com/mobile/1/" + cipher.update(hash, "binary", "hex") + cipher.final("hex");
 
-            request.get(mp3, {
+            progress(request(mp3, {
                 encoding: null
-            })
-                .then(buffer => {
-                    let keyMd5 = crypto.createHash("md5").update(json.DATA.SNG_ID).digest("hex");
-
-                    let key = "";
-
-                    for (let i = 0; i < 16; i++) {
-                        key += String.fromCharCode(keyMd5.charCodeAt(i)
-                            ^ keyMd5.charCodeAt(i + 16) ^ "g4el58wc0zvf9na1".charCodeAt(i));
-                    }
-
-                    for (let i = 0; i * 2048 < buffer.length; i++) {
-                        if (i % 3 == 0) {
-                            let cipher = crypto.createDecipheriv("bf-cbc", key, "\x00\x01\x02\x03\x04\x05\x06\x07");
-                            cipher.setAutoPadding(false);
-
-                            let bytesBuffer = Buffer.alloc(2048);
-                            buffer.copy(bytesBuffer, 0, i * 2048, i * 2048 + 2048);
-
-                            let bytes = Buffer.concat([cipher.update(bytesBuffer), cipher.final()]);
-                            bytes.copy(buffer, i * 2048, 0, bytes.length);
-                        }
-                    }
-
-                    resolve(buffer);
-                })
-                .catch(error => {
+            }, (error, response, body) => {
+                if (error) {
                     reject(error);
+                    return;
+                }
+
+                let keyMd5 = crypto.createHash("md5").update(json.DATA.SNG_ID).digest("hex");
+
+                let key = "";
+
+                for (let i = 0; i < 16; i++) {
+                    key += String.fromCharCode(keyMd5.charCodeAt(i)
+                        ^ keyMd5.charCodeAt(i + 16) ^ "g4el58wc0zvf9na1".charCodeAt(i));
+                }
+
+                for (let i = 0; i * 2048 < body.length; i++) {
+                    if (i % 3 == 0) {
+                        let cipher = crypto.createDecipheriv("bf-cbc", key, "\x00\x01\x02\x03\x04\x05\x06\x07");
+                        cipher.setAutoPadding(false);
+
+                        let buffer = Buffer.alloc(2048);
+
+                        body.copy(buffer, 0, i * 2048, i * 2048 + 2048);
+
+                        buffer = Buffer.concat([cipher.update(buffer), cipher.final()]);
+
+                        buffer.copy(body, i * 2048, 0, buffer.length);
+                    }
+                }
+
+                resolve(body);
+            }), {
+                throttle: 33
+            })
+                .on("progress", (state: object) => {
+                    progressCallback(state);
                 });
         });
     }

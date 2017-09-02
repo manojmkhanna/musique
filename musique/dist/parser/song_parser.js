@@ -62,7 +62,7 @@ class SongParser extends base_parser_1.default {
             resolve();
         });
     }
-    createFile() {
+    createFile(progressCallback) {
         return new Promise(resolve => {
             resolve();
         });
@@ -95,8 +95,8 @@ class SongParser extends base_parser_1.default {
     parseTrack() {
         return this.parseValue("track", () => this.createTrack());
     }
-    parseFile() {
-        return this.parseValue("file", () => this.createFile());
+    parseFile(progressCallback) {
+        return this.parseValue("file", () => this.createFile(progressCallback));
     }
     parseAlbum(outputParser) {
         if (outputParser == undefined) {
