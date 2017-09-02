@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const rp = require("request-promise");
 const cheerio = require("cheerio");
+const request = require("request");
 const search_parser_1 = require("../../../parser/search_parser");
 const song_output_1 = require("../../../output/song_output");
 const album_output_1 = require("../../../output/album_output");
@@ -140,58 +140,55 @@ class SaavnSearchParser extends search_parser_1.default {
     }
     createSongPage() {
         return new Promise((resolve, reject) => {
-            rp.get("https://www.saavn.com/search/song/" + this.input.query
-                + "?p=" + (this.songPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
-                this.songPageHtmls.push(html);
-                let $ = cheerio.load(html);
+            request("https://www.saavn.com/search/song/" + this.input.query + "?p=" + (this.songPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                this.songPageHtmls.push(body);
+                let $ = cheerio.load(body);
                 $("span.title>a").each((index, element) => {
                     let songInput = new song_input_1.default();
                     songInput.url = $(element).attr("href");
                     this.input.songs.push(songInput);
                 });
                 resolve();
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }
     createAlbumPage() {
         return new Promise((resolve, reject) => {
-            rp.get("https://www.saavn.com/search/album/" + this.input.query
-                + "?p=" + (this.albumPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
-                this.albumPageHtmls.push(html);
-                let $ = cheerio.load(html);
+            request("https://www.saavn.com/search/album/" + this.input.query + "?p=" + (this.albumPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                this.albumPageHtmls.push(body);
+                let $ = cheerio.load(body);
                 $("h3.title>a").each((index, element) => {
                     let albumInput = new album_input_1.default();
                     albumInput.url = $(element).attr("href");
                     this.input.albums.push(albumInput);
                 });
                 resolve();
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }
     createPlaylistPage() {
         return new Promise((resolve, reject) => {
-            rp.get("https://www.saavn.com/search/playlist/" + this.input.query
-                + "?p=" + (this.playlistPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
-                this.playlistPageHtmls.push(html);
-                let $ = cheerio.load(html);
+            request("https://www.saavn.com/search/playlist/" + this.input.query + "?p=" + (this.playlistPageHtmls.length + 1), saavn_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                this.playlistPageHtmls.push(body);
+                let $ = cheerio.load(body);
                 $("h3>a").each((index, element) => {
                     let playlistInput = new playlist_input_1.default();
                     playlistInput.url = $(element).attr("href");
                     this.input.playlists.push(playlistInput);
                 });
                 resolve();
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }

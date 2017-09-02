@@ -1,10 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const rp = require("request-promise");
+const request = require("request");
 const cheerio = require("cheerio");
 const crypto = require("crypto");
-const request = require("request");
 const song_parser_1 = require("../../../parser/song_parser");
 const song_content_1 = require("../../../content/song_content");
 const saavn_constants_1 = require("../saavn_constants");
@@ -17,14 +16,14 @@ const progress = require("request-progress");
 class SaavnSongParser extends song_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
-            rp.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
+            request(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
                 let content = new song_content_1.default();
-                content.html = html;
+                content.html = body;
                 resolve(content);
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }
@@ -85,16 +84,16 @@ class SaavnSongParser extends song_parser_1.default {
         return new Promise((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
             let id = JSON.parse($("div.song-json").first().text()).songid;
-            rp.get(this.input.album.url, saavn_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
+            request(this.input.album.url, saavn_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
                 let albumContent = new album_content_1.default();
-                albumContent.html = html;
+                albumContent.html = body;
                 this.content.album = albumContent;
-                let $ = cheerio.load(html);
+                let $ = cheerio.load(body);
                 resolve($("li.song-wrap[data-songid=" + id + "]>div.index").first().text());
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }

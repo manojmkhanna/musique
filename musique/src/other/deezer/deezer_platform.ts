@@ -9,10 +9,6 @@ import PlaylistParser from "../../parser/playlist_parser";
 import DeezerPlaylistParser from "./parser/deezer_playlist_parser";
 
 export default class DeezerPlatform extends Platform {
-    public constructor() {
-        super("deezer");
-    }
-
     public createSongParser(): SongParser {
         return new DeezerSongParser(this);
     }

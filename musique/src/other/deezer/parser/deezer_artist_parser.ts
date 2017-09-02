@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import * as rp from "request-promise";
+import * as request from "request";
 import * as cheerio from "cheerio";
 
 import ArtistParser from "../../../parser/artist_parser";
@@ -9,16 +9,17 @@ import DeezerConstants from "../deezer_constants";
 export default class DeezerArtistParser extends ArtistParser {
     protected createContent(): Promise<ArtistContent> {
         return new Promise<ArtistContent>((resolve, reject) => {
-            rp.get(this.input.url, DeezerConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    let content = new ArtistContent();
-                    content.html = html;
-
-                    resolve(content);
-                })
-                .catch(error => {
+            request(this.input.url, DeezerConstants.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
                     reject(error);
-                });
+                    return;
+                }
+
+                let content = new ArtistContent();
+                content.html = body;
+
+                resolve(content);
+            });
         });
     }
 

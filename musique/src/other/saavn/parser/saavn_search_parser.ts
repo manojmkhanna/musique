@@ -1,6 +1,6 @@
 import * as Promise from "bluebird";
-import * as rp from "request-promise";
 import * as cheerio from "cheerio";
+import * as request from "request";
 
 import SearchParser from "../../../parser/search_parser";
 import SongOutput from "../../../output/song_output";
@@ -179,12 +179,16 @@ export default class SaavnSearchParser extends SearchParser {
 
     private createSongPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            rp.get("https://www.saavn.com/search/song/" + this.input.query
-                + "?p=" + (this.songPageHtmls.length + 1), SaavnConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    this.songPageHtmls.push(html);
+            request("https://www.saavn.com/search/song/" + this.input.query + "?p=" + (this.songPageHtmls.length + 1),
+                SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
 
-                    let $ = cheerio.load(html);
+                    this.songPageHtmls.push(body);
+
+                    let $ = cheerio.load(body);
 
                     $("span.title>a").each((index, element) => {
                         let songInput = new SongInput();
@@ -194,21 +198,22 @@ export default class SaavnSearchParser extends SearchParser {
                     });
 
                     resolve();
-                })
-                .catch(error => {
-                    reject(error);
                 });
         });
     }
 
     private createAlbumPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            rp.get("https://www.saavn.com/search/album/" + this.input.query
-                + "?p=" + (this.albumPageHtmls.length + 1), SaavnConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    this.albumPageHtmls.push(html);
+            request("https://www.saavn.com/search/album/" + this.input.query + "?p=" + (this.albumPageHtmls.length + 1),
+                SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
 
-                    let $ = cheerio.load(html);
+                    this.albumPageHtmls.push(body);
+
+                    let $ = cheerio.load(body);
 
                     $("h3.title>a").each((index, element) => {
                         let albumInput = new AlbumInput();
@@ -218,21 +223,22 @@ export default class SaavnSearchParser extends SearchParser {
                     });
 
                     resolve();
-                })
-                .catch(error => {
-                    reject(error);
                 });
         });
     }
 
     private createPlaylistPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            rp.get("https://www.saavn.com/search/playlist/" + this.input.query
-                + "?p=" + (this.playlistPageHtmls.length + 1), SaavnConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    this.playlistPageHtmls.push(html);
+            request("https://www.saavn.com/search/playlist/" + this.input.query + "?p=" + (this.playlistPageHtmls.length + 1),
+                SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
 
-                    let $ = cheerio.load(html);
+                    this.playlistPageHtmls.push(body);
+
+                    let $ = cheerio.load(body);
 
                     $("h3>a").each((index, element) => {
                         let playlistInput = new PlaylistInput();
@@ -242,9 +248,6 @@ export default class SaavnSearchParser extends SearchParser {
                     });
 
                     resolve();
-                })
-                .catch(error => {
-                    reject(error);
                 });
         });
     }

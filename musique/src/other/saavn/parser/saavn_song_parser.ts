@@ -1,8 +1,7 @@
 import * as Promise from "bluebird";
-import * as rp from "request-promise";
+import * as request from "request";
 import * as cheerio from "cheerio";
 import * as crypto from "crypto";
-import * as request from "request";
 
 import SongParser from "../../../parser/song_parser";
 import SongContent from "../../../content/song_content";
@@ -18,16 +17,17 @@ const progress = require("request-progress");
 export default class SaavnSongParser extends SongParser {
     protected createContent(): Promise<SongContent> {
         return new Promise<SongContent>((resolve, reject) => {
-            rp.get(this.input.url, SaavnConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    let content = new SongContent();
-                    content.html = html;
-
-                    resolve(content);
-                })
-                .catch(error => {
+            request(this.input.url, SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
                     reject(error);
-                });
+                    return;
+                }
+
+                let content = new SongContent();
+                content.html = body;
+
+                resolve(content);
+            });
         });
     }
 
@@ -106,20 +106,21 @@ export default class SaavnSongParser extends SongParser {
 
             let id = JSON.parse($("div.song-json").first().text()).songid;
 
-            rp.get(this.input.album.url, SaavnConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    let albumContent = new AlbumContent();
-                    albumContent.html = html;
-
-                    this.content.album = albumContent;
-
-                    let $ = cheerio.load(html);
-
-                    resolve($("li.song-wrap[data-songid=" + id + "]>div.index").first().text());
-                })
-                .catch(error => {
+            request(this.input.album.url, SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
                     reject(error);
-                });
+                    return;
+                }
+
+                let albumContent = new AlbumContent();
+                albumContent.html = body;
+
+                this.content.album = albumContent;
+
+                let $ = cheerio.load(body);
+
+                resolve($("li.song-wrap[data-songid=" + id + "]>div.index").first().text());
+            });
         });
     }
 

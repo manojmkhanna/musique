@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const rp = require("request-promise");
+const request = require("request");
 const cheerio = require("cheerio");
 const artist_parser_1 = require("../../../parser/artist_parser");
 const artist_content_1 = require("../../../content/artist_content");
@@ -18,14 +18,14 @@ class SaavnArtistParser extends artist_parser_1.default {
     }
     createContent() {
         return new Promise((resolve, reject) => {
-            rp.get(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
+            request(this.input.url, saavn_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
                 let content = new artist_content_1.default();
-                content.html = html;
+                content.html = body;
                 resolve(content);
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }
@@ -118,39 +118,37 @@ class SaavnArtistParser extends artist_parser_1.default {
     }
     createAlbumPage() {
         return new Promise((resolve, reject) => {
-            rp.get(this.input.url.replace("-artist", "-albums")
-                + "?page=" + this.albumPageHtmls.length, saavn_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
-                this.albumPageHtmls.push(html);
-                let $ = cheerio.load(html);
+            request(this.input.url.replace("-artist", "-albums") + "?page=" + this.albumPageHtmls.length, saavn_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                this.albumPageHtmls.push(body);
+                let $ = cheerio.load(body);
                 $("h3.title>a").each((index, element) => {
                     let albumInput = new album_input_1.default();
                     albumInput.url = $(element).attr("href");
                     this.input.albums.push(albumInput);
                 });
                 resolve();
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }
     createSongPage() {
         return new Promise((resolve, reject) => {
-            rp.get(this.input.url.replace("-artist", "-songs")
-                + "?page=" + this.songPageHtmls.length, saavn_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
-                this.songPageHtmls.push(html);
-                let $ = cheerio.load(html);
+            request(this.input.url.replace("-artist", "-songs") + "?page=" + this.songPageHtmls.length, saavn_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                this.songPageHtmls.push(body);
+                let $ = cheerio.load(body);
                 $("span.title>a").each((index, element) => {
                     let songInput = new song_input_1.default();
                     songInput.url = $(element).attr("href");
                     this.input.songs.push(songInput);
                 });
                 resolve();
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }

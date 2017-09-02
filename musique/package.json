@@ -20,15 +20,13 @@
     "moment": "^2.18.1",
     "parsque": "^1.0.10",
     "request": "^2.81.0",
-    "request-progress": "^3.0.0",
-    "request-promise": "^4.2.1"
+    "request-progress": "^3.0.0"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.8",
     "@types/cheerio": "^0.22.2",
     "@types/node": "^8.0.26",
     "@types/request": "^2.0.3",
-    "@types/request-promise": "^4.1.37",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
     "gulp-sourcemaps": "^2.6.1",

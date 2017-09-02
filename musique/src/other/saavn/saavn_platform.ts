@@ -11,10 +11,6 @@ import SearchParser from "../../parser/search_parser";
 import SaavnSearchParser from "./parser/saavn_search_parser";
 
 export default class SaavnPlatform extends Platform {
-    public constructor() {
-        super("saavn");
-    }
-
     public createSongParser(): SongParser {
         return new SaavnSongParser(this);
     }

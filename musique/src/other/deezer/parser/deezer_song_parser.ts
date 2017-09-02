@@ -1,8 +1,7 @@
 import * as Promise from "bluebird";
-import * as rp from "request-promise";
+import * as request from "request";
 import * as cheerio from "cheerio";
 import * as crypto from "crypto";
-import * as request from "request";
 
 import SongParser from "../../../parser/song_parser";
 import SongContent from "../../../content/song_content";
@@ -17,16 +16,17 @@ const progress = require("request-progress");
 export default class DeezerSongParser extends SongParser {
     protected createContent(): Promise<SongContent> {
         return new Promise<SongContent>((resolve, reject) => {
-            rp.get(this.input.url, DeezerConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    let content = new SongContent();
-                    content.html = html;
-
-                    resolve(content);
-                })
-                .catch(error => {
+            request(this.input.url, DeezerConstants.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
                     reject(error);
-                });
+                    return;
+                }
+
+                let content = new SongContent();
+                content.html = body;
+
+                resolve(content);
+            });
         });
     }
 

@@ -1,5 +1,5 @@
 import * as Promise from "bluebird";
-import * as rp from "request-promise";
+import * as request from "request";
 import * as cheerio from "cheerio";
 
 import ArtistParser from "../../../parser/artist_parser";
@@ -18,16 +18,17 @@ export default class SaavnArtistParser extends ArtistParser {
 
     protected createContent(): Promise<ArtistContent> {
         return new Promise<ArtistContent>((resolve, reject) => {
-            rp.get(this.input.url, SaavnConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    let content = new ArtistContent();
-                    content.html = html;
-
-                    resolve(content);
-                })
-                .catch(error => {
+            request(this.input.url, SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
                     reject(error);
-                });
+                    return;
+                }
+
+                let content = new ArtistContent();
+                content.html = body;
+
+                resolve(content);
+            });
         });
     }
 
@@ -148,12 +149,16 @@ export default class SaavnArtistParser extends ArtistParser {
 
     private createAlbumPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            rp.get(this.input.url.replace("-artist", "-albums")
-                + "?page=" + this.albumPageHtmls.length, SaavnConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    this.albumPageHtmls.push(html);
+            request(this.input.url.replace("-artist", "-albums") + "?page=" + this.albumPageHtmls.length,
+                SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
 
-                    let $ = cheerio.load(html);
+                    this.albumPageHtmls.push(body);
+
+                    let $ = cheerio.load(body);
 
                     $("h3.title>a").each((index, element) => {
                         let albumInput = new AlbumInput();
@@ -163,21 +168,22 @@ export default class SaavnArtistParser extends ArtistParser {
                     });
 
                     resolve();
-                })
-                .catch(error => {
-                    reject(error);
                 });
         });
     }
 
     private createSongPage(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            rp.get(this.input.url.replace("-artist", "-songs")
-                + "?page=" + this.songPageHtmls.length, SaavnConstants.REQUEST_OPTIONS)
-                .then(html => {
-                    this.songPageHtmls.push(html);
+            request(this.input.url.replace("-artist", "-songs") + "?page=" + this.songPageHtmls.length,
+                SaavnConstants.REQUEST_OPTIONS, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
 
-                    let $ = cheerio.load(html);
+                    this.songPageHtmls.push(body);
+
+                    let $ = cheerio.load(body);
 
                     $("span.title>a").each((index, element) => {
                         let songInput = new SongInput();
@@ -187,9 +193,6 @@ export default class SaavnArtistParser extends ArtistParser {
                     });
 
                     resolve();
-                })
-                .catch(error => {
-                    reject(error);
                 });
         });
     }

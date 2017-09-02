@@ -1,10 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Promise = require("bluebird");
-const rp = require("request-promise");
+const request = require("request");
 const cheerio = require("cheerio");
 const crypto = require("crypto");
-const request = require("request");
 const song_parser_1 = require("../../../parser/song_parser");
 const song_content_1 = require("../../../content/song_content");
 const deezer_constants_1 = require("../deezer_constants");
@@ -16,14 +15,14 @@ const progress = require("request-progress");
 class DeezerSongParser extends song_parser_1.default {
     createContent() {
         return new Promise((resolve, reject) => {
-            rp.get(this.input.url, deezer_constants_1.default.REQUEST_OPTIONS)
-                .then(html => {
+            request(this.input.url, deezer_constants_1.default.REQUEST_OPTIONS, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
                 let content = new song_content_1.default();
-                content.html = html;
+                content.html = body;
                 resolve(content);
-            })
-                .catch(error => {
-                reject(error);
             });
         });
     }
