@@ -1,7 +1,7 @@
 import * as musique from "musique";
 import {AlbumOutput, SongOutput, SongParser} from "musique";
-import * as readline from "readline";
 import * as Promise from "bluebird";
+import * as readline from "readline";
 import * as async from "async";
 import * as mkdirp from "mkdirp";
 import * as ProgressBar from "progress";
@@ -75,7 +75,7 @@ function downloadSong(url: string, edit: boolean): Promise<void> {
         .then(() => {
             return new Promise<void>(resolve => {
                 if (edit) {
-                    const rl = readline.createInterface({
+                    let rl = readline.createInterface({
                         input: process.stdin,
                         output: process.stdout
                     });

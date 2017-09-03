@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const musique = require("musique");
-const readline = require("readline");
 const Promise = require("bluebird");
+const readline = require("readline");
 const async = require("async");
 const mkdirp = require("mkdirp");
 const ProgressBar = require("progress");
@@ -53,7 +53,7 @@ function downloadSong(url, edit) {
         .then(() => {
         return new Promise(resolve => {
             if (edit) {
-                const rl = readline.createInterface({
+                let rl = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout
                 });
