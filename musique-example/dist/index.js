@@ -189,10 +189,13 @@ function downloadSong(songUrl) {
                         renderThrottle: 250
                     });
                 }
+                if (!progress.time.remaining) {
+                    progress.time.remaining = "-";
+                }
                 progressBar.tick(progress.size.transferred - progress.size.downloaded, {
                     speed: megaBytes(progress.speed) + "MBps",
                     size: megaBytes(progress.size.transferred) + "/" + megaBytes(progress.size.total) + "MB",
-                    time: progress.time.remaining + "s"
+                    time: Math.ceil(progress.time.remaining) + "s"
                 });
                 progress.size.downloaded = progress.size.transferred;
             })
@@ -205,7 +208,7 @@ function downloadSong(songUrl) {
                     progressBar.tick(progress.size.total, {
                         speed: megaBytes(progress.speed) + "MBps",
                         size: megaBytes(progress.size.total) + "/" + megaBytes(progress.size.total) + "MB",
-                        time: "0.000s"
+                        time: "0s"
                     });
                     resolve();
                 });
