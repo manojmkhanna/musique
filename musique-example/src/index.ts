@@ -8,7 +8,7 @@ import * as ProgressBar from "progress";
 import * as fs from "fs";
 import * as request from "request";
 import * as Jimp from "jimp";
-// import * as program from "commander";
+import * as program from "commander";
 
 const nodeID3v23 = require("node-id3");
 const nodeID3v24 = require("node-id3v2.4");
@@ -60,6 +60,11 @@ function downloadSong(songUrl: string): Promise<void> {
                 albumTitle = albumOutput.title;
                 albumYear = albumOutput.year;
                 albumArtists = albumOutput.artists.map(artist => artist.title).join("; ");
+
+                {
+                    songArtists = songArtists.replace(/\.(\w)/g, ". $1");
+                    albumArtists = albumArtists.replace(/\.(\w)/g, ". $1");
+                }
 
                 resolve();
             })
@@ -226,20 +231,22 @@ function downloadSong(songUrl: string): Promise<void> {
                             width: 10,
                             head: ">",
                             incomplete: " ",
-                            renderThrottle: 250
+                            renderThrottle: 100
                         });
                     }
 
                     progressBar.tick(progress.size.transferred - progress.size.downloaded, {
                         speed: megaBytes(progress.speed) + "MBps",
                         size: megaBytes(progress.size.transferred) + "/" + megaBytes(progress.size.total) + "MB",
-                        time: Math.ceil(progress.time.remaining) + "s"
+                        time: progress.time.remaining + "s"
                     });
 
                     progress.size.downloaded = progress.size.transferred;
                 })
                     .then(parser => {
-                        fs.writeFile(mp3FileName, parser.output.file, error => {
+                        fs.writeFile(mp3FileName, parser.output.file, {
+                            flag: "wx"
+                        }, error => {
                             if (error) {
                                 reject(error);
                                 return;
@@ -248,7 +255,7 @@ function downloadSong(songUrl: string): Promise<void> {
                             progressBar.tick(progress.size.total, {
                                 speed: megaBytes(progress.speed) + "MBps",
                                 size: megaBytes(progress.size.total) + "/" + megaBytes(progress.size.total) + "MB",
-                                time: "0s"
+                                time: "0.000s"
                             });
 
                             resolve();
@@ -317,7 +324,7 @@ function downloadSong(songUrl: string): Promise<void> {
                     }
 
                     console.log("");
-                    console.log("Finished!");
+                    console.log("Completed!");
 
                     resolve();
                 });
@@ -325,11 +332,11 @@ function downloadSong(songUrl: string): Promise<void> {
         });
 }
 
-// program
-//     .option("-u, --url [url]")
-//     .parse(process.argv);
+program
+    .option("-u, --url [url]")
+    .parse(process.argv);
 
-downloadSong("https://www.saavn.com/s/song/hindi/Dear-Zindagi/Tu-Hi-Hai/PC4oXBVxeV0")
+downloadSong(program.url)
     .catch(error => {
         console.error(error);
     });
