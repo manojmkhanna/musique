@@ -12,19 +12,23 @@ const Jimp = require("jimp");
 const program = require("commander");
 const nodeID3v23 = require("node-id3");
 const nodeID3v24 = require("node-id3v2.4");
-function downloadSong(url, edit) {
+function downloadSong(songUrl) {
+    let rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
     let platformName;
-    if (url.includes("deezer")) {
+    if (songUrl.includes("deezer")) {
         platformName = "deezer";
     }
-    else if (url.includes("saavn")) {
+    else if (songUrl.includes("saavn")) {
         platformName = "saavn";
     }
     let songParser, songGenre, songTitle, songTrack, songArtists, albumDate, albumLabel, albumLanguage, albumTitle, albumYear, albumArtists, directoryName, mp3FileName, artFileName;
     return new Promise((resolve, reject) => {
         console.log("Starting...");
         console.log("");
-        musique.parseSong(platformName, url)
+        musique.parseSong(platformName, songUrl)
             .then(parser => parser.parse())
             .then(parser => parser.parseAlbum(childParser => childParser.parse()))
             .then(parser => {
@@ -52,103 +56,101 @@ function downloadSong(url, edit) {
     })
         .then(() => {
         return new Promise(resolve => {
-            if (edit) {
-                let rl = readline.createInterface({
-                    input: process.stdin,
-                    output: process.stdout
-                });
-                async.series([
-                    callback => {
-                        rl.question("Song title: (" + songTitle + ") ", answer => {
-                            if (answer) {
-                                songTitle = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Album title: (" + albumTitle + ") ", answer => {
-                            if (answer) {
-                                albumTitle = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Song artists: (" + songArtists + ") ", answer => {
-                            if (answer) {
-                                songArtists = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Album artists: (" + albumArtists + ") ", answer => {
-                            if (answer) {
-                                albumArtists = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Song track: (" + songTrack + ") ", answer => {
-                            if (answer) {
-                                songTrack = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Song genre: (" + songGenre + ") ", answer => {
-                            if (answer) {
-                                songGenre = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Album label: (" + albumLabel + ") ", answer => {
-                            if (answer) {
-                                albumLabel = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Album language: (" + albumLanguage + ") ", answer => {
-                            if (answer) {
-                                albumLanguage = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Album date: (" + albumDate + ") ", answer => {
-                            if (answer) {
-                                albumDate = answer;
-                            }
-                            callback();
-                        });
-                    }, callback => {
-                        rl.question("Album year: (" + albumYear + ") ", answer => {
-                            if (answer) {
-                                albumYear = answer;
-                            }
-                            callback();
-                        });
-                    }
-                ], () => {
-                    rl.close();
-                    console.log("");
-                    resolve();
-                });
-            }
-            else {
-                console.log("Song title: " + songTitle);
-                console.log("Album title: " + albumTitle);
-                console.log("Song artists: " + songArtists);
-                console.log("Album artists: " + albumArtists);
-                console.log("Song track: " + songTrack);
-                console.log("Song genre: " + songGenre);
-                console.log("Album label: " + albumLabel);
-                console.log("Album language: " + albumLanguage);
-                console.log("Album date: " + albumDate);
-                console.log("Album year: " + albumYear);
+            console.log("Song title: " + songTitle);
+            console.log("Album title: " + albumTitle);
+            console.log("Song artists: " + songArtists);
+            console.log("Album artists: " + albumArtists);
+            console.log("Song track: " + songTrack);
+            console.log("Song genre: " + songGenre);
+            console.log("Album label: " + albumLabel);
+            console.log("Album language: " + albumLanguage);
+            console.log("Album date: " + albumDate);
+            console.log("Album year: " + albumYear);
+            console.log("");
+            rl.question("Modify? (no) ", answer => {
                 console.log("");
-                resolve();
-            }
+                if (answer === "y" || answer === "yes") {
+                    async.series([
+                        callback => {
+                            rl.question("Song title: (" + songTitle + ") ", answer => {
+                                if (answer) {
+                                    songTitle = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Album title: (" + albumTitle + ") ", answer => {
+                                if (answer) {
+                                    albumTitle = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Song artists: (" + songArtists + ") ", answer => {
+                                if (answer) {
+                                    songArtists = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Album artists: (" + albumArtists + ") ", answer => {
+                                if (answer) {
+                                    albumArtists = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Song track: (" + songTrack + ") ", answer => {
+                                if (answer) {
+                                    songTrack = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Song genre: (" + songGenre + ") ", answer => {
+                                if (answer) {
+                                    songGenre = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Album label: (" + albumLabel + ") ", answer => {
+                                if (answer) {
+                                    albumLabel = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Album language: (" + albumLanguage + ") ", answer => {
+                                if (answer) {
+                                    albumLanguage = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Album date: (" + albumDate + ") ", answer => {
+                                if (answer) {
+                                    albumDate = answer;
+                                }
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Album year: (" + albumYear + ") ", answer => {
+                                if (answer) {
+                                    albumYear = answer;
+                                }
+                                callback();
+                            });
+                        }
+                    ], () => {
+                        console.log("");
+                        resolve();
+                    });
+                }
+                else {
+                    resolve();
+                }
+            });
         });
     })
         .then(() => {
@@ -171,9 +173,14 @@ function downloadSong(url, edit) {
         mp3FileName = directoryName + songTrack + " - " + songTitle + ".mp3";
         mp3FileName = mp3FileName.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
-            let progressBar, newProgress;
-            songParser.parseFile(progress => {
-                if (!progressBar) {
+            let progress, progressBar;
+            let megaBytes = function (bytes) {
+                return Math.round(bytes / 1024 / 1024 * 10) / 10;
+            };
+            songParser.parseFile(state => {
+                if (!progress) {
+                    progress = state;
+                    progress.size.downloaded = 0;
                     progressBar = new ProgressBar("Downloading... [:bar] :percent :speed :size :time", {
                         total: progress.size.total,
                         width: 10,
@@ -181,16 +188,13 @@ function downloadSong(url, edit) {
                         incomplete: " ",
                         renderThrottle: 250
                     });
-                    newProgress = progress;
-                    newProgress.size.downloaded = 0;
                 }
-                progressBar.tick(newProgress.size.transferred - newProgress.size.downloaded, {
-                    speed: Math.round(newProgress.speed / 1024 / 1024 * 10) / 10 + "MBps",
-                    size: Math.round(newProgress.size.transferred / 1024 / 1024 * 10) / 10 + "/"
-                        + Math.round(newProgress.size.total / 1024 / 1024 * 10) / 10 + "MB",
-                    time: Math.round(newProgress.time.remaining * 10) / 10 + "s"
+                progressBar.tick(progress.size.transferred - progress.size.downloaded, {
+                    speed: megaBytes(progress.speed) + "MBps",
+                    size: megaBytes(progress.size.transferred) + "/" + megaBytes(progress.size.total) + "MB",
+                    time: progress.time.remaining + "s"
                 });
-                newProgress.size.downloaded = newProgress.size.transferred;
+                progress.size.downloaded = progress.size.transferred;
             })
                 .then(parser => {
                 fs.writeFile(mp3FileName, parser.output.file, error => {
@@ -198,11 +202,10 @@ function downloadSong(url, edit) {
                         reject(error);
                         return;
                     }
-                    progressBar.tick(newProgress.size.total, {
-                        speed: Math.round(newProgress.speed / 1024 / 1024 * 10) / 10 + "MBps",
-                        size: Math.round(newProgress.size.total / 1024 / 1024 * 10) / 10 + "/"
-                            + Math.round(newProgress.size.total / 1024 / 1024 * 10) / 10 + "MB",
-                        time: "0.0s"
+                    progressBar.tick(progress.size.total, {
+                        speed: megaBytes(progress.speed) + "MBps",
+                        size: megaBytes(progress.size.total) + "/" + megaBytes(progress.size.total) + "MB",
+                        time: "0.000s"
                     });
                     resolve();
                 });
@@ -266,6 +269,7 @@ function downloadSong(url, edit) {
                 }
                 console.log("");
                 console.log("Finished!");
+                rl.close();
                 resolve();
             });
         });
@@ -273,9 +277,8 @@ function downloadSong(url, edit) {
 }
 program
     .option("-u, --url [url]")
-    .option("-e, --edit")
     .parse(process.argv);
-downloadSong(program.url, program.edit)
+downloadSong(program.url)
     .catch(error => {
     console.error(error);
 });
