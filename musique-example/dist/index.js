@@ -13,10 +13,6 @@ const Jimp = require("jimp");
 const nodeID3v23 = require("node-id3");
 const nodeID3v24 = require("node-id3v2.4");
 function downloadSong(songUrl) {
-    let rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
     let platformName;
     if (songUrl.includes("deezer")) {
         platformName = "deezer";
@@ -63,6 +59,10 @@ function downloadSong(songUrl) {
             console.log("Album date: " + albumDate);
             console.log("Album year: " + albumYear);
             console.log("");
+            let rl = readline.createInterface({
+                input: process.stdin,
+                output: process.stdout
+            });
             rl.question("Update? (no) ", answer => {
                 console.log("");
                 if (answer === "y" || answer === "yes") {
@@ -139,11 +139,13 @@ function downloadSong(songUrl) {
                             });
                         }
                     ], () => {
+                        rl.close();
                         console.log("");
                         resolve();
                     });
                 }
                 else {
+                    rl.close();
                     resolve();
                 }
             });
@@ -265,7 +267,6 @@ function downloadSong(songUrl) {
                 }
                 console.log("");
                 console.log("Finished!");
-                rl.close();
                 resolve();
             });
         });
