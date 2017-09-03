@@ -103,7 +103,7 @@ export default class DeezerSongParser extends SongParser {
         });
     }
 
-    protected createFile(progressCallback: (state: object) => void): Promise<Buffer> {
+    protected createFile(progressCallback: (progress: any) => void): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
             let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)![1]);
 

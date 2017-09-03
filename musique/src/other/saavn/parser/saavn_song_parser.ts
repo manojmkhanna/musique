@@ -124,7 +124,7 @@ export default class SaavnSongParser extends SongParser {
         });
     }
 
-    protected createFile(progressCallback: (progress: object) => void): Promise<Buffer> {
+    protected createFile(progressCallback: (progress: any) => void): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
             let $ = cheerio.load(this.content.html);
 

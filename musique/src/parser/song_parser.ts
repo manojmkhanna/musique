@@ -76,7 +76,7 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
         });
     }
 
-    protected createFile(progressCallback: (progress: object) => void): Promise<Buffer> {
+    protected createFile(progressCallback: (progress: any) => void): Promise<Buffer> {
         return new Promise<Buffer>(resolve => {
             resolve();
         });
@@ -118,7 +118,7 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
         return this.parseValue("track", () => this.createTrack());
     }
 
-    public parseFile(progressCallback: (progress: object) => void): Promise<this> {
+    public parseFile(progressCallback: (progress: any) => void): Promise<this> {
         return this.parseValue("file", () => this.createFile(progressCallback));
     }
 

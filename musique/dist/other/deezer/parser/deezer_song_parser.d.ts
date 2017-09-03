@@ -13,7 +13,7 @@ export default class DeezerSongParser extends SongParser {
     protected createMp3(): Promise<string>;
     protected createTitle(): Promise<string>;
     protected createTrack(): Promise<string>;
-    protected createFile(progressCallback: (state: object) => void): Promise<Buffer>;
+    protected createFile(progressCallback: (progress: any) => void): Promise<Buffer>;
     protected createAlbum(): Promise<AlbumOutput>;
     protected createArtists(): Promise<ArtistOutput[]>;
 }
