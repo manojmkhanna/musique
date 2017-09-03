@@ -5,6 +5,7 @@ const readline = require("readline");
 const Promise = require("bluebird");
 const async = require("async");
 const mkdirp = require("mkdirp");
+const ProgressBar = require("progress");
 const fs = require("fs");
 const request = require("request");
 const Jimp = require("jimp");
@@ -24,7 +25,7 @@ function downloadSong(songUrl) {
     }
     let songParser, songGenre, songTitle, songTrack, songArtists, albumDate, albumLabel, albumLanguage, albumTitle, albumYear, albumArtists, directoryName, songMp3FileName, songArtFileName;
     return new Promise((resolve, reject) => {
-        console.log("Starting download...");
+        console.log("Starting...");
         console.log("");
         musique.parseSong(platformName, songUrl)
             .then(parser => parser.parse())
@@ -153,14 +154,27 @@ function downloadSong(songUrl) {
         songMp3FileName = directoryName + songTrack + " - " + songTitle + ".mp3";
         songMp3FileName = songMp3FileName.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
-            // let progressBar: ProgressBar = new ProgressBar("Downloading... [:bar] :percent", {
-            //     total: 100,
-            //     width: 10,
-            //     // complete: "=",
-            //     // incomplete: " "
-            // });
+            let progressBar;
+            let newProgress;
             songParser.parseFile(progress => {
-                // progressBar.tick(progress.percent, {});
+                if (!progressBar) {
+                    progressBar = new ProgressBar("Downloading... [:bar] :percent :speed :size :time", {
+                        total: progress.size.total,
+                        width: 10,
+                        head: ">",
+                        incomplete: " ",
+                        renderThrottle: 250
+                    });
+                    newProgress = progress;
+                    newProgress.size.downloaded = 0;
+                }
+                progressBar.tick(newProgress.size.transferred - newProgress.size.downloaded, {
+                    speed: Math.round(newProgress.speed / 1024 / 1024 * 10) / 10 + "MBps",
+                    size: Math.round(newProgress.size.transferred / 1024 / 1024 * 10) / 10 + "/"
+                        + Math.round(newProgress.size.total / 1024 / 1024 * 10) / 10 + "MB",
+                    time: Math.round(newProgress.time.remaining * 10) / 10 + "s"
+                });
+                newProgress.size.downloaded = newProgress.size.transferred;
             })
                 .then(parser => {
                 fs.writeFile(songMp3FileName, parser.output.file, error => {
@@ -168,6 +182,12 @@ function downloadSong(songUrl) {
                         reject(error);
                         return;
                     }
+                    progressBar.tick(newProgress.size.total, {
+                        speed: Math.round(newProgress.speed / 1024 / 1024 * 10) / 10 + "MBps",
+                        size: Math.round(newProgress.size.total / 1024 / 1024 * 10) / 10 + "/"
+                            + Math.round(newProgress.size.total / 1024 / 1024 * 10) / 10 + "MB",
+                        time: "0.0s"
+                    });
                     resolve();
                 });
             })
@@ -228,7 +248,8 @@ function downloadSong(songUrl) {
                     reject(error);
                     return;
                 }
-                console.log("Download completed!");
+                console.log("");
+                console.log("Finished!");
                 resolve();
             });
         });

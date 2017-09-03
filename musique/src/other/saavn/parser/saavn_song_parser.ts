@@ -146,7 +146,7 @@ export default class SaavnSongParser extends SongParser {
 
                 resolve(body);
             }), {
-                throttle: 33
+                throttle: 16
             })
                 .on("progress", (state: object) => {
                     progressCallback(state);

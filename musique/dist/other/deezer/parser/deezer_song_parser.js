@@ -111,7 +111,7 @@ class DeezerSongParser extends song_parser_1.default {
                 }
                 resolve(body);
             }), {
-                throttle: 33
+                throttle: 16
             })
                 .on("progress", (state) => {
                 progressCallback(state);
