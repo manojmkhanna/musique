@@ -9,7 +9,7 @@ const ProgressBar = require("progress");
 const fs = require("fs");
 const request = require("request");
 const Jimp = require("jimp");
-const program = require("commander");
+// import * as program from "commander";
 const nodeID3v23 = require("node-id3");
 const nodeID3v24 = require("node-id3v2.4");
 function downloadSong(songUrl) {
@@ -44,10 +44,6 @@ function downloadSong(songUrl) {
             albumTitle = albumOutput.title;
             albumYear = albumOutput.year;
             albumArtists = albumOutput.artists.map(artist => artist.title).join("; ");
-            {
-                songArtists = songArtists.replace("A.R. Rahman", "A. R. Rahman");
-                albumArtists = albumArtists.replace("A.R. Rahman", "A. R. Rahman");
-            }
             resolve();
         })
             .catch(error => {
@@ -67,7 +63,7 @@ function downloadSong(songUrl) {
             console.log("Album date: " + albumDate);
             console.log("Album year: " + albumYear);
             console.log("");
-            rl.question("Modify? (no) ", answer => {
+            rl.question("Update? (no) ", answer => {
                 console.log("");
                 if (answer === "y" || answer === "yes") {
                     async.series([
@@ -189,9 +185,6 @@ function downloadSong(songUrl) {
                         renderThrottle: 250
                     });
                 }
-                if (!progress.time.remaining) {
-                    progress.time.remaining = "-";
-                }
                 progressBar.tick(progress.size.transferred - progress.size.downloaded, {
                     speed: megaBytes(progress.speed) + "MBps",
                     size: megaBytes(progress.size.transferred) + "/" + megaBytes(progress.size.total) + "MB",
@@ -278,10 +271,10 @@ function downloadSong(songUrl) {
         });
     });
 }
-program
-    .option("-u, --url [url]")
-    .parse(process.argv);
-downloadSong(program.url)
+// program
+//     .option("-u, --url [url]")
+//     .parse(process.argv);
+downloadSong("https://www.saavn.com/s/song/hindi/Dear-Zindagi/Tu-Hi-Hai/PC4oXBVxeV0")
     .catch(error => {
     console.error(error);
 });

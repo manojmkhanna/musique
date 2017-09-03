@@ -139,7 +139,7 @@ export default class SaavnSongParser extends SongParser {
             progress(request(mp3, {
                 encoding: null
             }, (error, response, body) => {
-                if (error) {
+                if (error || response.statusCode == 403) {
                     reject(error);
                     return;
                 }

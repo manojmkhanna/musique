@@ -19,7 +19,7 @@
     "commander": "^2.11.0",
     "jimp": "^0.2.28",
     "mkdirp": "^0.5.1",
-    "musique": "^1.0.6",
+    "musique": "file:../musique",
     "node-id3": "0.0.10",
     "node-id3v2.4": "0.0.4",
     "progress": "^2.0.0",
