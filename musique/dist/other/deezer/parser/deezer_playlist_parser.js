@@ -24,7 +24,7 @@ class DeezerPlaylistParser extends playlist_parser_1.default {
     }
     contentCreated() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let songInputs = [];
             for (let i = 0; i < json.SONGS.data.length; i++) {
                 let songInput = new song_input_1.default();
@@ -43,7 +43,7 @@ class DeezerPlaylistParser extends playlist_parser_1.default {
     }
     createSongs() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let songOutputs = this.output.songs;
             if (!songOutputs) {
                 songOutputs = [];

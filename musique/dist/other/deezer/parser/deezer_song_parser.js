@@ -28,7 +28,7 @@ class DeezerSongParser extends song_parser_1.default {
     }
     contentCreated() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let albumInput = new album_input_1.default();
             albumInput.url = "http://www.deezer.com/en/album/" + json.DATA.ALB_ID;
             this.input.album = albumInput;
@@ -56,7 +56,7 @@ class DeezerSongParser extends song_parser_1.default {
     }
     createMp3() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let hash = json.DATA.MD5_ORIGIN + "¤3¤" + json.DATA.SNG_ID + "¤" + json.DATA.MEDIA_VERSION;
             let hashMd5 = crypto.createHash("md5").update(new Buffer(hash, "binary")).digest("hex");
             hash = hashMd5 + "¤" + hash + "¤";
@@ -73,13 +73,13 @@ class DeezerSongParser extends song_parser_1.default {
     }
     createTrack() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             resolve(json.DATA.TRACK_NUMBER);
         });
     }
     createFile(progressCallback) {
         return new Promise((resolve, reject) => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let hash = json.DATA.MD5_ORIGIN + "¤3¤" + json.DATA.SNG_ID + "¤" + json.DATA.MEDIA_VERSION;
             let hashMd5 = crypto.createHash("md5").update(new Buffer(hash, "binary")).digest("hex");
             hash = hashMd5 + "¤" + hash + "¤";
@@ -120,7 +120,7 @@ class DeezerSongParser extends song_parser_1.default {
     }
     createAlbum() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let albumOutput = this.output.album;
             if (!albumOutput) {
                 albumOutput = new album_output_1.default();
@@ -132,7 +132,7 @@ class DeezerSongParser extends song_parser_1.default {
     }
     createArtists() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let artistOutputs = this.output.artists;
             if (!artistOutputs) {
                 artistOutputs = [];

@@ -27,7 +27,7 @@ class DeezerAlbumParser extends album_parser_1.default {
     }
     contentCreated() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let artistInputs = [];
             for (let i = 0; i < json.DATA.ARTISTS.length; i++) {
                 let artistInput = new artist_input_1.default();
@@ -83,7 +83,7 @@ class DeezerAlbumParser extends album_parser_1.default {
     }
     createArtists() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let artistOutputs = this.output.artists;
             if (!artistOutputs) {
                 artistOutputs = [];
@@ -102,7 +102,7 @@ class DeezerAlbumParser extends album_parser_1.default {
     }
     createSongs() {
         return new Promise(resolve => {
-            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)</)[1]);
+            let json = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
             let songOutputs = this.output.songs;
             if (!songOutputs) {
                 songOutputs = [];
