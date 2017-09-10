@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const musique = require("musique");
+const musique = require("musique"); //TODO: Change package.json file:
 const Promise = require("bluebird");
 const readline = require("readline");
 const async = require("async");
@@ -20,7 +20,7 @@ function downloadSong(songUrl) {
     else if (songUrl.includes("saavn")) {
         platformName = "saavn";
     }
-    let songParser, songGenre, songTitle, songTrack, songArtists, albumDate, albumLabel, albumLanguage, albumTitle, albumYear, albumArtists, directoryName, mp3FileName, artFileName;
+    let songParser, songTitle, songTrack, songArtists, albumDate, albumLabel, albumLanguage, albumTitle, albumArtists, directoryName, mp3FileName, artFileName;
     return new Promise((resolve, reject) => {
         console.log("Starting...");
         console.log("");
@@ -30,7 +30,6 @@ function downloadSong(songUrl) {
             .then(parser => {
             songParser = parser;
             let songOutput = parser.output, albumOutput = songOutput.album;
-            songGenre = songOutput.genre;
             songTitle = songOutput.title;
             songTrack = songOutput.track;
             songArtists = songOutput.artists.map(artist => artist.title).join("; ");
@@ -38,12 +37,9 @@ function downloadSong(songUrl) {
             albumLabel = albumOutput.label;
             albumLanguage = albumOutput.language;
             albumTitle = albumOutput.title;
-            albumYear = albumOutput.year;
             albumArtists = albumOutput.artists.map(artist => artist.title).join("; ");
-            {
-                songArtists = songArtists.replace(/\.(\w)/g, ". $1");
-                albumArtists = albumArtists.replace(/\.(\w)/g, ". $1");
-            }
+            songArtists = songArtists.replace(/\.(\w)/g, ". $1");
+            albumArtists = albumArtists.replace(/\.(\w)/g, ". $1");
             resolve();
         })
             .catch(error => {
@@ -57,11 +53,9 @@ function downloadSong(songUrl) {
             console.log("Song artists: " + songArtists);
             console.log("Album artists: " + albumArtists);
             console.log("Song track: " + songTrack);
-            console.log("Song genre: " + songGenre);
+            console.log("Album date: " + albumDate);
             console.log("Album label: " + albumLabel);
             console.log("Album language: " + albumLanguage);
-            console.log("Album date: " + albumDate);
-            console.log("Album year: " + albumYear);
             console.log("");
             let rl = readline.createInterface({
                 input: process.stdin,
@@ -107,9 +101,9 @@ function downloadSong(songUrl) {
                                 callback();
                             });
                         }, callback => {
-                            rl.question("Song genre: (" + songGenre + ") ", answer => {
+                            rl.question("Album date: (" + albumDate + ") ", answer => {
                                 if (answer) {
-                                    songGenre = answer;
+                                    albumDate = answer;
                                 }
                                 callback();
                             });
@@ -124,20 +118,6 @@ function downloadSong(songUrl) {
                             rl.question("Album language: (" + albumLanguage + ") ", answer => {
                                 if (answer) {
                                     albumLanguage = answer;
-                                }
-                                callback();
-                            });
-                        }, callback => {
-                            rl.question("Album date: (" + albumDate + ") ", answer => {
-                                if (answer) {
-                                    albumDate = answer;
-                                }
-                                callback();
-                            });
-                        }, callback => {
-                            rl.question("Album year: (" + albumYear + ") ", answer => {
-                                if (answer) {
-                                    albumYear = answer;
                                 }
                                 callback();
                             });
@@ -158,7 +138,7 @@ function downloadSong(songUrl) {
         .then(() => {
         directoryName = "Songs/"
             + albumLanguage + "/"
-            + albumYear + "/"
+            + albumDate.substr(0, 4) + "/"
             + albumTitle + "/";
         directoryName = directoryName.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
@@ -199,9 +179,7 @@ function downloadSong(songUrl) {
                 progress.size.downloaded = progress.size.transferred;
             })
                 .then(parser => {
-                fs.writeFile(mp3FileName, parser.output.file, {
-                    flag: "wx"
-                }, error => {
+                fs.writeFile(mp3FileName, parser.output.file, error => {
                     if (error) {
                         reject(error);
                         return;
@@ -209,7 +187,7 @@ function downloadSong(songUrl) {
                     progressBar.tick(progress.size.total, {
                         speed: megaBytes(progress.speed) + "MBps",
                         size: megaBytes(progress.size.total) + "/" + megaBytes(progress.size.total) + "MB",
-                        time: "0.000s"
+                        time: "0s"
                     });
                     resolve();
                 });
@@ -251,16 +229,15 @@ function downloadSong(songUrl) {
         nodeID3v23.write({
             album: albumTitle,
             artist: songArtists,
-            genre: songGenre,
             image: artFileName,
             language: albumLanguage,
             performerInfo: albumArtists,
             publisher: albumLabel,
             title: songTitle,
-            trackNumber: songTrack,
-            year: albumYear,
+            trackNumber: songTrack
         }, mp3FileName);
         let tag = nodeID3v24.readTag(mp3FileName);
+        tag.addFrame("TDRC", [albumDate]);
         tag.addFrame("TDRL", [albumDate]);
         tag.write();
     })

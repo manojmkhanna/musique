@@ -5,6 +5,7 @@ import * as request from "request";
 import SearchParser from "../../../parser/search_parser";
 import SongOutput from "../../../output/song_output";
 import AlbumOutput from "../../../output/album_output";
+import ArtistOutput from "../../../output/artist_output";
 import PlaylistOutput from "../../../output/playlist_output";
 import SongParser from "../../../parser/song_parser";
 import AlbumParser from "../../../parser/album_parser";
@@ -88,6 +89,10 @@ export default class SaavnSearchParser extends SearchParser {
 
                 return albumOutputs;
             });
+    }
+
+    protected createArtists(): Promise<ArtistOutput[]> {    //TODO
+        return super.createArtists();
     }
 
     protected createPlaylists(): Promise<PlaylistOutput[]> {

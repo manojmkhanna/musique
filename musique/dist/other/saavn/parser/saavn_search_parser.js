@@ -71,6 +71,9 @@ class SaavnSearchParser extends search_parser_1.default {
             return albumOutputs;
         });
     }
+    createArtists() {
+        return super.createArtists();
+    }
     createPlaylists() {
         return this.createPlaylistPage()
             .then(() => {
