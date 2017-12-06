@@ -87,7 +87,7 @@ export default class SaavnAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("div.header-context>a").first().text());
+            resolve($("div.header-context>a[title]").last().text().match("(.+) Albums")![1]);
         });
     }
 
