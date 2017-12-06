@@ -1,6 +1,6 @@
 {
   "name": "musique",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,26 +11,26 @@
   "keywords": [],
   "author": {
     "name": "Manoj Khanna",
-    "email": "manojkhannakm@gmail.com"
+    "email": "manojmkhanna@gmail.com"
   },
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.5.0",
+    "bluebird": "^3.5.1",
     "cheerio": "^1.0.0-rc.2",
-    "moment": "^2.18.1",
-    "parsque": "^1.0.11",
-    "request": "^2.81.0",
+    "moment": "^2.19.3",
+    "parsque": "^1.0.12",
+    "request": "^2.83.0",
     "request-progress": "^3.0.0"
   },
   "devDependencies": {
-    "@types/bluebird": "^3.5.8",
-    "@types/cheerio": "^0.22.2",
-    "@types/node": "^8.0.26",
-    "@types/request": "^2.0.3",
+    "@types/bluebird": "^3.5.18",
+    "@types/cheerio": "^0.22.6",
+    "@types/node": "^8.0.55",
+    "@types/request": "^2.0.8",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
     "gulp-sourcemaps": "^2.6.1",
-    "gulp-typescript": "^3.2.2",
+    "gulp-typescript": "^3.2.3",
     "typescript": "^2.5.2"
   }
 }

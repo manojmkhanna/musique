@@ -1,4 +1,4 @@
-import * as musique from "musique"; //TODO: Change package.json file:
+import * as musique from "musique";
 import {AlbumOutput, SongOutput, SongParser} from "musique";
 import * as Promise from "bluebird";
 import * as readline from "readline";
@@ -50,12 +50,12 @@ function downloadSong(songUrl: string): Promise<void> {
 
                 songTitle = songOutput.title;
                 songTrack = songOutput.track;
-                songArtists = songOutput.artists.map(artist => artist.title).join("; ");
+                songArtists = [...new Set(songOutput.artists.map(artist => artist.title))].join("; ");
                 albumDate = albumOutput.date;
                 albumLabel = albumOutput.label;
                 albumLanguage = albumOutput.language;
                 albumTitle = albumOutput.title;
-                albumArtists = albumOutput.artists.map(artist => artist.title).join("; ");
+                albumArtists = [...new Set(albumOutput.artists.map(artist => artist.title))].join("; ");
 
                 songArtists = songArtists.replace(/\.(\w)/g, ". $1");
                 albumArtists = albumArtists.replace(/\.(\w)/g, ". $1");

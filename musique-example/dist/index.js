@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const musique = require("musique"); //TODO: Change package.json file:
+const musique = require("musique");
 const Promise = require("bluebird");
 const readline = require("readline");
 const async = require("async");
@@ -32,12 +32,12 @@ function downloadSong(songUrl) {
             let songOutput = parser.output, albumOutput = songOutput.album;
             songTitle = songOutput.title;
             songTrack = songOutput.track;
-            songArtists = songOutput.artists.map(artist => artist.title).join("; ");
+            songArtists = [...new Set(songOutput.artists.map(artist => artist.title))].join("; ");
             albumDate = albumOutput.date;
             albumLabel = albumOutput.label;
             albumLanguage = albumOutput.language;
             albumTitle = albumOutput.title;
-            albumArtists = albumOutput.artists.map(artist => artist.title).join("; ");
+            albumArtists = [...new Set(albumOutput.artists.map(artist => artist.title))].join("; ");
             songArtists = songArtists.replace(/\.(\w)/g, ". $1");
             albumArtists = albumArtists.replace(/\.(\w)/g, ". $1");
             resolve();
@@ -65,7 +65,7 @@ function downloadSong(songUrl) {
                 console.log("");
                 if (answer === "y" || answer === "yes") {
                     async.series([
-                        callback => {
+                            callback => {
                             rl.question("Song title: (" + songTitle + ") ", answer => {
                                 if (answer) {
                                     songTitle = answer;

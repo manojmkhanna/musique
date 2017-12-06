@@ -10,34 +10,34 @@
   "keywords": [],
   "author": {
     "name": "Manoj Khanna",
-    "email": "manojkhannakm@gmail.com"
+    "email": "manojmkhanna@gmail.com"
   },
   "license": "MIT",
   "dependencies": {
-    "async": "^2.5.0",
-    "bluebird": "^3.5.0",
-    "commander": "^2.11.0",
+    "async": "^2.6.0",
+    "bluebird": "^3.5.1",
+    "commander": "^2.12.2",
     "jimp": "^0.2.28",
     "mkdirp": "^0.5.1",
     "musique": "file:../musique",
-    "node-id3": "0.0.10",
-    "node-id3v2.4": "0.0.4",
+    "node-id3": "^0.1.0",
+    "node-id3v2.4": "^0.0.4",
     "progress": "^2.0.0",
-    "request": "^2.81.0"
+    "request": "^2.83.0"
   },
   "devDependencies": {
-    "@types/async": "^2.0.42",
-    "@types/bluebird": "^3.5.8",
-    "@types/commander": "^2.9.2",
+    "@types/async": "^2.0.45",
+    "@types/bluebird": "^3.5.18",
+    "@types/commander": "^2.12.2",
     "@types/jimp": "^0.2.1",
-    "@types/mkdirp": "^0.5.1",
-    "@types/node": "^8.0.26",
+    "@types/mkdirp": "^0.5.2",
+    "@types/node": "^8.0.55",
     "@types/progress": "^2.0.0",
-    "@types/request": "^2.0.3",
+    "@types/request": "^2.0.8",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
     "gulp-sourcemaps": "^2.6.1",
-    "gulp-typescript": "^3.2.2",
-    "typescript": "^2.5.2"
+    "gulp-typescript": "^3.2.3",
+    "typescript": "^2.6.2"
   }
 }
