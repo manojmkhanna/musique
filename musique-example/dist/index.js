@@ -5,45 +5,67 @@ const Promise = require("bluebird");
 const readline = require("readline");
 const async = require("async");
 const mkdirp = require("mkdirp");
-const ProgressBar = require("progress");
 const fs = require("fs");
+const ProgressBar = require("progress");
 const request = require("request");
 const Jimp = require("jimp");
-const program = require("commander");
 const nodeID3v23 = require("node-id3");
 const nodeID3v24 = require("node-id3v2.4");
-function downloadSong(songUrl) {
-    let platformName;
-    if (songUrl.includes("deezer")) {
-        platformName = "deezer";
-    }
-    else if (songUrl.includes("saavn")) {
-        platformName = "saavn";
-    }
-    let songParser, songTitle, songTrack, songArtists, albumDate, albumLabel, albumLanguage, albumTitle, albumArtists, directoryName, mp3FileName, artFileName;
+function run() {
+    console.log("Starting...");
+    console.log("");
+    let songUrl, songFileName, songParser, songTitle, songTrack, songArtists, albumDate, albumLabel, albumLanguage, albumTitle, albumArtists, directoryName, mp3FileName, artFileName;
     return new Promise((resolve, reject) => {
-        console.log("Starting...");
-        console.log("");
-        musique.parseSong(platformName, songUrl)
-            .then(parser => parser.parse())
-            .then(parser => parser.parseAlbum(childParser => childParser.parse()))
-            .then(parser => {
-            songParser = parser;
-            let songOutput = parser.output, albumOutput = songOutput.album;
-            songTitle = songOutput.title;
-            songTrack = songOutput.track;
-            songArtists = [...new Set(songOutput.artists.map(artist => artist.title))].join("; ");
-            albumDate = albumOutput.date;
-            albumLabel = albumOutput.label;
-            albumLanguage = albumOutput.language;
-            albumTitle = albumOutput.title;
-            albumArtists = [...new Set(albumOutput.artists.map(artist => artist.title))].join("; ");
-            songArtists = songArtists.replace(/\.(\w)/g, ". $1");
-            albumArtists = albumArtists.replace(/\.(\w)/g, ". $1");
+        let rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        rl.question("Song args: ", answer => {
+            console.log("");
+            if (!answer) {
+                rl.close();
+                reject(new Error("Invalid song args!"));
+                return;
+            }
+            let songArgs = answer.split("; ");
+            songUrl = songArgs[0];
+            if (songArgs.length > 1) {
+                songFileName = songArgs[1];
+            }
+            rl.close();
             resolve();
-        })
-            .catch(error => {
-            reject(error);
+        });
+    })
+        .then(() => {
+        let platformName;
+        if (songUrl.includes("deezer")) {
+            platformName = "deezer";
+        }
+        else if (songUrl.includes("saavn")) {
+            platformName = "saavn";
+        }
+        return new Promise((resolve, reject) => {
+            musique.parseSong(platformName, songUrl)
+                .then(parser => parser.parse())
+                .then(parser => parser.parseAlbum(childParser => childParser.parse()))
+                .then(parser => {
+                songParser = parser;
+                let songOutput = parser.output, albumOutput = songOutput.album;
+                songTitle = songOutput.title;
+                songTrack = songOutput.track;
+                songArtists = [...new Set(songOutput.artists.map(artist => artist.title))].join("; ");
+                albumDate = albumOutput.date;
+                albumLabel = albumOutput.label;
+                albumLanguage = albumOutput.language;
+                albumTitle = albumOutput.title;
+                albumArtists = [...new Set(albumOutput.artists.map(artist => artist.title))].join("; ");
+                songArtists = songArtists.replace(/\.(\w)/g, ". $1");
+                albumArtists = albumArtists.replace(/\.(\w)/g, ". $1");
+                resolve();
+            })
+                .catch(error => {
+                reject(error);
+            });
         });
     })
         .then(() => {
@@ -123,8 +145,8 @@ function downloadSong(songUrl) {
                             });
                         }
                     ], () => {
-                        rl.close();
                         console.log("");
+                        rl.close();
                         resolve();
                     });
                 }
@@ -137,8 +159,11 @@ function downloadSong(songUrl) {
     })
         .then(() => {
         directoryName = "Songs/"
-            + albumLanguage + "/"
-            + albumDate.substr(0, 4) + "/"
+            + albumLanguage + "/";
+        if (albumLanguage === "English" && songTitle === albumTitle && songTrack === "1") {
+            directoryName += "Singles/";
+        }
+        directoryName += albumDate.substr(0, 4) + "/"
             + albumTitle + "/";
         directoryName = directoryName.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
@@ -155,46 +180,57 @@ function downloadSong(songUrl) {
         mp3FileName = directoryName + songTrack + " - " + songTitle + ".mp3";
         mp3FileName = mp3FileName.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
-            let progress, progressBar;
-            let megaBytes = function (bytes) {
-                return Math.round(bytes / 1024 / 1024 * 10) / 10;
-            };
-            songParser.parseFile(state => {
-                if (!progress) {
-                    progress = state;
-                    progress.size.downloaded = 0;
-                    progressBar = new ProgressBar("Downloading... [:bar] :percent :speed :size :time", {
-                        total: progress.size.total,
-                        width: 10,
-                        head: ">",
-                        incomplete: " ",
-                        renderThrottle: 100
-                    });
-                }
-                progressBar.tick(progress.size.transferred - progress.size.downloaded, {
-                    speed: megaBytes(progress.speed) + "MBps",
-                    size: megaBytes(progress.size.transferred) + "/" + megaBytes(progress.size.total) + "MB",
-                    time: progress.time.remaining + "s"
-                });
-                progress.size.downloaded = progress.size.transferred;
-            })
-                .then(parser => {
-                fs.writeFile(mp3FileName, parser.output.file, error => {
+            if (songFileName) {
+                fs.rename(songFileName, mp3FileName, error => {
                     if (error) {
                         reject(error);
                         return;
                     }
-                    progressBar.tick(progress.size.total, {
-                        speed: megaBytes(progress.speed) + "MBps",
-                        size: megaBytes(progress.size.total) + "/" + megaBytes(progress.size.total) + "MB",
-                        time: "0s"
-                    });
                     resolve();
                 });
-            })
-                .catch(error => {
-                reject(error);
-            });
+            }
+            else {
+                let progress, progressBar;
+                let megaBytes = function (bytes) {
+                    return Math.round(bytes / 1024 / 1024 * 10) / 10;
+                };
+                songParser.parseFile(state => {
+                    if (!progress) {
+                        progress = state;
+                        progress.size.downloaded = 0;
+                        progressBar = new ProgressBar("Downloading... [:bar] :percent :speed :size :time", {
+                            total: progress.size.total,
+                            width: 10,
+                            head: ">",
+                            incomplete: " ",
+                            renderThrottle: 100
+                        });
+                    }
+                    progressBar.tick(progress.size.transferred - progress.size.downloaded, {
+                        speed: megaBytes(progress.speed) + "MBps",
+                        size: megaBytes(progress.size.transferred) + "/" + megaBytes(progress.size.total) + "MB",
+                        time: progress.time.remaining + "s"
+                    });
+                    progress.size.downloaded = progress.size.transferred;
+                })
+                    .then(parser => {
+                    fs.writeFile(mp3FileName, parser.output.file, error => {
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+                        progressBar.tick(progress.size.total, {
+                            speed: megaBytes(progress.speed) + "MBps",
+                            size: megaBytes(progress.size.total) + "/" + megaBytes(progress.size.total) + "MB",
+                            time: "0s"
+                        });
+                        resolve();
+                    });
+                })
+                    .catch(error => {
+                    reject(error);
+                });
+            }
         });
     })
         .then(() => {
@@ -255,10 +291,7 @@ function downloadSong(songUrl) {
         });
     });
 }
-program
-    .option("-u, --url [url]")
-    .parse(process.argv);
-downloadSong(program.url)
+run()
     .catch(error => {
     console.error(error);
 });
