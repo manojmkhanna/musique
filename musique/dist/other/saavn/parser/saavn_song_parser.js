@@ -31,18 +31,14 @@ class SaavnSongParser extends song_parser_1.default {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
             let albumInput = new album_input_1.default();
-            let artistInputs = [];
-            $("h2.page-subtitle>a").each((index, element) => {
-                if (index == 0) {
-                    albumInput.url = $(element).attr("href");
-                }
-                else {
-                    let artistInput = new artist_input_1.default();
-                    artistInput.url = $(element).attr("href").replace("-albums", "-artist");
-                    artistInputs[index - 1] = artistInput;
-                }
-            });
+            albumInput.url = $("h2.page-subtitle>a").first().attr("href");
             this.input.album = albumInput;
+            let artistInputs = [];
+            $("h4:contains(Singers)+p>a").each((index, element) => {
+                let artistInput = new artist_input_1.default();
+                artistInput.url = $(element).attr("href").replace("-albums", "-artist");
+                artistInputs[index] = artistInput;
+            });
             this.input.artists = artistInputs;
             resolve();
         });
@@ -71,7 +67,7 @@ class SaavnSongParser extends song_parser_1.default {
             let hash = JSON.parse($("div.song-json").first().text()).url;
             let cipher = crypto.createDecipheriv("des-ecb", "38346591", "");
             hash = cipher.update(hash, "base64", "ascii") + cipher.final("ascii");
-            resolve("https://h.saavncdn.com" + hash.substr(10) + "_320.mp3");
+            resolve("https://h.saavncdn.com" + hash.substr(10) + ".mp3");
         });
     }
     createTitle() {
@@ -112,7 +108,20 @@ class SaavnSongParser extends song_parser_1.default {
                     return;
                 }
                 if (response.statusCode == 403) {
-                    reject(new Error(response.statusMessage));
+                    progress(request(mp3.replace("_320", ""), {
+                        encoding: null
+                    }, (error, response, body) => {
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+                        resolve(body);
+                    }), {
+                        throttle: 16
+                    })
+                        .on("progress", (state) => {
+                        progressCallback(state);
+                    });
                     return;
                 }
                 resolve(body);
@@ -144,16 +153,14 @@ class SaavnSongParser extends song_parser_1.default {
             if (!artistOutputs) {
                 artistOutputs = [];
             }
-            $("h2.page-subtitle>a").each((index, element) => {
-                if (index > 0) {
-                    let artistOutput = artistOutputs[index];
-                    if (!artistOutput) {
-                        artistOutput = new artist_output_1.default();
-                    }
-                    artistOutput.url = $(element).attr("href").replace("-albums", "-artist");
-                    artistOutput.title = $(element).text();
-                    artistOutputs[index - 1] = artistOutput;
+            $("h4:contains(Singers)+p>a").each((index, element) => {
+                let artistOutput = artistOutputs[index];
+                if (!artistOutput) {
+                    artistOutput = new artist_output_1.default();
                 }
+                artistOutput.url = $(element).attr("href").replace("-albums", "-artist");
+                artistOutput.title = $(element).text();
+                artistOutputs[index] = artistOutput;
             });
             resolve(artistOutputs);
         });

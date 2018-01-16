@@ -36,20 +36,19 @@ export default class SaavnSongParser extends SongParser {
             let $ = cheerio.load(this.content.html);
 
             let albumInput: AlbumInput = new AlbumInput();
-            let artistInputs: ArtistInput[] = [];
-
-            $("h2.page-subtitle>a").each((index, element) => {
-                if (index == 0) {
-                    albumInput.url = $(element).attr("href");
-                } else {
-                    let artistInput: ArtistInput = new ArtistInput();
-                    artistInput.url = $(element).attr("href").replace("-albums", "-artist");
-
-                    artistInputs[index - 1] = artistInput;
-                }
-            });
+            albumInput.url = $("h2.page-subtitle>a").first().attr("href");
 
             this.input.album = albumInput;
+
+            let artistInputs: ArtistInput[] = [];
+
+            $("h4:contains(Singers)+p>a").each((index, element) => {
+                let artistInput: ArtistInput = new ArtistInput();
+                artistInput.url = $(element).attr("href").replace("-albums", "-artist");
+
+                artistInputs[index] = artistInput;
+            });
+
             this.input.artists = artistInputs;
 
             resolve();
@@ -88,7 +87,7 @@ export default class SaavnSongParser extends SongParser {
 
             hash = cipher.update(hash, "base64", "ascii") + cipher.final("ascii");
 
-            resolve("https://h.saavncdn.com" + hash.substr(10) + "_320.mp3");
+            resolve("https://h.saavncdn.com" + hash.substr(10) + ".mp3");
         });
     }
 
@@ -145,7 +144,22 @@ export default class SaavnSongParser extends SongParser {
                 }
 
                 if (response.statusCode == 403) {
-                    reject(new Error(response.statusMessage));
+                    progress(request(mp3.replace("_320", ""), {
+                        encoding: null
+                    }, (error, response, body) => {
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+
+                        resolve(body);
+                    }), {
+                        throttle: 16
+                    })
+                        .on("progress", (state: object) => {
+                            progressCallback(state);
+                        });
+
                     return;
                 }
 
@@ -188,19 +202,17 @@ export default class SaavnSongParser extends SongParser {
                 artistOutputs = [];
             }
 
-            $("h2.page-subtitle>a").each((index, element) => {
-                if (index > 0) {
-                    let artistOutput: ArtistOutput = artistOutputs[index];
+            $("h4:contains(Singers)+p>a").each((index, element) => {
+                let artistOutput: ArtistOutput = artistOutputs[index];
 
-                    if (!artistOutput) {
-                        artistOutput = new ArtistOutput();
-                    }
-
-                    artistOutput.url = $(element).attr("href").replace("-albums", "-artist");
-                    artistOutput.title = $(element).text();
-
-                    artistOutputs[index - 1] = artistOutput;
+                if (!artistOutput) {
+                    artistOutput = new ArtistOutput();
                 }
+
+                artistOutput.url = $(element).attr("href").replace("-albums", "-artist");
+                artistOutput.title = $(element).text();
+
+                artistOutputs[index] = artistOutput;
             });
 
             resolve(artistOutputs);

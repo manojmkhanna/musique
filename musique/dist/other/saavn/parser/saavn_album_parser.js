@@ -67,7 +67,7 @@ class SaavnAlbumParser extends album_parser_1.default {
     createLanguage() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("div.header-context>a[title]").last().text().match("New Releases (.+)")[1]);
+            resolve($("div.header-context>ol>li>a>span").eq(1).text().match("(.+) Albums")[1]);
         });
     }
     createTitle() {

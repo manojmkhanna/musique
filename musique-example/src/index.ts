@@ -7,6 +7,7 @@ import * as mkdirp from "mkdirp";
 import * as fs from "fs";
 import * as ProgressBar from "progress";
 import * as request from "request";
+import * as ffmpeg from "fluent-ffmpeg";
 import * as Jimp from "jimp";
 
 const nodeID3v23 = require("node-id3");
@@ -238,19 +239,20 @@ function run(): Promise<void> {
                         resolve();
                     });
                 } else {
-                    let progress: any, progressBar: ProgressBar;
+                    let downloadProgress: any,
+                        downloadProgressBar: ProgressBar;
 
                     let megaBytes = function (bytes: number) {
                         return Math.round(bytes / 1024 / 1024 * 10) / 10;
                     };
 
-                    songParser.parseFile(state => {
-                        if (!progress) {
-                            progress = state;
-                            progress.size.downloaded = 0;
+                    songParser.parseFile(progress => {
+                        if (!downloadProgress) {
+                            downloadProgress = progress;
+                            downloadProgress.size.downloaded = 0;
 
-                            progressBar = new ProgressBar("Downloading... [:bar] :percent :speed :size :time", {
-                                total: progress.size.total,
+                            downloadProgressBar = new ProgressBar("Downloading... [:bar] :percent :speed :size :time", {
+                                total: downloadProgress.size.total,
                                 width: 10,
                                 head: ">",
                                 incomplete: " ",
@@ -258,13 +260,13 @@ function run(): Promise<void> {
                             });
                         }
 
-                        progressBar.tick(progress.size.transferred - progress.size.downloaded, {
-                            speed: megaBytes(progress.speed) + "MBps",
-                            size: megaBytes(progress.size.transferred) + "/" + megaBytes(progress.size.total) + "MB",
-                            time: progress.time.remaining + "s"
+                        downloadProgressBar.tick(downloadProgress.size.transferred - downloadProgress.size.downloaded, {
+                            speed: megaBytes(downloadProgress.speed) + "MBps",
+                            size: megaBytes(downloadProgress.size.transferred) + "/" + megaBytes(downloadProgress.size.total) + "MB",
+                            time: downloadProgress.time.remaining + "s"
                         });
 
-                        progress.size.downloaded = progress.size.transferred;
+                        downloadProgress.size.downloaded = downloadProgress.size.transferred;
                     })
                         .then(parser => {
                             fs.writeFile(mp3FileName, parser.output.file, error => {
@@ -273,11 +275,13 @@ function run(): Promise<void> {
                                     return;
                                 }
 
-                                progressBar.tick(progress.size.total, {
-                                    speed: megaBytes(progress.speed) + "MBps",
-                                    size: megaBytes(progress.size.total) + "/" + megaBytes(progress.size.total) + "MB",
+                                downloadProgressBar.tick(downloadProgress.size.total, {
+                                    speed: megaBytes(downloadProgress.speed) + "MBps",
+                                    size: megaBytes(downloadProgress.size.total) + "/" + megaBytes(downloadProgress.size.total) + "MB",
                                     time: "0s"
                                 });
+
+                                console.log("");
 
                                 resolve();
                             });
@@ -286,6 +290,47 @@ function run(): Promise<void> {
                             reject(error);
                         });
                 }
+            });
+        })
+        .then(() => {
+            return new Promise<void>((resolve, reject) => {
+                ffmpeg.ffprobe(mp3FileName, (error, data) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (data.format.bit_rate >= 320000) {
+                        resolve();
+                        return;
+                    }
+
+                    let tmpFileName: string = mp3FileName.replace(".mp3", ".tmp");
+
+                    fs.rename(mp3FileName, tmpFileName, error => {
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+
+                        ffmpeg(tmpFileName)
+                            .audioBitrate("320k")
+                            .on("error", error => {
+                                reject(error);
+                            })
+                            .on("end", () => {
+                                fs.unlink(tmpFileName, error => {
+                                    if (error) {
+                                        reject(error);
+                                        return;
+                                    }
+
+                                    resolve();
+                                });
+                            })
+                            .save(mp3FileName);
+                    });
+                });
             });
         })
         .then(() => {
@@ -318,33 +363,31 @@ function run(): Promise<void> {
             });
         })
         .then(() => {
-            nodeID3v23.removeTags(mp3FileName);
-
-            nodeID3v23.write({
-                album: albumTitle,
-                artist: songArtists,
-                image: artFileName,
-                language: albumLanguage,
-                performerInfo: albumArtists,
-                publisher: albumLabel,
-                title: songTitle,
-                trackNumber: songTrack
-            }, mp3FileName);
-
-            let tag = nodeID3v24.readTag(mp3FileName);
-            tag.addFrame("TDRC", [albumDate]);
-            tag.addFrame("TDRL", [albumDate]);
-            tag.write();
-        })
-        .then(() => {
             return new Promise<void>((resolve, reject) => {
+                nodeID3v23.removeTags(mp3FileName);
+
+                nodeID3v23.write({
+                    album: albumTitle,
+                    artist: songArtists,
+                    image: artFileName,
+                    language: albumLanguage,
+                    performerInfo: albumArtists,
+                    publisher: albumLabel,
+                    title: songTitle,
+                    trackNumber: songTrack
+                }, mp3FileName);
+
+                let tag = nodeID3v24.readTag(mp3FileName);
+                tag.addFrame("TDRC", [albumDate]);
+                tag.addFrame("TDRL", [albumDate]);
+                tag.write();
+
                 fs.unlink(artFileName, error => {
                     if (error) {
                         reject(error);
                         return;
                     }
 
-                    console.log("");
                     console.log("Completed!");
 
                     resolve();
