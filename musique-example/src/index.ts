@@ -239,47 +239,31 @@ function run(): Promise<void> {
                         resolve();
                     });
                 } else {
-                    let downloadProgress: any,
-                        downloadProgressBar: ProgressBar;
+                    let progressBar: ProgressBar = new ProgressBar("Downloading... [:bar] :percent :speedMBps :sizeMB :etas", {
+                        total: 100,
+                        width: 10,
+                        incomplete: " "
+                    }), progress: any;
 
-                    let megaBytes = function (bytes: number) {
-                        return Math.round(bytes / 1024 / 1024 * 10) / 10;
-                    };
-
-                    songParser.parseFile(progress => {
-                        if (!downloadProgress) {
-                            downloadProgress = progress;
-                            downloadProgress.size.downloaded = 0;
-
-                            downloadProgressBar = new ProgressBar("Downloading... [:bar] :percent :speed :size :time", {
-                                total: downloadProgress.size.total,
-                                width: 10,
-                                head: ">",
-                                incomplete: " ",
-                                renderThrottle: 100
-                            });
-                        }
-
-                        downloadProgressBar.tick(downloadProgress.size.transferred - downloadProgress.size.downloaded, {
-                            speed: megaBytes(downloadProgress.speed) + "MBps",
-                            size: megaBytes(downloadProgress.size.transferred) + "/" + megaBytes(downloadProgress.size.total) + "MB",
-                            time: downloadProgress.time.remaining + "s"
+                    songParser.parseFile(downloadProgress => {
+                        progressBar.update(downloadProgress.percent, {
+                            speed: Math.round(downloadProgress.speed / 1024 / 1024 * 10) / 10,
+                            size: Math.round(downloadProgress.size.transferred / 1024 / 1024 * 10) / 10
                         });
 
-                        downloadProgress.size.downloaded = downloadProgress.size.transferred;
+                        progress = downloadProgress;
                     })
                         .then(parser => {
+                            progressBar.update(1, {
+                                speed: Math.round(progress.speed / 1024 / 1024 * 10) / 10,
+                                size: Math.round(progress.size.total / 1024 / 1024 * 10) / 10
+                            });
+
                             fs.writeFile(mp3FileName, parser.output.file, error => {
                                 if (error) {
                                     reject(error);
                                     return;
                                 }
-
-                                downloadProgressBar.tick(downloadProgress.size.total, {
-                                    speed: megaBytes(downloadProgress.speed) + "MBps",
-                                    size: megaBytes(downloadProgress.size.total) + "/" + megaBytes(downloadProgress.size.total) + "MB",
-                                    time: "0s"
-                                });
 
                                 console.log("");
 
@@ -313,17 +297,36 @@ function run(): Promise<void> {
                             return;
                         }
 
+                        let progressBar: ProgressBar = new ProgressBar("Converting... [:bar] :percent :sizeMB :etas", {
+                            total: 100,
+                            width: 10,
+                            incomplete: " "
+                        }), progress: any;
+
                         ffmpeg(tmpFileName)
                             .audioBitrate("320k")
+                            .on("progress", convertProgress => {
+                                progressBar.update(convertProgress.percent / 100, {
+                                    size: Math.round(convertProgress.targetSize / 1024 * 10) / 10
+                                });
+
+                                progress = convertProgress;
+                            })
                             .on("error", error => {
                                 reject(error);
                             })
                             .on("end", () => {
+                                progressBar.update(1, {
+                                    size: Math.round(progress.targetSize / 1024 * 10) / 10
+                                });
+
                                 fs.unlink(tmpFileName, error => {
                                     if (error) {
                                         reject(error);
                                         return;
                                     }
+
+                                    console.log("");
 
                                     resolve();
                                 });
