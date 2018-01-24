@@ -70,8 +70,14 @@ export default class SaavnAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve(moment($("p.copyright").first().text()
-                .match(/Released (.+)©/)![1], "MMM DD, YYYY").format("YYYY-MM-DD"));
+            let date: string = $("p.copyright").first().text();
+
+            if (!date.includes("Released")) {
+                resolve("");
+                return;
+            }
+
+            resolve(moment(date.match(/Released (.+)©/)![1], "MMM DD, YYYY").format("YYYY-MM-DD"));
         });
     }
 

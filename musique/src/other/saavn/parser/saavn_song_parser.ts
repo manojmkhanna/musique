@@ -69,11 +69,12 @@ export default class SaavnSongParser extends SongParser {
 
             let lyrics: string | null = $("h2.page-subtitle:contains(Lyrics)+p").first().html();
 
-            if (lyrics) {
-                resolve(lyrics.replace(/(<br>){2,}/g, "\n\n").replace(/<br>/g, "\n"));
-            } else {
-                resolve();
+            if (!lyrics) {
+                resolve("");
+                return;
             }
+
+            resolve(lyrics.replace(/(<br>){2,}/g, "\n\n").replace(/<br>/g, "\n"));
         });
     }
 
