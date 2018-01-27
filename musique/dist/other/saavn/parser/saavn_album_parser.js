@@ -65,7 +65,7 @@ class SaavnAlbumParser extends album_parser_1.default {
     createLabel() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("p.copyright>a").last().text());
+            resolve($("p.copyright").first().text().match(/© \d{4} (.+)/)[1]);
         });
     }
     createLanguage() {
