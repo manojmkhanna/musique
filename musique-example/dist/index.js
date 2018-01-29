@@ -198,15 +198,15 @@ function run() {
                 }), progress;
                 songParser.parseFile(downloadProgress => {
                     progressBar.update(downloadProgress.percent, {
-                        speed: Math.round(downloadProgress.speed / 1024 / 1024 * 10) / 10,
-                        size: Math.round(downloadProgress.size.transferred / 1024 / 1024 * 10) / 10
+                        speed: (downloadProgress.speed / 1024 / 1024).toFixed(1),
+                        size: (downloadProgress.size.transferred / 1024 / 1024).toFixed(1)
                     });
                     progress = downloadProgress;
                 })
                     .then(parser => {
                     progressBar.update(1, {
-                        speed: Math.round(progress.speed / 1024 / 1024 * 10) / 10,
-                        size: Math.round(progress.size.total / 1024 / 1024 * 10) / 10
+                        speed: (0).toFixed(1),
+                        size: (progress.size.total / 1024 / 1024).toFixed(1)
                     });
                     fs.writeFile(mp3FileName, parser.output.file, error => {
                         if (error) {
@@ -249,7 +249,7 @@ function run() {
                         .audioBitrate("320k")
                         .on("progress", convertProgress => {
                         progressBar.update(convertProgress.percent / 100, {
-                            size: Math.round(convertProgress.targetSize / 1024 * 10) / 10
+                            size: (convertProgress.targetSize / 1024).toFixed(1)
                         });
                         progress = convertProgress;
                     })
@@ -258,7 +258,7 @@ function run() {
                     })
                         .on("end", () => {
                         progressBar.update(1, {
-                            size: Math.round(progress.targetSize / 1024 * 10) / 10
+                            size: (progress.targetSize / 1024).toFixed(1)
                         });
                         fs.unlink(tmpFileName, error => {
                             if (error) {
