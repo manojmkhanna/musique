@@ -15,7 +15,7 @@ const nodeID3v24 = require("node-id3v2.4");
 function run() {
     console.log("Starting...");
     console.log("");
-    let songUrl, songFileName, songParser, songTitle, songTrack, songArtists, albumDate, albumLabel, albumLanguage, albumTitle, albumArtists, directoryName, mp3FileName, artFileName;
+    let songUrl, songFile, songParser, songTitle, songTrack, songArtists, albumDate, albumLabel, albumLanguage, albumTitle, albumArtists, directory, mp3File, artFile;
     return new Promise((resolve, reject) => {
         let rl = readline.createInterface({
             input: process.stdin,
@@ -31,22 +31,22 @@ function run() {
             let songArgs = answer.split("; ");
             songUrl = songArgs[0];
             if (songArgs.length > 1) {
-                songFileName = songArgs[1];
+                songFile = songArgs[1];
             }
             rl.close();
             resolve();
         });
     })
         .then(() => {
-        let platformName;
+        let platform;
         if (songUrl.includes("deezer")) {
-            platformName = "deezer";
+            platform = "deezer";
         }
         else if (songUrl.includes("saavn")) {
-            platformName = "saavn";
+            platform = "saavn";
         }
         return new Promise((resolve, reject) => {
-            musique.parseSong(platformName, songUrl)
+            musique.parseSong(platform, songUrl)
                 .then(parser => parser.parse())
                 .then(parser => parser.parseAlbum(childParser => childParser.parse()))
                 .then(parser => {
@@ -159,16 +159,16 @@ function run() {
         });
     })
         .then(() => {
-        directoryName = "Songs/"
+        directory = "Songs/"
             + albumLanguage + "/";
         if (albumLanguage === "English" && songTitle === albumTitle && songTrack === "1") {
-            directoryName += "Singles/";
+            directory += "Singles/";
         }
-        directoryName += albumDate.substr(0, 4) + "/"
-            + albumTitle + "/";
-        directoryName = directoryName.replace(/[\\:*?"<>|]/g, "");
+        directory += albumDate.substr(0, 4) + "/"
+            + albumTitle.replace(/\//g, "") + "/";
+        directory = directory.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
-            mkdirp(directoryName, error => {
+            mkdirp(directory, error => {
                 if (error) {
                     reject(error);
                     return;
@@ -178,11 +178,11 @@ function run() {
         });
     })
         .then(() => {
-        mp3FileName = directoryName + songTrack + " - " + songTitle + ".mp3";
-        mp3FileName = mp3FileName.replace(/[\\:*?"<>|]/g, "");
+        mp3File = directory + songTrack + " - " + songTitle + ".mp3";
+        mp3File = mp3File.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
-            if (songFileName) {
-                fs.rename(songFileName, mp3FileName, error => {
+            if (songFile) {
+                fs.rename(songFile, mp3File, error => {
                     if (error) {
                         reject(error);
                         return;
@@ -208,7 +208,7 @@ function run() {
                         speed: (0).toFixed(1),
                         size: (progress.size.total / 1024 / 1024).toFixed(1)
                     });
-                    fs.writeFile(mp3FileName, parser.output.file, error => {
+                    fs.writeFile(mp3File, parser.output.file, error => {
                         if (error) {
                             reject(error);
                             return;
@@ -225,7 +225,7 @@ function run() {
     })
         .then(() => {
         return new Promise((resolve, reject) => {
-            ffmpeg.ffprobe(mp3FileName, (error, data) => {
+            ffmpeg.ffprobe(mp3File, (error, data) => {
                 if (error) {
                     reject(error);
                     return;
@@ -234,8 +234,8 @@ function run() {
                     resolve();
                     return;
                 }
-                let tmpFileName = mp3FileName.replace(".mp3", ".tmp");
-                fs.rename(mp3FileName, tmpFileName, error => {
+                let tmpFile = mp3File.replace(".mp3", ".tmp");
+                fs.rename(mp3File, tmpFile, error => {
                     if (error) {
                         reject(error);
                         return;
@@ -245,7 +245,7 @@ function run() {
                         width: 10,
                         incomplete: " "
                     }), progress;
-                    ffmpeg(tmpFileName)
+                    ffmpeg(tmpFile)
                         .audioBitrate("320k")
                         .on("progress", convertProgress => {
                         progressBar.update(convertProgress.percent / 100, {
@@ -260,7 +260,7 @@ function run() {
                         progressBar.update(1, {
                             size: (progress.targetSize / 1024).toFixed(1)
                         });
-                        fs.unlink(tmpFileName, error => {
+                        fs.unlink(tmpFile, error => {
                             if (error) {
                                 reject(error);
                                 return;
@@ -269,25 +269,25 @@ function run() {
                             resolve();
                         });
                     })
-                        .save(mp3FileName);
+                        .save(mp3File);
                 });
             });
         });
     })
         .then(() => {
-        artFileName = directoryName + songTrack + " - " + songTitle + ".png";
-        artFileName = artFileName.replace(/[\\:*?"<>|]/g, "");
+        artFile = directory + songTrack + " - " + songTitle + ".png";
+        artFile = artFile.replace(/[\\:*?"<>|]/g, "");
         return new Promise((resolve, reject) => {
             request(songParser.output.album.art)
                 .on("error", error => {
                 reject(error);
             })
-                .pipe(fs.createWriteStream(artFileName))
+                .pipe(fs.createWriteStream(artFile))
                 .on("finish", () => {
-                Jimp.read(artFileName)
+                Jimp.read(artFile)
                     .then(image => {
                     image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
-                        .write(artFileName, error => {
+                        .write(artFile, error => {
                         if (error) {
                             reject(error);
                             return;
@@ -303,22 +303,22 @@ function run() {
     })
         .then(() => {
         return new Promise((resolve, reject) => {
-            nodeID3v23.removeTags(mp3FileName);
+            nodeID3v23.removeTags(mp3File);
             nodeID3v23.write({
                 album: albumTitle,
                 artist: songArtists,
-                image: artFileName,
+                image: artFile,
                 language: albumLanguage,
                 performerInfo: albumArtists,
                 publisher: albumLabel,
                 title: songTitle,
                 trackNumber: songTrack
-            }, mp3FileName);
-            let tag = nodeID3v24.readTag(mp3FileName);
+            }, mp3File);
+            let tag = nodeID3v24.readTag(mp3File);
             tag.addFrame("TDRC", [albumDate]);
             tag.addFrame("TDRL", [albumDate]);
             tag.write();
-            fs.unlink(artFileName, error => {
+            fs.unlink(artFile, error => {
                 if (error) {
                     reject(error);
                     return;
