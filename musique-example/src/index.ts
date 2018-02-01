@@ -1,6 +1,6 @@
 import * as musique from "musique";
-import {AlbumOutput, SongOutput, SongParser} from "musique";
-import * as Promise from "bluebird";
+import {AlbumOutput, SongOutput, AlbumParser, SongParser} from "musique";
+import * as Promise from "bluebird";    //TODO: Rearrange later
 import * as readline from "readline";
 import * as async from "async";
 import * as mkdirp from "mkdirp";
@@ -20,21 +20,22 @@ const rl = readline.createInterface({
 });
 
 class Album {
+    parser: AlbumParser;
     date: string;
     label: string;
     language: string;
     title: string;
     artists: string;
     folder: string;
-    artFile: string;
+    art: string;
 }
 
 class Song {
+    parser: SongParser;
     title: string;
     track: string;
     artists: string;
-    parser: SongParser;
-    mp3File: string;
+    file: string;
 }
 
 program
@@ -70,16 +71,18 @@ program
 
                             callback();
                         });
+                    }, callback => {
+                        if (!songUrl && !songFile) {
+                            callback(new Error());
+                            return;
+                        }
+
+                        callback();
                     }
-                ], () => {
-                    callback();
+                ], error => {
+                    callback(error);
                 })
             }, callback => {
-                if (!songUrl && !songFile) {
-                    callback(new Error());
-                    return;
-                }
-
                 if (songUrl) {
                     console.log("Parsing song...");
 
@@ -91,9 +94,13 @@ program
                         platform = "saavn";
                     }
 
+                    let albumParser: AlbumParser;
+
                     musique.parseSong(platform!, songUrl)
                         .then(parser => parser.parse())
                         .then(parser => parser.parseAlbum(childParser => {
+                            albumParser = childParser;
+
                             console.log("Parsing album...");
                             console.log("");
 
@@ -104,6 +111,7 @@ program
                                 albumOutput: AlbumOutput = songOutput.album;
 
                             album = new Album();
+                            album.parser = albumParser;
                             album.date = albumOutput.date;
                             album.label = albumOutput.label;
                             album.language = albumOutput.language;
@@ -112,11 +120,15 @@ program
                                 .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
 
                             song = new Song();
+                            song.parser = parser;
                             song.title = songOutput.title;
                             song.track = songOutput.track;
                             song.artists = [...new Set(songOutput.artists
                                 .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
-                            song.parser = parser;
+
+                            if (songFile) {
+                                song.file = songFile;
+                            }
 
                             callback();
                         })
@@ -124,26 +136,40 @@ program
                             callback(error);
                         });
                 } else if (songFile) {
-                    let tagMap: Map<string, string> = new Map<string, string>();
+                    let tagMap: Map<string, any> = new Map<string, any>();
 
                     for (let frame of nodeID3v24.readTag(songFile).frames) {
-                        tagMap.set(frame.type, frame.data.text);
+                        tagMap.set(frame.type, frame.data);
                     }
 
                     album = new Album();
-                    album.date = tagMap.get("TDRL")!.replace("\u0000", "");
-                    album.label = tagMap.get("TPUB")!;
-                    album.language = tagMap.get("TLAN")!;
-                    album.title = tagMap.get("TALB")!;
-                    album.artists = tagMap.get("TPE2")!;
+                    album.date = tagMap.get("TDRL").text.replace("\u0000", "");
+                    album.label = tagMap.get("TPUB").text;
+                    album.language = tagMap.get("TLAN").text;
+                    album.title = tagMap.get("TALB").text;
+                    album.artists = tagMap.get("TPE2").text;
 
                     song = new Song();
-                    song.title = tagMap.get("TIT2")!;
-                    song.track = tagMap.get("TRCK")!;
-                    song.artists = tagMap.get("TPE1")!;
-                    song.mp3File = songFile;
+                    song.title = tagMap.get("TIT2").text;
+                    song.track = tagMap.get("TRCK").text;
+                    song.artists = tagMap.get("TPE1").text;
 
-                    callback();
+                    song.file = songFile;
+
+                    if (tagMap.has("APIC")) {
+                        album.art = songFile.replace(".mp3", ".png");
+
+                        fs.writeFile(album.art, tagMap.get("APIC").picture, error => {
+                            if (error) {
+                                callback(error);
+                                return;
+                            }
+
+                            callback();
+                        });
+                    } else {
+                        callback();
+                    }
                 }
             }, callback => {
                 console.log("Updating album...");
@@ -274,12 +300,12 @@ program
             }, callback => {
                 let songFile: string;
 
-                if (song.mp3File) {
-                    songFile = song.mp3File;
+                if (song.file) {
+                    songFile = song.file;
                 }
 
-                song.mp3File = album.folder + song.track + " - " + song.title + ".mp3";
-                song.mp3File = song.mp3File.replace(/[\\:*?"<>|]/g, "");
+                song.file = album.folder + song.track + " - " + song.title + ".mp3";
+                song.file = song.file.replace(/[\\:*?"<>|]/g, "");
 
                 if (!songFile!) {
                     let progressBar: ProgressBar = new ProgressBar("Downloading song"
@@ -305,7 +331,7 @@ program
 
                             console.log("");
 
-                            fs.writeFile(song.mp3File, parser.output.file, error => {
+                            fs.writeFile(song.file, parser.output.file, error => {
                                 if (error) {
                                     callback(error);
                                     return;
@@ -318,7 +344,7 @@ program
                             callback(error);
                         });
                 } else {
-                    fs.rename(songFile!, song.mp3File, error => {
+                    fs.rename(songFile!, song.file, error => {
                         if (error) {
                             callback(error);
                             return;
@@ -328,7 +354,7 @@ program
                     });
                 }
             }, callback => {
-                ffmpeg.ffprobe(song.mp3File, (error, data) => {
+                ffmpeg.ffprobe(song.file, (error, data) => {
                     if (error) {
                         callback(error);
                         return;
@@ -339,9 +365,9 @@ program
                         return;
                     }
 
-                    let tmpFile: string = song.mp3File.replace(".mp3", ".tmp");
+                    let tempSongFile: string = song.file.replace(".mp3", ".tmp");
 
-                    fs.rename(song.mp3File, tmpFile, error => {
+                    fs.rename(song.file, tempSongFile, error => {
                         if (error) {
                             callback(error);
                             return;
@@ -354,7 +380,7 @@ program
                             incomplete: " "
                         }), progress: any;
 
-                        ffmpeg(tmpFile)
+                        ffmpeg(tempSongFile)
                             .audioBitrate("320k")
                             .on("progress", convertProgress => {
                                 progressBar.update(convertProgress.percent / 100, {
@@ -371,7 +397,7 @@ program
                                     size: (progress.targetSize / 1024).toFixed(1)
                                 });
 
-                                fs.unlink(tmpFile, error => {
+                                fs.unlink(tempSongFile, error => {
                                     if (error) {
                                         callback(error);
                                         return;
@@ -382,9 +408,54 @@ program
                                     callback();
                                 });
                             })
-                            .save(song.mp3File);
+                            .save(song.file);
                     });
                 });
+            }, callback => {
+                let albumArt: string;
+
+                if (album.art) {
+                    albumArt = album.art;
+                }
+
+                album.art = album.folder + song.track + " - " + song.title + ".png";
+                album.art = album.art.replace(/[\\:*?"<>|]/g, "");
+
+                if (!albumArt!) {
+                    request(album.parser.output.art)
+                        .on("error", error => {
+                            callback(error);
+                        })
+                        .pipe(fs.createWriteStream(album.art))
+                        .on("finish", () => {
+                            Jimp.read(album.art)
+                                .then(image => {
+                                    image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
+                                        .write(album.art, error => {
+                                            if (error) {
+                                                callback(error);
+                                                return;
+                                            }
+
+                                            callback();
+                                        });
+                                })
+                                .catch(error => {
+                                    callback(error);
+                                });
+                        });
+                } else {
+                    fs.rename(albumArt!, album.art, error => {
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
+                        callback();
+                    });
+                }
+            }, callback => {
+                callback(); //TODO: Finish later
             }
         ], error => {
             rl.close();
@@ -404,6 +475,8 @@ program
         let albumUrl: string,
             albumFolder: string,
             songTracks: string;
+
+        let songFileMap: Map<number, string> = new Map<number, string>();
 
         let album: Album,
             songs: Song[] = [];
@@ -437,16 +510,33 @@ program
 
                             callback();
                         });
+                    }, callback => {
+                        if (!albumUrl && !albumFolder || albumUrl && !songTracks) {
+                            callback(new Error());
+                            return;
+                        }
+
+                        callback();
                     }
-                ], () => {
-                    callback();
+                ], error => {
+                    callback(error);
                 });
             }, callback => {
-                if (!albumUrl && !albumFolder || albumUrl && !songTracks) {
-                    callback(new Error());
-                    return;
-                }
+                if (albumFolder) {
+                    fs.readdir(albumFolder, (error, files) => {
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
 
+                        for (let file of files.filter(value => value.endsWith(".mp3"))) {
+                            songFileMap.set(parseInt(file.match(/(\d+) - /)![1]) - 1, file);
+                        }
+
+                        callback();
+                    });
+                }
+            }, callback => {
                 if (albumUrl) {
                     console.log("Parsing album...");
 
@@ -478,6 +568,7 @@ program
                             let albumOutput: AlbumOutput = parser.output;
 
                             album = new Album();
+                            album.parser = parser;
                             album.date = albumOutput.date;
                             album.label = albumOutput.label;
                             album.language = albumOutput.language;
@@ -489,11 +580,15 @@ program
                                 let songOutput: SongOutput = albumOutput.songs[songIndex];
 
                                 let song: Song = new Song();
+                                song.parser = songParserMap.get(songIndex)!;
                                 song.title = songOutput.title;
                                 song.track = songOutput.track;
                                 song.artists = [...new Set(songOutput.artists
                                     .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
-                                song.parser = songParserMap.get(songIndex)!;
+
+                                if (songFileMap) {
+                                    song.file = songFileMap.get(songIndex)!;
+                                }
 
                                 songs.push(song);
                             }
@@ -504,45 +599,53 @@ program
                             callback(error);
                         });
                 } else if (albumFolder) {
-                    fs.readdir(albumFolder, (error, files) => {
-                        if (error) {
-                            callback(error);
-                            return;
+                    let tagMap: Map<string, any> = new Map<string, any>();
+
+                    for (let frame of nodeID3v24.readTag(songFileMap.get(0)).frames) {
+                        tagMap.set(frame.type, frame.data);
+                    }
+
+                    album = new Album();
+                    album.date = tagMap.get("TDRL").text.replace("\u0000", "");
+                    album.label = tagMap.get("TPUB").text;
+                    album.language = tagMap.get("TLAN").text;
+                    album.title = tagMap.get("TALB").text;
+                    album.artists = tagMap.get("TPE2").text;
+
+                    async.eachSeries(songFileMap.values(), (songFile, callback) => {
+                        let tagMap: Map<string, any> = new Map<string, any>();
+
+                        for (let frame of nodeID3v24.readTag(songFile).frames) {
+                            tagMap.set(frame.type, frame.data);
                         }
 
-                        let songFiles: string[] = files.filter(value => value.endsWith(".mp3"))
-                            .sort((a, b) => parseInt(a.match(/(\d+) - /)![1]) - parseInt(b.match(/(\d+) - /)![1]));
+                        let song: Song = new Song();
+                        song.title = tagMap.get("TIT2").text;
+                        song.track = tagMap.get("TRCK").text;
+                        song.artists = tagMap.get("TPE1").text;
 
-                        let tagMap: Map<string, string> = new Map<string, string>();
+                        song.file = songFile;
 
-                        for (let frame of nodeID3v24.readTag(songFiles[0]).frames) {
-                            tagMap.set(frame.type, frame.data.text);
-                        }
+                        if (tagMap.has("APIC")) {
+                            album.art = songFile.replace(".mp3", ".png");
 
-                        album = new Album();
-                        album.date = tagMap.get("TDRL")!.replace("\u0000", "");
-                        album.label = tagMap.get("TPUB")!;
-                        album.language = tagMap.get("TLAN")!;
-                        album.title = tagMap.get("TALB")!;
-                        album.artists = tagMap.get("TPE2")!;
+                            fs.writeFile(album.art, tagMap.get("APIC").picture, error => {
+                                if (error) {
+                                    callback(error);
+                                    return;
+                                }
 
-                        for (let songFile of songFiles) {
-                            let tagMap: Map<string, string> = new Map<string, string>();
+                                songs.push(song);
 
-                            for (let frame of nodeID3v24.readTag(songFile).frames) {
-                                tagMap.set(frame.type, frame.data.text);
-                            }
-
-                            let song: Song = new Song();
-                            song.title = tagMap.get("TIT2")!;
-                            song.track = tagMap.get("TRCK")!;
-                            song.artists = tagMap.get("TPE1")!;
-                            song.mp3File = songFile;
-
+                                callback();
+                            });
+                        } else {
                             songs.push(song);
-                        }
 
-                        callback();
+                            callback();
+                        }
+                    }, error => {
+                        callback(error);
                     });
                 }
             }, callback => {
@@ -679,12 +782,12 @@ program
                 async.eachSeries(songs, (song, callback) => {
                     let songFile: string;
 
-                    if (song.mp3File) {
-                        songFile = song.mp3File;
+                    if (song.file) {
+                        songFile = song.file;
                     }
 
-                    song.mp3File = album.folder + song.track + " - " + song.title + ".mp3";
-                    song.mp3File = song.mp3File.replace(/[\\:*?"<>|]/g, "");
+                    song.file = album.folder + song.track + " - " + song.title + ".mp3";
+                    song.file = song.file.replace(/[\\:*?"<>|]/g, "");
 
                     if (!songFile!) {
                         let progressBar: ProgressBar = new ProgressBar("Downloading song "
@@ -708,7 +811,7 @@ program
                                     size: (progress.size.total / 1024 / 1024).toFixed(1)
                                 });
 
-                                fs.writeFile(song.mp3File, parser.output.file, error => {
+                                fs.writeFile(song.file, parser.output.file, error => {
                                     if (error) {
                                         callback(error);
                                         return;
@@ -721,7 +824,7 @@ program
                                 callback(error);
                             });
                     } else {
-                        fs.rename(songFile!, song.mp3File, error => {
+                        fs.rename(songFile!, song.file, error => {
                             if (error) {
                                 callback(error);
                                 return;
@@ -730,14 +833,14 @@ program
                             callback();
                         });
                     }
-                }, () => {
+                }, error => {
                     console.log("");
 
-                    callback();
+                    callback(error);
                 });
             }, callback => {
                 async.eachSeries(songs, (song, callback) => {
-                    ffmpeg.ffprobe(song.mp3File, (error, data) => {
+                    ffmpeg.ffprobe(song.file, (error, data) => {
                         if (error) {
                             callback(error);
                             return;
@@ -748,22 +851,22 @@ program
                             return;
                         }
 
-                        let tmpFile: string = song.mp3File.replace(".mp3", ".tmp");
+                        let tempSongFile: string = song.file.replace(".mp3", ".tmp");
 
-                        fs.rename(song.mp3File, tmpFile, error => {
+                        fs.rename(song.file, tempSongFile, error => {
                             if (error) {
                                 callback(error);
                                 return;
                             }
 
-                            let progressBar: ProgressBar = new ProgressBar("Converting song"
-                                + "... [:bar] :percent :sizeMB :etas", {
+                            let progressBar: ProgressBar = new ProgressBar("Converting song "
+                                + song.track + "... [:bar] :percent :sizeMB :etas", {
                                 total: 100,
                                 width: 10,
                                 incomplete: " "
                             }), progress: any;
 
-                            ffmpeg(tmpFile)
+                            ffmpeg(tempSongFile)
                                 .audioBitrate("320k")
                                 .on("progress", convertProgress => {
                                     progressBar.update(convertProgress.percent / 100, {
@@ -780,7 +883,7 @@ program
                                         size: (progress.targetSize / 1024).toFixed(1)
                                     });
 
-                                    fs.unlink(tmpFile, error => {
+                                    fs.unlink(tempSongFile, error => {
                                         if (error) {
                                             callback(error);
                                             return;
@@ -789,14 +892,63 @@ program
                                         callback();
                                     });
                                 })
-                                .save(song.mp3File);
+                                .save(song.file);
                         });
                     });
-                }, () => {
+                }, error => {
                     console.log("");
 
-                    callback();
+                    callback(error);
                 });
+            }, callback => {
+                async.eachSeries(songs, (song, callback) => {
+                    let albumArt: string;
+
+                    if (album.art) {
+                        albumArt = album.art;
+                    }
+
+                    album.art = album.folder + song.track + " - " + song.title + ".png";
+                    album.art = album.art.replace(/[\\:*?"<>|]/g, "");
+
+                    if (!albumArt!) {
+                        request(album.parser.output.art)
+                            .on("error", error => {
+                                callback(error);
+                            })
+                            .pipe(fs.createWriteStream(album.art))
+                            .on("finish", () => {
+                                Jimp.read(album.art)
+                                    .then(image => {
+                                        image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
+                                            .write(album.art, error => {
+                                                if (error) {
+                                                    callback(error);
+                                                    return;
+                                                }
+
+                                                callback();
+                                            });
+                                    })
+                                    .catch(error => {
+                                        callback(error);
+                                    });
+                            });
+                    } else {
+                        fs.rename(albumArt!, album.art, error => {
+                            if (error) {
+                                callback(error);
+                                return;
+                            }
+
+                            callback();
+                        });
+                    }
+                }, error => {
+                    callback(error);
+                })
+            }, callback => {
+                callback(); //TODO: Finish later
             }
         ], error => {
             rl.close();
