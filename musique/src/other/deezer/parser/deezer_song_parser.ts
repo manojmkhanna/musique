@@ -32,7 +32,7 @@ export default class DeezerSongParser extends SongParser {
 
     protected contentCreated(): Promise<void> {
         return new Promise<void>(resolve => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             let albumInput: AlbumInput = new AlbumInput();
             albumInput.url = "http://www.deezer.com/en/album/" + json.DATA.ALB_ID;
@@ -58,7 +58,7 @@ export default class DeezerSongParser extends SongParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("div.naboo_track_song").last().text().match(/Length : 0*(\d+:\d+)/)![1]);
+            resolve($("div.naboo_track_song").last().text().match(/Length : 0*(\d+:\d+)/)[1]);
         });
     }
 
@@ -72,7 +72,7 @@ export default class DeezerSongParser extends SongParser {
 
     protected createMp3(): Promise<string> {
         return new Promise<string>(resolve => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             let hash: string = json.DATA.MD5_ORIGIN + "¤3¤" + json.DATA.SNG_ID + "¤" + json.DATA.MEDIA_VERSION;
 
@@ -97,7 +97,7 @@ export default class DeezerSongParser extends SongParser {
 
     protected createTrack(): Promise<string> {
         return new Promise<string>(resolve => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             resolve(json.DATA.TRACK_NUMBER);
         });
@@ -105,7 +105,7 @@ export default class DeezerSongParser extends SongParser {
 
     protected createFile(progressCallback: (progress: any) => void): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             let hash: string = json.DATA.MD5_ORIGIN + "¤3¤" + json.DATA.SNG_ID + "¤" + json.DATA.MEDIA_VERSION;
 
@@ -162,7 +162,7 @@ export default class DeezerSongParser extends SongParser {
 
     protected createAlbum(): Promise<AlbumOutput> {
         return new Promise<AlbumOutput>(resolve => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             let albumOutput: AlbumOutput = this.output.album;
 
@@ -179,7 +179,7 @@ export default class DeezerSongParser extends SongParser {
 
     protected createArtists(): Promise<ArtistOutput[]> {
         return new Promise<ArtistOutput[]>(resolve => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             let artistOutputs: ArtistOutput[] = this.output.artists;
 

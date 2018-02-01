@@ -59,7 +59,7 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("h2.page-subtitle").first().text().match(/ · (.+)/)![1]);
+            resolve($("h2.page-subtitle").first().text().match(/ · (.+)/)[1]);
         });
     }
 
@@ -67,7 +67,7 @@ export default class SaavnSongParser extends SongParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            let lyrics: string | null = $("h2.page-subtitle:contains(Lyrics)+p").first().html();
+            let lyrics: string = $("h2.page-subtitle:contains(Lyrics)+p").first().html();
 
             if (!lyrics) {
                 resolve("");

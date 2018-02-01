@@ -51,7 +51,7 @@ class ArtistParser extends base_parser_1.default {
         return this.parseValue("title", () => this.createTitle());
     }
     parseAlbums(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("albums", () => this.createAlbums());
         }
         else {
@@ -61,7 +61,7 @@ class ArtistParser extends base_parser_1.default {
         }
     }
     parseSongs(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("songs", () => this.createSongs());
         }
         else {
@@ -71,7 +71,7 @@ class ArtistParser extends base_parser_1.default {
         }
     }
     parsePlaylists(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("playlists", () => this.createPlaylists());
         }
         else {

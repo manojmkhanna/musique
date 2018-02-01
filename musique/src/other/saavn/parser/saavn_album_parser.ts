@@ -77,7 +77,7 @@ export default class SaavnAlbumParser extends AlbumParser {
                 return;
             }
 
-            resolve(moment(date.match(/Released (.+)©/)![1], "MMM DD, YYYY").format("YYYY-MM-DD"));
+            resolve(moment(date.match(/Released (.+)©/)[1], "MMM DD, YYYY").format("YYYY-MM-DD"));
         });
     }
 
@@ -85,7 +85,7 @@ export default class SaavnAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("p.copyright").first().text().match(/© \d{4} (.+)/)![1]);
+            resolve($("p.copyright").first().text().match(/© \d{4} (.+)/)[1]);
         });
     }
 
@@ -93,7 +93,7 @@ export default class SaavnAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("div.header-context>ol>li>a>span").eq(1).text().match("(.+) Albums")![1]);
+            resolve($("div.header-context>ol>li>a>span").eq(1).text().match("(.+) Albums")[1]);
         });
     }
 

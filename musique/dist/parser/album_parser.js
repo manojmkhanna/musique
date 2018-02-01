@@ -91,7 +91,7 @@ class AlbumParser extends base_parser_1.default {
         return this.parseValue("year", () => this.createYear());
     }
     parseArtists(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("artists", () => this.createArtists());
         }
         else {
@@ -101,7 +101,7 @@ class AlbumParser extends base_parser_1.default {
         }
     }
     parseSongs(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("songs", () => this.createSongs());
         }
         else {

@@ -52,7 +52,7 @@ class SearchParser extends parsque_1.Parser {
         });
     }
     parseSongs(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("songs", () => this.createSongs());
         }
         else {
@@ -62,7 +62,7 @@ class SearchParser extends parsque_1.Parser {
         }
     }
     parseAlbums(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("albums", () => this.createAlbums());
         }
         else {
@@ -72,7 +72,7 @@ class SearchParser extends parsque_1.Parser {
         }
     }
     parseArtists(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("artists", () => this.createArtists());
         }
         else {
@@ -82,7 +82,7 @@ class SearchParser extends parsque_1.Parser {
         }
     }
     parsePlaylists(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("playlists", () => this.createPlaylists());
         }
         else {

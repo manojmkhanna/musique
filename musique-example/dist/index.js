@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const musique = require("musique");
-const readline = require("readline");
 const async = require("async");
-const mkdirp = require("mkdirp");
-const fs = require("fs");
-const ProgressBar = require("progress");
-const request = require("request");
+const program = require("commander");
 const ffmpeg = require("fluent-ffmpeg");
 const Jimp = require("jimp");
-const program = require("commander");
+const mkdirp = require("mkdirp");
+const ProgressBar = require("progress");
+const request = require("request");
+const fs = require("fs");
+const readline = require("readline");
 const nodeID3v23 = require("node-id3");
 const nodeID3v24 = require("node-id3v2.4");
 const rl = readline.createInterface({
@@ -28,9 +28,9 @@ program
     let songUrl, songFile;
     let album, song;
     async.series([
-            callback => {
+        callback => {
             async.series([
-                    callback => {
+                callback => {
                     rl.question("Song url: ", answer => {
                         if (answer) {
                             songUrl = answer;
@@ -140,7 +140,7 @@ program
                 console.log("");
                 if (answer === "y" || answer === "yes") {
                     async.series([
-                            callback => {
+                        callback => {
                             rl.question("Album title: (" + album.title + ") ", answer => {
                                 if (answer) {
                                     album.title = answer;
@@ -194,7 +194,7 @@ program
                 console.log("");
                 if (answer === "y" || answer === "yes") {
                     async.series([
-                            callback => {
+                        callback => {
                             rl.question("Song track: (" + song.track + ") ", answer => {
                                 if (answer) {
                                     song.track = answer;
@@ -376,7 +376,31 @@ program
                 });
             }
         }, callback => {
-            callback(); //TODO: Finish later
+            nodeID3v23.removeTags(song.file);
+            nodeID3v23.write({
+                album: album.title,
+                artist: song.artists,
+                image: album.art,
+                language: album.language,
+                performerInfo: album.artists,
+                publisher: album.label,
+                title: song.title,
+                trackNumber: song.track
+            }, song.file);
+            let tag = nodeID3v24.readTag(song.file, {
+                targetversion: 4
+            });
+            tag.addFrame("TDRC", [album.date]);
+            tag.addFrame("TDRL", [album.date]);
+            tag.write();
+            fs.unlink(album.art, error => {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+                console.log("Completed!");
+                callback();
+            });
         }
     ], error => {
         rl.close();
@@ -394,9 +418,9 @@ program
     let songFileMap = new Map();
     let album, songs = [];
     async.series([
-            callback => {
+        callback => {
             async.series([
-                    callback => {
+                callback => {
                     rl.question("Album url: ", answer => {
                         if (answer) {
                             albumUrl = answer;
@@ -542,7 +566,7 @@ program
                 console.log("");
                 if (answer === "y" || answer === "yes") {
                     async.series([
-                            callback => {
+                        callback => {
                             rl.question("Album title: (" + album.title + ") ", answer => {
                                 if (answer) {
                                     album.title = answer;
@@ -597,7 +621,7 @@ program
                     console.log("");
                     if (answer === "y" || answer === "yes") {
                         async.series([
-                                callback => {
+                            callback => {
                                 rl.question("Song track: (" + song.track + ") ", answer => {
                                     if (answer) {
                                         song.track = answer;
@@ -794,7 +818,35 @@ program
                 callback(error);
             });
         }, callback => {
-            callback(); //TODO: Finish later
+            async.eachSeries(songs, (song, callback) => {
+                nodeID3v23.removeTags(song.file);
+                nodeID3v23.write({
+                    album: album.title,
+                    artist: song.artists,
+                    image: album.art,
+                    language: album.language,
+                    performerInfo: album.artists,
+                    publisher: album.label,
+                    title: song.title,
+                    trackNumber: song.track
+                }, song.file);
+                let tag = nodeID3v24.readTag(song.file, {
+                    targetversion: 4
+                });
+                tag.addFrame("TDRC", [album.date]);
+                tag.addFrame("TDRL", [album.date]);
+                tag.write();
+                fs.unlink(album.art, error => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+                    callback();
+                });
+            }, () => {
+                console.log("Completed!");
+                callback();
+            });
         }
     ], error => {
         rl.close();

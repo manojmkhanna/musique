@@ -30,7 +30,7 @@ export default class DeezerAlbumParser extends AlbumParser {
 
     protected contentCreated(): Promise<void> {
         return new Promise<void>(resolve => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             let artistInputs: ArtistInput[] = [];
 
@@ -71,7 +71,7 @@ export default class DeezerAlbumParser extends AlbumParser {
             let $ = cheerio.load(this.content.html);
 
             resolve(moment($("span#naboo_album_head_style")
-                .first().text().match(/\| (.+?)\t+/)![1], "DD-MM-YYYY").format("YYYY-MM-DD"));
+                .first().text().match(/\| (.+?)\t+/)[1], "DD-MM-YYYY").format("YYYY-MM-DD"));
         });
     }
 
@@ -79,7 +79,7 @@ export default class DeezerAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("div.naboo-album-label").first().text().match(/\| \t+(.+?)\t+/)![1]);
+            resolve($("div.naboo-album-label").first().text().match(/\| \t+(.+?)\t+/)[1]);
         });
     }
 
@@ -101,13 +101,13 @@ export default class DeezerAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("div.naboo-album-label").first().text().match(/\t+(\d+?) \|/)![1]);
+            resolve($("div.naboo-album-label").first().text().match(/\t+(\d+?) \|/)[1]);
         });
     }
 
     protected createArtists(): Promise<ArtistOutput[]> {
         return new Promise<ArtistOutput[]>(resolve => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             let artistOutputs: ArtistOutput[] = this.output.artists;
 
@@ -134,7 +134,7 @@ export default class DeezerAlbumParser extends AlbumParser {
 
     protected createSongs(): Promise<SongOutput[]> {
         return new Promise<SongOutput[]>(resolve => {
-            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)![1]);
+            let json: any = JSON.parse(this.content.html.match(/__DZR_APP_STATE__ = (.+?)<\/script>/)[1]);
 
             let songOutputs: SongOutput[] = this.output.songs;
 

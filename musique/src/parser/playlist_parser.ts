@@ -50,7 +50,7 @@ export default class PlaylistParser extends BaseParser<PlaylistInput, PlaylistOu
 
     public parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>,
                       ...indexes: number[]): Promise<this> {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("songs", () => this.createSongs());
         } else {
             return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {

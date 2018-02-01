@@ -114,7 +114,7 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
 
     public parseArtists(outputsParser?: (childParser: ArtistParser, index: number) => Promise<any>,
                         ...indexes: number[]): Promise<this> {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("artists", () => this.createArtists());
         } else {
             return this.parseOutputs("artists", () => new Promise<ArtistParser>(resolve => {
@@ -125,7 +125,7 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
 
     public parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>,
                       ...indexes: number[]): Promise<this> {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("songs", () => this.createSongs());
         } else {
             return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {

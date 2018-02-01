@@ -40,7 +40,7 @@ class PlaylistParser extends base_parser_1.default {
         return this.parseValue("title", () => this.createTitle());
     }
     parseSongs(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("songs", () => this.createSongs());
         }
         else {

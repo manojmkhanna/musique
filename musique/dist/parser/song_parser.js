@@ -99,7 +99,7 @@ class SongParser extends base_parser_1.default {
         return this.parseValue("file", () => this.createFile(progressCallback));
     }
     parseAlbum(outputParser) {
-        if (outputParser == undefined) {
+        if (!outputParser) {
             return this.parseValue("album", () => this.createAlbum());
         }
         else {
@@ -109,7 +109,7 @@ class SongParser extends base_parser_1.default {
         }
     }
     parseArtists(outputsParser, ...indexes) {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("artists", () => this.createArtists());
         }
         else {

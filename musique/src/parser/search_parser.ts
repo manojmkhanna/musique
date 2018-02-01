@@ -70,7 +70,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
 
     public parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>,
                       ...indexes: number[]): Promise<this> {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("songs", () => this.createSongs());
         } else {
             return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {
@@ -81,7 +81,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
 
     public parseAlbums(outputsParser?: (childParser: AlbumParser, index: number) => Promise<any>,
                        ...indexes: number[]): Promise<this> {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("albums", () => this.createAlbums());
         } else {
             return this.parseOutputs("albums", () => new Promise<AlbumParser>(resolve => {
@@ -92,7 +92,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
 
     public parseArtists(outputsParser?: (childParser: ArtistParser, index: number) => Promise<any>,
                         ...indexes: number[]): Promise<this> {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("artists", () => this.createArtists());
         } else {
             return this.parseOutputs("artists", () => new Promise<ArtistParser>(resolve => {
@@ -103,7 +103,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
 
     public parsePlaylists(outputsParser?: (childParser: PlaylistParser, index: number) => Promise<any>,
                           ...indexes: number[]): Promise<this> {
-        if (outputsParser == undefined) {
+        if (!outputsParser) {
             return this.parseValue("playlists", () => this.createPlaylists());
         } else {
             return this.parseOutputs("playlists", () => new Promise<PlaylistParser>(resolve => {

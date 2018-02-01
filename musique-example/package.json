@@ -15,7 +15,6 @@
   "license": "MIT",
   "dependencies": {
     "async": "^2.6.0",
-    "bluebird": "^3.5.1",
     "commander": "^2.13.0",
     "fluent-ffmpeg": "^2.1.2",
     "jimp": "^0.2.28",
@@ -28,7 +27,6 @@
   },
   "devDependencies": {
     "@types/async": "^2.0.47",
-    "@types/bluebird": "^3.5.20",
     "@types/commander": "^2.12.2",
     "@types/fluent-ffmpeg": "^2.1.6",
     "@types/jimp": "^0.2.28",
@@ -40,6 +38,6 @@
     "gulp-nodemon": "^2.2.1",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-typescript": "^3.2.4",
-    "typescript": "^2.6.2"
+    "typescript": "^2.7.1"
   }
 }
