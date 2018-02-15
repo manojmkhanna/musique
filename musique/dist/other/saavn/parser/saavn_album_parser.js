@@ -59,19 +59,19 @@ class SaavnAlbumParser extends album_parser_1.default {
                 resolve("");
                 return;
             }
-            resolve(moment(date.match(/Released (.+)©/)[1], "MMM DD, YYYY").format("YYYY-MM-DD"));
+            resolve(moment(date.match(/Released (.+)(©|\(P\))/)[1], "MMM DD, YYYY").format("YYYY-MM-DD"));
         });
     }
     createLabel() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("p.copyright").first().text().match(/© \d{4} (.+)/)[1]);
+            resolve($("p.copyright").first().text().match(/(?:©|\(P\)) \d{4} (.+)/)[1]);
         });
     }
     createLanguage() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("div.header-context>ol>li>a>span").eq(1).text().match("(.+) Albums")[1]);
+            resolve($("div.header-context>ol>li>a>span").eq(1).text().match(/(.+) Albums/)[1]);
         });
     }
     createTitle() {
