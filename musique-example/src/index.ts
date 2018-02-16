@@ -1,5 +1,5 @@
 import * as musique from "musique";
-import {AlbumOutput, SongOutput, AlbumParser, SongParser} from "musique";
+import {AlbumOutput, SongOutput, SongParser} from "musique";
 import * as async from "async";
 import * as program from "commander";
 import * as ffmpeg from "fluent-ffmpeg";
@@ -14,22 +14,21 @@ import * as readline from "readline";
 const nodeID3 = require("node-id3v2.4");
 
 class Album {
-    parser: AlbumParser;
+    title: string;
+    artists: string;
     date: string;
     label: string;
     language: string;
-    title: string;
-    artists: string;
-    folder: string;
     art: string;
+    folder: string;
 }
 
 class Song {
-    parser: SongParser;
-    title: string;
     track: string;
+    title: string;
     artists: string;
     file: string;
+    parser: SongParser;
 }
 
 program
@@ -95,13 +94,9 @@ program
                         platform = "saavn";
                     }
 
-                    let albumParser: AlbumParser;
-
                     musique.parseSong(platform, songUrl)
                         .then(parser => parser.parse())
                         .then(parser => parser.parseAlbum(childParser => {
-                            albumParser = childParser;
-
                             console.log("Parsing album...");
                             console.log("");
 
@@ -112,19 +107,19 @@ program
                                 albumOutput: AlbumOutput = songOutput.album;
 
                             album = new Album();
-                            album.parser = albumParser;
+                            album.art = albumOutput.art;
                             album.date = albumOutput.date;
                             album.label = albumOutput.label;
                             album.language = albumOutput.language;
                             album.title = albumOutput.title;
-                            album.artists = [...new Set(albumOutput.artists
+                            album.artists = [...new Set<string>(albumOutput.artists
                                 .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
 
                             song = new Song();
                             song.parser = parser;
                             song.title = songOutput.title;
                             song.track = songOutput.track;
-                            song.artists = [...new Set(songOutput.artists
+                            song.artists = [...new Set<string>(songOutput.artists
                                 .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
 
                             if (songFile) {
@@ -144,16 +139,40 @@ program
                     }
 
                     album = new Album();
-                    album.date = tagMap.get("TDRL").text;
-                    album.label = tagMap.get("TPUB").text;
-                    album.language = tagMap.get("TLAN").text;
-                    album.title = tagMap.get("TALB").text;
-                    album.artists = tagMap.get("TPE2").text;
+
+                    if (tagMap.has("TDRL")) {
+                        album.date = tagMap.get("TDRL").text;
+                    }
+
+                    if (tagMap.has("TPUB")) {
+                        album.label = tagMap.get("TPUB").text;
+                    }
+
+                    if (tagMap.has("TLAN")) {
+                        album.language = tagMap.get("TLAN").text;
+                    }
+
+                    if (tagMap.has("TALB")) {
+                        album.title = tagMap.get("TALB").text;
+                    }
+
+                    if (tagMap.has("TPE2")) {
+                        album.artists = tagMap.get("TPE2").text;
+                    }
 
                     song = new Song();
-                    song.title = tagMap.get("TIT2").text;
-                    song.track = tagMap.get("TRCK").text;
-                    song.artists = tagMap.get("TPE1").text;
+
+                    if (tagMap.has("TIT2")) {
+                        song.title = tagMap.get("TIT2").text;
+                    }
+
+                    if (tagMap.has("TRCK")) {
+                        song.track = tagMap.get("TRCK").text;
+                    }
+
+                    if (tagMap.has("TPE1")) {
+                        song.artists = tagMap.get("TPE1").text;
+                    }
 
                     song.file = songFile;
 
@@ -181,6 +200,7 @@ program
                 console.log("Album date: " + album.date);
                 console.log("Album label: " + album.label);
                 console.log("Album language: " + album.language);
+                console.log("Album art: " + album.art);
 
                 let rl = readline.createInterface({
                     input: process.stdin,
@@ -232,12 +252,20 @@ program
                             });
                         }, callback => {
                             rl.question("Album language: (" + album.language + ") ", answer => {
+                                if (answer) {
+                                    album.language = answer;
+                                }
+
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Album art: (" + album.art + ") ", answer => {
                                 rl.close();
 
                                 console.log("");
 
                                 if (answer) {
-                                    album.language = answer;
+                                    album.art = answer;
                                 }
 
                                 callback();
@@ -435,17 +463,13 @@ program
                     });
                 });
             }, callback => {
-                let albumArt: string;
-
-                if (album.art) {
-                    albumArt = album.art;
-                }
+                let albumArt: string = album.art;
 
                 album.art = album.folder + album.title.replace(/\//g, "") + ".png";
                 album.art = album.art.replace(/[\\:*?"<>|]/g, "");
 
-                if (!albumArt) {
-                    request(album.parser.output.art)
+                if (albumArt.startsWith("http")) {
+                    request(albumArt)
                         .on("error", error => {
                             callback(error);
                         })
@@ -468,14 +492,33 @@ program
                                 });
                         });
                 } else {
-                    fs.rename(albumArt, album.art, error => {
-                        if (error) {
-                            callback(error);
-                            return;
-                        }
+                    Jimp.read(albumArt)
+                        .then(image => {
+                            if (image.getMIME() !== "image/png"
+                                || image.bitmap.width !== 512 || image.bitmap.height !== 512) {
+                                image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
+                                    .write(album.art, error => {
+                                        if (error) {
+                                            callback(error);
+                                            return;
+                                        }
 
-                        callback();
-                    });
+                                        callback();
+                                    });
+                            } else {
+                                fs.rename(albumArt, album.art, error => {
+                                    if (error) {
+                                        callback(error);
+                                        return;
+                                    }
+
+                                    callback();
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            callback(error);
+                        });
                 }
             }, callback => {
                 let tag = nodeID3.readTag(song.file, {
@@ -614,7 +657,7 @@ program
                 if (albumUrl) {
                     console.log("Parsing album...");
 
-                    let songIndexes: number[] = [...new Set(songTracks.split(", ")
+                    let songIndexes: number[] = [...new Set<number>(songTracks.split(", ")
                         .map(value => parseInt(value) - 1))].sort();
 
                     let platform: "deezer" | "saavn";
@@ -642,12 +685,12 @@ program
                             let albumOutput: AlbumOutput = parser.output;
 
                             album = new Album();
-                            album.parser = parser;
+                            album.art = albumOutput.art;
                             album.date = albumOutput.date;
                             album.label = albumOutput.label;
                             album.language = albumOutput.language;
                             album.title = albumOutput.title;
-                            album.artists = [...new Set(albumOutput.artists
+                            album.artists = [...new Set<string>(albumOutput.artists
                                 .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
 
                             for (let songIndex of songIndexes) {
@@ -657,7 +700,7 @@ program
                                 song.parser = songParserMap.get(songIndex);
                                 song.title = songOutput.title;
                                 song.track = songOutput.track;
-                                song.artists = [...new Set(songOutput.artists
+                                song.artists = [...new Set<string>(songOutput.artists
                                     .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
 
                                 if (songFileMap) {
@@ -680,11 +723,26 @@ program
                     }
 
                     album = new Album();
-                    album.date = tagMap.get("TDRL").text;
-                    album.label = tagMap.get("TPUB").text;
-                    album.language = tagMap.get("TLAN").text;
-                    album.title = tagMap.get("TALB").text;
-                    album.artists = tagMap.get("TPE2").text;
+
+                    if (tagMap.has("TDRL")) {
+                        album.date = tagMap.get("TDRL").text;
+                    }
+
+                    if (tagMap.has("TPUB")) {
+                        album.label = tagMap.get("TPUB").text;
+                    }
+
+                    if (tagMap.has("TLAN")) {
+                        album.language = tagMap.get("TLAN").text;
+                    }
+
+                    if (tagMap.has("TALB")) {
+                        album.title = tagMap.get("TALB").text;
+                    }
+
+                    if (tagMap.has("TPE2")) {
+                        album.artists = tagMap.get("TPE2").text;
+                    }
 
                     for (let songFile of songFileMap.values()) {
                         let tagMap: Map<string, any> = new Map<string, any>();
@@ -694,9 +752,18 @@ program
                         }
 
                         let song: Song = new Song();
-                        song.title = tagMap.get("TIT2").text;
-                        song.track = tagMap.get("TRCK").text;
-                        song.artists = tagMap.get("TPE1").text;
+
+                        if (tagMap.has("TIT2")) {
+                            song.title = tagMap.get("TIT2").text;
+                        }
+
+                        if (tagMap.has("TRCK")) {
+                            song.track = tagMap.get("TRCK").text;
+                        }
+
+                        if (tagMap.has("TPE1")) {
+                            song.artists = tagMap.get("TPE1").text;
+                        }
 
                         song.file = songFile;
 
@@ -727,6 +794,7 @@ program
                 console.log("Album date: " + album.date);
                 console.log("Album label: " + album.label);
                 console.log("Album language: " + album.language);
+                console.log("Album art: " + album.art);
 
                 let rl = readline.createInterface({
                     input: process.stdin,
@@ -778,12 +846,20 @@ program
                             });
                         }, callback => {
                             rl.question("Album language: (" + album.language + ") ", answer => {
+                                if (answer) {
+                                    album.language = answer;
+                                }
+
+                                callback();
+                            });
+                        }, callback => {
+                            rl.question("Album art: (" + album.art + ") ", answer => {
                                 rl.close();
 
                                 console.log("");
 
                                 if (answer) {
-                                    album.language = answer;
+                                    album.art = answer;
                                 }
 
                                 callback();
@@ -997,17 +1073,13 @@ program
                     callback(error);
                 });
             }, callback => {
-                let albumArt: string;
-
-                if (album.art) {
-                    albumArt = album.art;
-                }
+                let albumArt: string = album.art;
 
                 album.art = album.folder + album.title.replace(/\//g, "") + ".png";
                 album.art = album.art.replace(/[\\:*?"<>|]/g, "");
 
-                if (!albumArt) {
-                    request(album.parser.output.art)
+                if (albumArt.startsWith("http")) {
+                    request(albumArt)
                         .on("error", error => {
                             callback(error);
                         })
@@ -1030,14 +1102,33 @@ program
                                 });
                         });
                 } else {
-                    fs.rename(albumArt, album.art, error => {
-                        if (error) {
-                            callback(error);
-                            return;
-                        }
+                    Jimp.read(albumArt)
+                        .then(image => {
+                            if (image.getMIME() !== "image/png"
+                                || image.bitmap.width !== 512 || image.bitmap.height !== 512) {
+                                image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
+                                    .write(album.art, error => {
+                                        if (error) {
+                                            callback(error);
+                                            return;
+                                        }
 
-                        callback();
-                    });
+                                        callback();
+                                    });
+                            } else {
+                                fs.rename(albumArt, album.art, error => {
+                                    if (error) {
+                                        callback(error);
+                                        return;
+                                    }
+
+                                    callback();
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            callback(error);
+                        });
                 }
             }, callback => {
                 for (let song of songs) {
