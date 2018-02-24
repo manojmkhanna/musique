@@ -99,9 +99,12 @@ program
                 });
             }
             else if (songFile) {
+                let tag = nodeID3.readTag(songFile);
                 let tagMap = new Map();
-                for (let frame of nodeID3.readTag(songFile).frames) {
-                    tagMap.set(frame.type, frame.data);
+                if (tag.frames) {
+                    for (let frame of tag.frames) {
+                        tagMap.set(frame.type, frame.data);
+                    }
                 }
                 album = new Album();
                 if (tagMap.has("TDRL")) {
@@ -436,6 +439,7 @@ program
             tag.frames = [];
             tag.addFrame("APIC", [album.art, 0x03]);
             tag.addFrame("TALB", [album.title]);
+            tag.addFrame("TCON", [album.language]);
             tag.addFrame("TDRC", [album.date.substr(0, 4)]);
             tag.addFrame("TDRL", [album.date]);
             tag.addFrame("TIT2", [song.title]);
@@ -598,9 +602,12 @@ program
                 });
             }
             else if (albumFolder) {
+                let tag = nodeID3.readTag(songFileMap.values().next().value);
                 let tagMap = new Map();
-                for (let frame of nodeID3.readTag(songFileMap.values().next().value).frames) {
-                    tagMap.set(frame.type, frame.data);
+                if (tag.frames) {
+                    for (let frame of tag.frames) {
+                        tagMap.set(frame.type, frame.data);
+                    }
                 }
                 album = new Album();
                 if (tagMap.has("TDRL")) {
@@ -619,9 +626,12 @@ program
                     album.artists = tagMap.get("TPE2").text;
                 }
                 for (let songFile of songFileMap.values()) {
+                    let tag = nodeID3.readTag(songFile);
                     let tagMap = new Map();
-                    for (let frame of nodeID3.readTag(songFile).frames) {
-                        tagMap.set(frame.type, frame.data);
+                    if (tag.frames) {
+                        for (let frame of tag.frames) {
+                            tagMap.set(frame.type, frame.data);
+                        }
                     }
                     let song = new Song();
                     if (tagMap.has("TIT2")) {
@@ -959,6 +969,7 @@ program
                 tag.frames = [];
                 tag.addFrame("APIC", [album.art, 0x03]);
                 tag.addFrame("TALB", [album.title]);
+                tag.addFrame("TCON", [album.language]);
                 tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                 tag.addFrame("TDRL", [album.date]);
                 tag.addFrame("TIT2", [song.title]);

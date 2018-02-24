@@ -132,10 +132,14 @@ program
                             callback(error);
                         });
                 } else if (songFile) {
+                    let tag = nodeID3.readTag(songFile);
+
                     let tagMap: Map<string, any> = new Map<string, any>();
 
-                    for (let frame of nodeID3.readTag(songFile).frames) {
-                        tagMap.set(frame.type, frame.data);
+                    if (tag.frames) {
+                        for (let frame of tag.frames) {
+                            tagMap.set(frame.type, frame.data);
+                        }
                     }
 
                     album = new Album();
@@ -535,6 +539,7 @@ program
 
                 tag.addFrame("APIC", [album.art, 0x03]);
                 tag.addFrame("TALB", [album.title]);
+                tag.addFrame("TCON", [album.language]);
                 tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                 tag.addFrame("TDRL", [album.date]);
                 tag.addFrame("TIT2", [song.title]);
@@ -739,10 +744,14 @@ program
                             callback(error);
                         });
                 } else if (albumFolder) {
+                    let tag = nodeID3.readTag(songFileMap.values().next().value);
+
                     let tagMap: Map<string, any> = new Map<string, any>();
 
-                    for (let frame of nodeID3.readTag(songFileMap.values().next().value).frames) {
-                        tagMap.set(frame.type, frame.data);
+                    if (tag.frames) {
+                        for (let frame of tag.frames) {
+                            tagMap.set(frame.type, frame.data);
+                        }
                     }
 
                     album = new Album();
@@ -768,10 +777,14 @@ program
                     }
 
                     for (let songFile of songFileMap.values()) {
+                        let tag = nodeID3.readTag(songFile);
+
                         let tagMap: Map<string, any> = new Map<string, any>();
 
-                        for (let frame of nodeID3.readTag(songFile).frames) {
-                            tagMap.set(frame.type, frame.data);
+                        if (tag.frames) {
+                            for (let frame of tag.frames) {
+                                tagMap.set(frame.type, frame.data);
+                            }
                         }
 
                         let song: Song = new Song();
@@ -1169,6 +1182,7 @@ program
 
                     tag.addFrame("APIC", [album.art, 0x03]);
                     tag.addFrame("TALB", [album.title]);
+                    tag.addFrame("TCON", [album.language]);
                     tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                     tag.addFrame("TDRL", [album.date]);
                     tag.addFrame("TIT2", [song.title]);
