@@ -82,13 +82,13 @@ program
                     album.language = albumOutput.language;
                     album.title = albumOutput.title;
                     album.artists = [...new Set(albumOutput.artists
-                            .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                            .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
                     song = new Song();
                     song.parser = parser;
                     song.title = songOutput.title;
                     song.track = songOutput.track;
                     song.artists = [...new Set(songOutput.artists
-                            .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                            .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
                     if (songFile) {
                         song.file = songFile;
                     }
@@ -524,9 +524,26 @@ program
                     return;
                 }
                 songFileMap = new Map();
-                for (let file of files.filter(value => value.endsWith(".mp3"))
-                    .sort((a, b) => parseInt(a.match(/(\d+) - /)[1]) - parseInt(b.match(/(\d+) - /)[1]))) {
-                    songFileMap.set(parseInt(file.match(/(\d+) - /)[1]) - 1, albumFolder + "/" + file);
+                for (let file of files.filter(file => file.endsWith(".mp3"))
+                    .sort((a, b) => {
+                    let aTrack = 0, bTrack = 0;
+                    let aMatch = a.match(/(\d+) - /);
+                    if (aMatch) {
+                        aTrack = parseInt(aMatch[1]);
+                    }
+                    let bMatch = b.match(/(\d+) - /);
+                    if (bMatch) {
+                        bTrack = parseInt(bMatch[1]);
+                    }
+                    return aTrack - bTrack;
+                })) {
+                    let fileMatch = file.match(/(\d+) - /);
+                    if (fileMatch) {
+                        songFileMap.set(parseInt(fileMatch[1]) - 1, albumFolder + "/" + file);
+                    }
+                    else {
+                        songFileMap.set(songFileMap.size, albumFolder + "/" + file);
+                    }
                 }
                 callback();
             });
@@ -534,7 +551,7 @@ program
             if (albumUrl) {
                 console.log("Parsing album...");
                 let songIndexes = [...new Set(songTracks.split(", ")
-                        .map(value => parseInt(value) - 1))].sort();
+                        .map(songTrack => parseInt(songTrack) - 1))].sort((a, b) => a - b);
                 let platform;
                 if (albumUrl.includes("deezer")) {
                     platform = "deezer";
@@ -560,7 +577,7 @@ program
                     album.language = albumOutput.language;
                     album.title = albumOutput.title;
                     album.artists = [...new Set(albumOutput.artists
-                            .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                            .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
                     for (let songIndex of songIndexes) {
                         let songOutput = albumOutput.songs[songIndex];
                         let song = new Song();
@@ -568,7 +585,7 @@ program
                         song.title = songOutput.title;
                         song.track = songOutput.track;
                         song.artists = [...new Set(songOutput.artists
-                                .map(value => value.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                                .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
                         if (songFileMap) {
                             song.file = songFileMap.get(songIndex);
                         }
