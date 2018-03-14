@@ -55,17 +55,22 @@ class SaavnAlbumParser extends album_parser_1.default {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
             let date = $("p.copyright").first().text();
-            if (!date.includes("Released")) {
+            if (!date.startsWith("Released")) {
                 resolve("");
                 return;
             }
-            resolve(moment(date.match(/Released (.+)(©|\(P\))/)[1], "MMM DD, YYYY").format("YYYY-MM-DD"));
+            resolve(moment(date.match(/Released (\w+ \d+, \d+) *(© \d+ |\(P\) \d+ )?.+/)[1], "MMM DD, YYYY").format("YYYY-MM-DD"));
         });
     }
     createLabel() {
         return new Promise(resolve => {
             let $ = cheerio.load(this.content.html);
-            resolve($("p.copyright").first().text().match(/(?:©|\(P\)) \d{4} (.+)/)[1]);
+            let label = $("p.copyright").first().text();
+            if (!label.startsWith("Released")) {
+                resolve("");
+                return;
+            }
+            resolve(label.match(/Released \w+ \d+, \d+ *(?:© \d+ |\(P\) \d+ )?(.+)/)[1]);
         });
     }
     createLanguage() {

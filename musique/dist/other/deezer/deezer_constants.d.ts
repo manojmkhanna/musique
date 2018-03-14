@@ -7,6 +7,7 @@ export default class DeezerConstants {
             "Cache-Control": string;
             "Connection": string;
             "DNT": string;
+            "Cookie": string;
             "Host": string;
             "Upgrade-Insecure-Requests": string;
             "User-Agent": string;

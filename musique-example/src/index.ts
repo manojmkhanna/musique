@@ -186,7 +186,7 @@ program
                     }
 
                     album.art = path.dirname(songFile)
-                        + "/" + album.title.replace(/\//g, "") + ".png";
+                        + "/" + album.title.replace(/[/.]/g, "") + ".png";
 
                     fs.writeFile(album.art, tagMap.get("APIC").picture, error => {
                         if (error) {
@@ -341,7 +341,7 @@ program
                     album.folder += "Singles/";
                 }
 
-                album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/\//g, "") + "/";
+                album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
                 album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
 
                 mkdirp(album.folder, error => {
@@ -359,7 +359,7 @@ program
                     songFile = song.file;
                 }
 
-                song.file = album.folder + song.track + " - " + song.title.replace(/\//g, "") + ".mp3";
+                song.file = album.folder + song.track + " - " + song.title.replace(/[/.]/g, "") + ".mp3";
                 song.file = song.file.replace(/[\\:*?"<>|]/g, "");
 
                 if (!songFile) {
@@ -469,7 +469,7 @@ program
             }, callback => {
                 let albumArt: string = album.art;
 
-                album.art = album.folder + album.title.replace(/\//g, "") + ".png";
+                album.art = album.folder + album.title.replace(/[/.]/g, "") + ".png";
                 album.art = album.art.replace(/[\\:*?"<>|]/g, "");
 
                 if (albumArt.startsWith("http")) {
@@ -812,7 +812,7 @@ program
                     }
 
                     album.art = path.dirname(songFileMap.values().next().value)
-                        + "/" + album.title.replace(/\//g, "") + ".png";
+                        + "/" + album.title.replace(/[/.]/g, "") + ".png";
 
                     fs.writeFile(album.art, tagMap.get("APIC").picture, error => {
                         if (error) {
@@ -971,7 +971,7 @@ program
                     album.folder += "Singles/";
                 }
 
-                album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/\//g, "") + "/";
+                album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
                 album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
 
                 mkdirp(album.folder, error => {
@@ -990,7 +990,7 @@ program
                         songFile = song.file;
                     }
 
-                    song.file = album.folder + song.track + " - " + song.title.replace(/\//g, "") + ".mp3";
+                    song.file = album.folder + song.track + " - " + song.title.replace(/[/.]/g, "") + ".mp3";
                     song.file = song.file.replace(/[\\:*?"<>|]/g, "");
 
                     if (!songFile) {
@@ -1111,7 +1111,7 @@ program
             }, callback => {
                 let albumArt: string = album.art;
 
-                album.art = album.folder + album.title.replace(/\//g, "") + ".png";
+                album.art = album.folder + album.title.replace(/[/.]/g, "") + ".png";
                 album.art = album.art.replace(/[\\:*?"<>|]/g, "");
 
                 if (albumArt.startsWith("http")) {

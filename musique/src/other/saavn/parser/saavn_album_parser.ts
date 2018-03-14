@@ -72,12 +72,12 @@ export default class SaavnAlbumParser extends AlbumParser {
 
             let date: string = $("p.copyright").first().text();
 
-            if (!date.includes("Released")) {
+            if (!date.startsWith("Released")) {
                 resolve("");
                 return;
             }
 
-            resolve(moment(date.match(/Released (.+)(©|\(P\))/)[1], "MMM DD, YYYY").format("YYYY-MM-DD"));
+            resolve(moment(date.match(/Released (\w+ \d+, \d+) *(© \d+ |\(P\) \d+ )?.+/)[1], "MMM DD, YYYY").format("YYYY-MM-DD"));
         });
     }
 
@@ -85,7 +85,14 @@ export default class SaavnAlbumParser extends AlbumParser {
         return new Promise<string>(resolve => {
             let $ = cheerio.load(this.content.html);
 
-            resolve($("p.copyright").first().text().match(/(?:©|\(P\)) \d{4} (.+)/)[1]);
+            let label: string = $("p.copyright").first().text();
+
+            if (!label.startsWith("Released")) {
+                resolve("");
+                return;
+            }
+
+            resolve(label.match(/Released \w+ \d+, \d+ *(?:© \d+ |\(P\) \d+ )?(.+)/)[1]);
         });
     }
 

@@ -138,7 +138,7 @@ program
                     return;
                 }
                 album.art = path.dirname(songFile)
-                    + "/" + album.title.replace(/\//g, "") + ".png";
+                    + "/" + album.title.replace(/[/.]/g, "") + ".png";
                 fs.writeFile(album.art, tagMap.get("APIC").picture, error => {
                     if (error) {
                         callback(error);
@@ -266,7 +266,7 @@ program
             if (album.language === "English" && song.title === album.title && song.track === "1") {
                 album.folder += "Singles/";
             }
-            album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/\//g, "") + "/";
+            album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
             album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
             mkdirp(album.folder, error => {
                 if (error) {
@@ -280,7 +280,7 @@ program
             if (song.file) {
                 songFile = song.file;
             }
-            song.file = album.folder + song.track + " - " + song.title.replace(/\//g, "") + ".mp3";
+            song.file = album.folder + song.track + " - " + song.title.replace(/[/.]/g, "") + ".mp3";
             song.file = song.file.replace(/[\\:*?"<>|]/g, "");
             if (!songFile) {
                 let progressBar = new ProgressBar("Downloading song"
@@ -374,7 +374,7 @@ program
             });
         }, callback => {
             let albumArt = album.art;
-            album.art = album.folder + album.title.replace(/\//g, "") + ".png";
+            album.art = album.folder + album.title.replace(/[/.]/g, "") + ".png";
             album.art = album.art.replace(/[\\:*?"<>|]/g, "");
             if (albumArt.startsWith("http")) {
                 request(albumArt)
@@ -651,7 +651,7 @@ program
                     return;
                 }
                 album.art = path.dirname(songFileMap.values().next().value)
-                    + "/" + album.title.replace(/\//g, "") + ".png";
+                    + "/" + album.title.replace(/[/.]/g, "") + ".png";
                 fs.writeFile(album.art, tagMap.get("APIC").picture, error => {
                     if (error) {
                         callback(error);
@@ -783,7 +783,7 @@ program
             if (album.language === "English" && songs[0].title === album.title && songs[0].track === "1") {
                 album.folder += "Singles/";
             }
-            album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/\//g, "") + "/";
+            album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
             album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
             mkdirp(album.folder, error => {
                 if (error) {
@@ -798,7 +798,7 @@ program
                 if (song.file) {
                     songFile = song.file;
                 }
-                song.file = album.folder + song.track + " - " + song.title.replace(/\//g, "") + ".mp3";
+                song.file = album.folder + song.track + " - " + song.title.replace(/[/.]/g, "") + ".mp3";
                 song.file = song.file.replace(/[\\:*?"<>|]/g, "");
                 if (!songFile) {
                     let progressBar = new ProgressBar("Downloading song "
@@ -903,7 +903,7 @@ program
             });
         }, callback => {
             let albumArt = album.art;
-            album.art = album.folder + album.title.replace(/\//g, "") + ".png";
+            album.art = album.folder + album.title.replace(/[/.]/g, "") + ".png";
             album.art = album.art.replace(/[\\:*?"<>|]/g, "");
             if (albumArt.startsWith("http")) {
                 request(albumArt)
