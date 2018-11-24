@@ -4,14 +4,15 @@ import * as async from "async";
 import * as program from "commander";
 import * as ffmpeg from "fluent-ffmpeg";
 import * as mkdirp from "mkdirp";
+import * as moment from "moment";
 import * as ProgressBar from "progress";
 import * as request from "request";
 import * as fs from "fs";
 import * as path from "path";
 import * as readline from "readline";
 
-const nodeID3 = require("node-id3v2.4");
 const Jimp = require("jimp");
+const nodeID3 = require("node-id3v2.4");
 
 class Album {
     title: string;
@@ -201,7 +202,7 @@ program
                 console.log("Updating album...");
                 console.log("Album title: " + album.title);
                 console.log("Album artists: " + album.artists);
-                console.log("Album date: " + album.date);
+                console.log("Album date: " + (album.date ? moment(album.date, "YYYY-MM-DD").format("D-M-YYYY") : ""));
                 console.log("Album label: " + album.label);
                 console.log("Album language: " + album.language);
                 console.log("Album art: " + album.art);
@@ -239,9 +240,9 @@ program
                                 callback();
                             });
                         }, callback => {
-                            rl.question("Album date: (" + album.date + ") ", answer => {
+                            rl.question("Album date: (" + (album.date ? moment(album.date, "YYYY-MM-DD").format("D-M-YYYY") : "") + ") ", answer => {
                                 if (answer) {
-                                    album.date = answer;
+                                    album.date = moment(answer, "D-M-YYYY").format("YYYY-MM-DD");
                                 }
 
                                 callback();
@@ -827,7 +828,7 @@ program
                 console.log("Updating album...");
                 console.log("Album title: " + album.title);
                 console.log("Album artists: " + album.artists);
-                console.log("Album date: " + album.date);
+                console.log("Album date: " + (album.date ? moment(album.date, "YYYY-MM-DD").format("D-M-YYYY") : ""));
                 console.log("Album label: " + album.label);
                 console.log("Album language: " + album.language);
                 console.log("Album art: " + album.art);
@@ -865,9 +866,9 @@ program
                                 callback();
                             });
                         }, callback => {
-                            rl.question("Album date: (" + album.date + ") ", answer => {
+                            rl.question("Album date: (" + (album.date ? moment(album.date, "YYYY-MM-DD").format("D-M-YYYY") : "") + ") ", answer => {
                                 if (answer) {
-                                    album.date = answer;
+                                    album.date = moment(answer, "D-M-YYYY").format("YYYY-MM-DD");
                                 }
 
                                 callback();
