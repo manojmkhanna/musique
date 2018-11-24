@@ -3,7 +3,6 @@ import {AlbumOutput, SongOutput, SongParser} from "musique";
 import * as async from "async";
 import * as program from "commander";
 import * as ffmpeg from "fluent-ffmpeg";
-import * as Jimp from "jimp";
 import * as mkdirp from "mkdirp";
 import * as ProgressBar from "progress";
 import * as request from "request";
@@ -12,6 +11,7 @@ import * as path from "path";
 import * as readline from "readline";
 
 const nodeID3 = require("node-id3v2.4");
+const Jimp = require("jimp");
 
 class Album {
     title: string;

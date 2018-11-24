@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/input/playlist_input.ts"],"names":[],"mappings":";;AAAA,6CAAqC;AAGrC,mBAAmC,SAAQ,oBAAS;CAEnD;AAFD,gCAEC","file":"playlist_input.js","sourcesContent":["import BaseInput from \"./base_input\";\r\nimport SongInput from \"./song_input\";\r\n\r\nexport default class PlaylistInput extends BaseInput {\r\n    public songs: SongInput[];\r\n}\r\n"]}

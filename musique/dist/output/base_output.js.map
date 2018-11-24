@@ -1,1 +1,0 @@
-{"version":3,"sources":["../src/output/base_output.ts"],"names":[],"mappings":";;AAAA,qCAA+B;AAE/B,gBAAgC,SAAQ,gBAAM;CAE7C;AAFD,6BAEC","file":"base_output.js","sourcesContent":["import {Output} from \"parsque\";\r\n\r\nexport default class BaseOutput extends Output {\r\n    public url: string;\r\n}\r\n"]}

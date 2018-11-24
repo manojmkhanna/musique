@@ -15,22 +15,22 @@
   },
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.5.1",
+    "bluebird": "^3.5.3",
     "cheerio": "^1.0.0-rc.2",
-    "moment": "^2.20.1",
+    "moment": "^2.22.2",
     "parsque": "file:../../parsque/parsque",
-    "request": "^2.83.0",
+    "request": "^2.88.0",
     "request-progress": "^3.0.0"
   },
   "devDependencies": {
-    "@types/bluebird": "^3.5.20",
-    "@types/cheerio": "^0.22.7",
-    "@types/node": "^9.4.6",
-    "@types/request": "^2.47.0",
-    "gulp": "^3.9.1",
-    "gulp-nodemon": "^2.2.1",
+    "@types/bluebird": "^3.5.24",
+    "@types/cheerio": "^0.22.9",
+    "@types/node": "^10.12.10",
+    "@types/request": "^2.48.1",
+    "gulp": "^4.0.0",
+    "gulp-nodemon": "^2.4.1",
     "gulp-sourcemaps": "^2.6.4",
-    "gulp-typescript": "^4.0.1",
-    "typescript": "^2.7.2"
+    "gulp-typescript": "^5.0.0-alpha.3",
+    "typescript": "^3.1.6"
   }
 }

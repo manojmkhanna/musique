@@ -13,7 +13,7 @@ gulp.task("build", () => {
         .pipe(gulp.dest("dist"))
 });
 
-gulp.task("start", ["build"], () => {
+gulp.task("start", gulp.series(["build"]), () => {
     return nodemon({
         watch: "src",
         ext: "ts",
@@ -21,4 +21,4 @@ gulp.task("start", ["build"], () => {
     });
 });
 
-gulp.task("default", ["start"]);
+gulp.task("default", gulp.series(["start"]));
