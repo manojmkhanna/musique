@@ -82,7 +82,7 @@ program
                     }
                 ], error => {
                     callback(error);
-                })
+                });
             }, callback => {
                 if (songUrl) {
                     console.log("Parsing song...");
@@ -99,11 +99,12 @@ program
                         .then(parser => parser.parse())
                         .then(parser => parser.parseAlbum(childParser => {
                             console.log("Parsing album...");
-                            console.log("");
 
                             return childParser.parse();
                         }))
                         .then(parser => {
+                            console.log("");
+
                             let songOutput: SongOutput = parser.output,
                                 albumOutput: AlbumOutput = songOutput.album;
 
@@ -199,10 +200,16 @@ program
                     });
                 }
             }, callback => {
+                let albumDate: string = "";
+
+                if (album.date) {
+                    albumDate = moment(album.date, "YYYY-MM-DD").format("D-M-YYYY");
+                }
+
                 console.log("Updating album...");
                 console.log("Album title: " + album.title);
                 console.log("Album artists: " + album.artists);
-                console.log("Album date: " + (album.date ? moment(album.date, "YYYY-MM-DD").format("D-M-YYYY") : ""));
+                console.log("Album date: " + albumDate);
                 console.log("Album label: " + album.label);
                 console.log("Album language: " + album.language);
                 console.log("Album art: " + album.art);
@@ -240,7 +247,7 @@ program
                                 callback();
                             });
                         }, callback => {
-                            rl.question("Album date: (" + (album.date ? moment(album.date, "YYYY-MM-DD").format("D-M-YYYY") : "") + ") ", answer => {
+                            rl.question("Album date: (" + albumDate + ") ", answer => {
                                 if (answer) {
                                     album.date = moment(answer, "D-M-YYYY").format("YYYY-MM-DD");
                                 }
@@ -421,9 +428,9 @@ program
                         return;
                     }
 
-                    let tempFile: string = song.file.replace(".mp3", ".tmp");
+                    let tempSongFile: string = song.file.replace(".mp3", ".tmp");
 
-                    fs.rename(song.file, tempFile, error => {
+                    fs.rename(song.file, tempSongFile, error => {
                         if (error) {
                             callback(error);
                             return;
@@ -436,7 +443,7 @@ program
                             incomplete: " "
                         }), progress: any;
 
-                        ffmpeg(tempFile)
+                        ffmpeg(tempSongFile)
                             .audioBitrate("320k")
                             .on("progress", convertProgress => {
                                 progressBar.update(convertProgress.percent / 100, {
@@ -455,7 +462,7 @@ program
 
                                 console.log("");
 
-                                fs.unlink(tempFile, error => {
+                                fs.unlink(tempSongFile, error => {
                                     if (error) {
                                         callback(error);
                                         return;
@@ -586,10 +593,12 @@ program
             albumFolder: string,
             songTracks: string;
 
-        let songFileMap: Map<number, string>;
+        let songIndexes: number[],
+            songFileMap: Map<number, string>,
+            songParserMap: Map<number, SongParser>;
 
         let album: Album,
-            songs: Song[] = [];
+            songs: Song[];
 
         async.series([
             callback => {
@@ -628,7 +637,7 @@ program
                             callback();
                         });
                     }, callback => {
-                        if (!albumUrl && !albumFolder || albumUrl && !songTracks) {
+                        if (!albumUrl && !albumFolder) {
                             callback(new Error());
                             return;
                         }
@@ -639,10 +648,23 @@ program
                     callback(error);
                 });
             }, callback => {
+                if (!songTracks) {
+                    callback();
+                    return;
+                }
+
+                songIndexes = [...new Set<number>(songTracks.split(", ")
+                    .map(songTrack => parseInt(songTrack) - 1))]
+                    .sort((songIndexA, songIndexB) => songIndexA - songIndexB);
+
+                callback();
+            }, callback => {
                 if (!albumFolder) {
                     callback();
                     return;
                 }
+
+                songFileMap = new Map<number, string>();
 
                 fs.readdir(albumFolder, (error, files) => {
                     if (error) {
@@ -650,33 +672,50 @@ program
                         return;
                     }
 
-                    songFileMap = new Map<number, string>();
+                    let songFiles: string[] = files.filter(file => file.endsWith(".mp3")),
+                        songIndexMap: Map<string, number> = new Map<string, number>();
 
-                    for (let file of files.filter(file => file.endsWith(".mp3"))
-                        .sort((a, b) => {
-                            let aTrack: number = 0,
-                                bTrack: number = 0;
+                    for (let songFile of songFiles) {
+                        let songFileMatch = songFile.match(/^(\d+) - .+?\.mp3$/);
 
-                            let aMatch = a.match(/(\d+) - /);
+                        if (songFileMatch) {
+                            songIndexMap.set(songFile, parseInt(songFileMatch[1]) - 1);
+                        }
+                    }
 
-                            if (aMatch) {
-                                aTrack = parseInt(aMatch[1]);
+                    for (let songFile of songFiles.sort((songFileA, songFileB) => {
+                        if (songIndexMap.has(songFileA) && songIndexMap.has(songFileB)) {
+                            return songIndexMap.get(songFileA) - songIndexMap.get(songFileB);
+                        }
+
+                        return 0;
+                    })) {
+                        let songIndex: number;
+
+                        if (songIndexMap.has(songFile)) {
+                            if (!songIndexes) {
+                                songIndex = songIndexMap.get(songFile);
+                            } else {
+                                let tempSongIndex: number = songIndexMap.get(songFile);
+
+                                if (songIndexes.includes(tempSongIndex)) {
+                                    songIndex = tempSongIndex;
+                                }
                             }
-
-                            let bMatch = b.match(/(\d+) - /);
-
-                            if (bMatch) {
-                                bTrack = parseInt(bMatch[1]);
-                            }
-
-                            return aTrack - bTrack;
-                        })) {
-                        let fileMatch = file.match(/(\d+) - /);
-
-                        if (fileMatch) {
-                            songFileMap.set(parseInt(fileMatch[1]) - 1, albumFolder + "/" + file);
                         } else {
-                            songFileMap.set(songFileMap.size, albumFolder + "/" + file);
+                            if (!songIndexes) {
+                                songIndex = songFileMap.size;
+                            } else {
+                                let tempSongIndex: number = songIndexes[songFileMap.size];
+
+                                if (tempSongIndex >= 0) {
+                                    songIndex = tempSongIndex;
+                                }
+                            }
+                        }
+
+                        if (songIndex >= 0) {
+                            songFileMap.set(songIndex, albumFolder + "/" + songFile);
                         }
                     }
 
@@ -686,9 +725,6 @@ program
                 if (albumUrl) {
                     console.log("Parsing album...");
 
-                    let songIndexes: number[] = [...new Set<number>(songTracks.split(", ")
-                        .map(songTrack => parseInt(songTrack) - 1))].sort((a, b) => a - b);
-
                     let platform: "deezer" | "saavn";
 
                     if (albumUrl.includes("deezer")) {
@@ -697,7 +733,7 @@ program
                         platform = "saavn";
                     }
 
-                    let songParserMap: Map<number, SongParser> = new Map<number, SongParser>();
+                    songParserMap = new Map<number, SongParser>();
 
                     musique.parseAlbum(platform, albumUrl)
                         .then(parser => parser.parse())
@@ -707,7 +743,7 @@ program
                             console.log("Parsing song " + (index + 1) + "...");
 
                             return childParser.parse();
-                        }, ...songIndexes))
+                        }, ...(songIndexes ? songIndexes : [])))
                         .then(parser => {
                             console.log("");
 
@@ -722,6 +758,16 @@ program
                             album.artists = [...new Set<string>(albumOutput.artists
                                 .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
 
+                            if (!songIndexes) {
+                                songIndexes = [];
+
+                                for (let i = 0; i < albumOutput.songs.length; i++) {
+                                    songIndexes.push(i);
+                                }
+                            }
+
+                            songs = [];
+
                             for (let songIndex of songIndexes) {
                                 let songOutput: SongOutput = albumOutput.songs[songIndex];
 
@@ -733,7 +779,11 @@ program
                                     .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
 
                                 if (songFileMap) {
-                                    song.file = songFileMap.get(songIndex);
+                                    let songFile: string = songFileMap.get(songIndex);
+
+                                    if (songFile) {
+                                        song.file = songFile;
+                                    }
                                 }
 
                                 songs.push(song);
@@ -776,6 +826,8 @@ program
                     if (tagMap.has("TPE2")) {
                         album.artists = tagMap.get("TPE2").text;
                     }
+
+                    songs = [];
 
                     for (let songFile of songFileMap.values()) {
                         let tag = nodeID3.readTag(songFile);
@@ -825,10 +877,16 @@ program
                     });
                 }
             }, callback => {
+                let albumDate: string = "";
+
+                if (album.date) {
+                    albumDate = moment(album.date, "YYYY-MM-DD").format("D-M-YYYY");
+                }
+
                 console.log("Updating album...");
                 console.log("Album title: " + album.title);
                 console.log("Album artists: " + album.artists);
-                console.log("Album date: " + (album.date ? moment(album.date, "YYYY-MM-DD").format("D-M-YYYY") : ""));
+                console.log("Album date: " + albumDate);
                 console.log("Album label: " + album.label);
                 console.log("Album language: " + album.language);
                 console.log("Album art: " + album.art);
@@ -866,7 +924,7 @@ program
                                 callback();
                             });
                         }, callback => {
-                            rl.question("Album date: (" + (album.date ? moment(album.date, "YYYY-MM-DD").format("D-M-YYYY") : "") + ") ", answer => {
+                            rl.question("Album date: (" + albumDate + ") ", answer => {
                                 if (answer) {
                                     album.date = moment(answer, "D-M-YYYY").format("YYYY-MM-DD");
                                 }
@@ -1058,9 +1116,9 @@ program
                             return;
                         }
 
-                        let tempFile: string = song.file.replace(".mp3", ".tmp");
+                        let tempSongFile: string = song.file.replace(".mp3", ".tmp");
 
-                        fs.rename(song.file, tempFile, error => {
+                        fs.rename(song.file, tempSongFile, error => {
                             if (error) {
                                 callback(error);
                                 return;
@@ -1073,7 +1131,7 @@ program
                                 incomplete: " "
                             }), progress: any;
 
-                            ffmpeg(tempFile)
+                            ffmpeg(tempSongFile)
                                 .audioBitrate("320k")
                                 .on("progress", convertProgress => {
                                     progressBar.update(convertProgress.percent / 100, {
@@ -1094,7 +1152,7 @@ program
                                         console.log("");
                                     }
 
-                                    fs.unlink(tempFile, error => {
+                                    fs.unlink(tempSongFile, error => {
                                         if (error) {
                                             callback(error);
                                             return;
