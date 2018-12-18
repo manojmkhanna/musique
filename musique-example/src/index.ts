@@ -20,7 +20,6 @@ class Album {
     title: string;
     artists: string;
     date: string;
-    label: string;
     language: string;
     art: string;
     folder: string;
@@ -115,7 +114,6 @@ program
                             album = new Album();
                             album.art = albumOutput.art;
                             album.date = albumOutput.date;
-                            album.label = albumOutput.label;
                             album.language = albumOutput.language;
                             album.title = albumOutput.title;
                             album.artists = [...new Set<string>(albumOutput.artists
@@ -159,12 +157,8 @@ program
                         album.date = tagMap.get("TDRL").text;
                     }
 
-                    if (tagMap.has("TPUB")) {
-                        album.label = tagMap.get("TPUB").text;
-                    }
-
-                    if (tagMap.has("TLAN")) {
-                        album.language = tagMap.get("TLAN").text;
+                    if (tagMap.has("TCON")) {
+                        album.language = tagMap.get("TCON").text;
                     }
 
                     if (tagMap.has("TALB")) {
@@ -216,7 +210,6 @@ program
                 console.log("Album title: " + album.title);
                 console.log("Album artists: " + album.artists);
                 console.log("Album date: " + albumDate);
-                console.log("Album label: " + album.label);
                 console.log("Album language: " + album.language);
                 console.log("Album art: " + album.art);
 
@@ -256,14 +249,6 @@ program
                             rl.question("Album date: (" + albumDate + ") ", answer => {
                                 if (answer) {
                                     album.date = moment(answer, "D-M-YYYY").format("YYYY-MM-DD");
-                                }
-
-                                callback();
-                            });
-                        }, callback => {
-                            rl.question("Album label: (" + album.label + ") ", answer => {
-                                if (answer) {
-                                    album.label = answer;
                                 }
 
                                 callback();
@@ -569,10 +554,8 @@ program
                 tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                 tag.addFrame("TDRL", [album.date]);
                 tag.addFrame("TIT2", [song.title]);
-                tag.addFrame("TLAN", [album.language]);
                 tag.addFrame("TPE1", [song.artists]);
                 tag.addFrame("TPE2", [album.artists]);
-                tag.addFrame("TPUB", [album.label]);
                 tag.addFrame("TRCK", [song.track]);
 
                 for (let frame of tag.frames) {
@@ -780,7 +763,6 @@ program
                             album = new Album();
                             album.art = albumOutput.art;
                             album.date = albumOutput.date;
-                            album.label = albumOutput.label;
                             album.language = albumOutput.language;
                             album.title = albumOutput.title;
                             album.artists = [...new Set<string>(albumOutput.artists
@@ -836,12 +818,8 @@ program
                         album.date = tagMap.get("TDRL").text;
                     }
 
-                    if (tagMap.has("TPUB")) {
-                        album.label = tagMap.get("TPUB").text;
-                    }
-
-                    if (tagMap.has("TLAN")) {
-                        album.language = tagMap.get("TLAN").text;
+                    if (tagMap.has("TCON")) {
+                        album.language = tagMap.get("TCON").text;
                     }
 
                     if (tagMap.has("TALB")) {
@@ -909,7 +887,6 @@ program
                 console.log("Album title: " + album.title);
                 console.log("Album artists: " + album.artists);
                 console.log("Album date: " + albumDate);
-                console.log("Album label: " + album.label);
                 console.log("Album language: " + album.language);
                 console.log("Album art: " + album.art);
 
@@ -949,14 +926,6 @@ program
                             rl.question("Album date: (" + albumDate + ") ", answer => {
                                 if (answer) {
                                     album.date = moment(answer, "D-M-YYYY").format("YYYY-MM-DD");
-                                }
-
-                                callback();
-                            });
-                        }, callback => {
-                            rl.question("Album label: (" + album.label + ") ", answer => {
-                                if (answer) {
-                                    album.label = answer;
                                 }
 
                                 callback();
@@ -1279,10 +1248,8 @@ program
                     tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                     tag.addFrame("TDRL", [album.date]);
                     tag.addFrame("TIT2", [song.title]);
-                    tag.addFrame("TLAN", [album.language]);
                     tag.addFrame("TPE1", [song.artists]);
                     tag.addFrame("TPE2", [album.artists]);
-                    tag.addFrame("TPUB", [album.label]);
                     tag.addFrame("TRCK", [song.track]);
 
                     for (let frame of tag.frames) {
@@ -1514,7 +1481,6 @@ program
                                     let album: Album = new Album();
                                     album.art = albumOutput.art;
                                     album.date = albumOutput.date;
-                                    album.label = albumOutput.label;
                                     album.language = albumOutput.language;
                                     album.title = albumOutput.title;
                                     album.artists = [...new Set<string>(albumOutput.artists
@@ -1583,12 +1549,8 @@ program
                                 album.date = tagMap.get("TDRL").text;
                             }
 
-                            if (tagMap.has("TPUB")) {
-                                album.label = tagMap.get("TPUB").text;
-                            }
-
-                            if (tagMap.has("TLAN")) {
-                                album.language = tagMap.get("TLAN").text;
+                            if (tagMap.has("TCON")) {
+                                album.language = tagMap.get("TCON").text;
                             }
 
                             if (tagMap.has("TALB")) {
@@ -1692,7 +1654,6 @@ program
                             console.log("Album title: " + album.title);
                             console.log("Album artists: " + album.artists);
                             console.log("Album date: " + albumDate);
-                            console.log("Album label: " + album.label);
                             console.log("Album language: " + album.language);
                             console.log("Album art: " + album.art);
 
@@ -1732,14 +1693,6 @@ program
                                         rl.question("Album date: (" + albumDate + ") ", answer => {
                                             if (answer) {
                                                 album.date = moment(answer, "D-M-YYYY").format("YYYY-MM-DD");
-                                            }
-
-                                            callback();
-                                        });
-                                    }, callback => {
-                                        rl.question("Album label: (" + album.label + ") ", answer => {
-                                            if (answer) {
-                                                album.label = answer;
                                             }
 
                                             callback();
@@ -2106,10 +2059,8 @@ program
                         tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                         tag.addFrame("TDRL", [album.date]);
                         tag.addFrame("TIT2", [song.title]);
-                        tag.addFrame("TLAN", [album.language]);
                         tag.addFrame("TPE1", [song.artists]);
                         tag.addFrame("TPE2", [album.artists]);
-                        tag.addFrame("TPUB", [album.label]);
                         tag.addFrame("TRCK", [song.track]);
 
                         for (let frame of tag.frames) {
