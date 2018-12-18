@@ -760,7 +760,7 @@ program
                         .then(albumParser => albumParser.parseSongs((songParser, index) => {
                             songParserMap.set(index, songParser);
 
-                            console.log("Parsing song " + (index + 1) + "...");
+                            console.log("Parsing song " + songParserMap.size + "...");
 
                             return songParser.parse();
                         }, ...(songIndexes ? songIndexes : [])))
@@ -994,7 +994,7 @@ program
                 }
             }, callback => {
                 async.eachOfSeries(songs, (song, index, callback) => {
-                    console.log("Updating song " + song.track + "...");
+                    console.log("Updating song " + (<number> index + 1) + "...");
                     console.log("Song track: " + song.track);
                     console.log("Song title: " + song.title);
                     console.log("Song artists: " + song.artists);
@@ -1004,7 +1004,7 @@ program
                         output: process.stdout
                     });
 
-                    rl.question("Update song " + song.track + "? (no) ", answer => {
+                    rl.question("Update song " + (<number> index + 1) + "? (no) ", answer => {
                         console.log("");
 
                         if (!(answer === "y" || answer === "yes")) {
@@ -1088,7 +1088,7 @@ program
 
                     if (!songFile) {
                         let progressBar: ProgressBar = new ProgressBar("Downloading song "
-                            + song.track + "... [:bar] :percent :speedMBps :sizeMB :etas", {
+                            + (<number> index + 1) + "... [:bar] :percent :speedMBps :sizeMB :etas", {
                             total: 100,
                             width: 10,
                             incomplete: " "
@@ -1159,7 +1159,7 @@ program
                             }
 
                             let progressBar: ProgressBar = new ProgressBar("Converting song "
-                                + song.track + "... [:bar] :percent :sizeMB :etas", {
+                                + (<number> index + 1) + "... [:bar] :percent :sizeMB :etas", {
                                 total: 100,
                                 width: 10,
                                 incomplete: " "
@@ -1479,11 +1479,11 @@ program
                         .then(playlistParser => playlistParser.parseSongs((songParser, index) => {
                             songParserMap.set(index, songParser);
 
-                            console.log("Parsing song " + (index + 1) + "...");
+                            console.log("Parsing song " + songParserMap.size + "...");
 
                             return songParser.parse()
                                 .then(songParser => songParser.parseAlbum(albumParser => {
-                                    console.log("Parsing album " + (index + 1) + "...");
+                                    console.log("Parsing album " + songParserMap.size + "...");
 
                                     return albumParser.parse();
                                 }));
@@ -1688,7 +1688,7 @@ program
                                 albumDate = moment(album.date, "YYYY-MM-DD").format("D-M-YYYY");
                             }
 
-                            console.log("Updating album...");
+                            console.log("Updating album " + (<number> index + 1) + "...");
                             console.log("Album title: " + album.title);
                             console.log("Album artists: " + album.artists);
                             console.log("Album date: " + albumDate);
@@ -1779,7 +1779,7 @@ program
                             let songs: Song[] = songsMap.get(album);
 
                             async.eachOfSeries(songs, (song, index, callback) => {
-                                console.log("Updating song " + song.track + "...");
+                                console.log("Updating song " + (<number> index + 1) + "...");
                                 console.log("Song track: " + song.track);
                                 console.log("Song title: " + song.title);
                                 console.log("Song artists: " + song.artists);
@@ -1789,7 +1789,7 @@ program
                                     output: process.stdout
                                 });
 
-                                rl.question("Update song " + song.track + "? (no) ", answer => {
+                                rl.question("Update song " + (<number> index + 1) + "? (no) ", answer => {
                                     console.log("");
 
                                     if (!(answer === "y" || answer === "yes")) {
@@ -1893,7 +1893,7 @@ program
 
                         if (!songFile) {
                             let progressBar: ProgressBar = new ProgressBar("Downloading song "
-                                + song.track + "... [:bar] :percent :speedMBps :sizeMB :etas", {
+                                + (<number> songIndex + 1) + "... [:bar] :percent :speedMBps :sizeMB :etas", {
                                 total: 100,
                                 width: 10,
                                 incomplete: " "
@@ -1972,7 +1972,7 @@ program
                                 }
 
                                 let progressBar: ProgressBar = new ProgressBar("Converting song "
-                                    + song.track + "... [:bar] :percent :sizeMB :etas", {
+                                    + (<number> songIndex + 1) + "... [:bar] :percent :sizeMB :etas", {
                                     total: 100,
                                     width: 10,
                                     incomplete: " "
