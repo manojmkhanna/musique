@@ -12,9 +12,8 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as readline from "readline";
-
-const Jimp = require("jimp");
-const nodeID3 = require("node-id3v2.4");
+import Jimp = require("jimp");
+import nodeID3 = require("node-id3v2.4");
 
 class Album {
     title: string;
@@ -597,8 +596,7 @@ program
             songTracks: string;
 
         let songIndexes: number[],
-            songFileMap: Map<number, string>,
-            songParserMap: Map<number, SongParser>;
+            songFileMap: Map<number, string>;
 
         let album: Album,
             songs: Song[];
@@ -736,14 +734,16 @@ program
                         platformName = "saavn";
                     }
 
-                    songParserMap = new Map<number, SongParser>();
+                    let songParseCount: number = 0,
+                        songParserMap: Map<number, SongParser> = new Map<number, SongParser>();
 
                     musique.parseAlbum(platformName, albumUrl)
                         .then(albumParser => albumParser.parse())
                         .then(albumParser => albumParser.parseSongs((songParser, index) => {
-                            songParserMap.set(index, songParser);
+                            console.log("Parsing song " + (songParseCount + 1) + "...");
 
-                            console.log("Parsing song " + songParserMap.size + "...");
+                            songParseCount++;
+                            songParserMap.set(index, songParser);
 
                             return songParser.parse();
                         }, ...(songIndexes ? songIndexes : [])))
@@ -811,7 +811,7 @@ program
 
                     if (tagMap.has("APIC") && tagMap.has("TALB")) {
                         album.art = path.dirname(songFileMap.values().next().value) + "/"
-                            + tagMap.get("TALB").text.replace(/[/.]/g, "") + ".png";
+                            + (<string> tagMap.get("TALB").text).replace(/[/.]/g, "") + ".png";
                     }
 
                     if (tagMap.has("TDRL")) {
@@ -1045,6 +1045,8 @@ program
                     callback();
                 });
             }, callback => {
+                let songDownloadCount: number = 0;
+
                 async.eachOfSeries(songs, (song, index, callback) => {
                     let songFile: string;
 
@@ -1057,7 +1059,7 @@ program
 
                     if (!songFile) {
                         let progressBar: ProgressBar = new ProgressBar("Downloading song "
-                            + (<number> index + 1) + "... [:bar] :percent :speedMBps :sizeMB :etas", {
+                            + (songDownloadCount + 1) + "... [:bar] :percent :speedMBps :sizeMB :etas", {
                             total: 100,
                             width: 10,
                             incomplete: " "
@@ -1077,9 +1079,7 @@ program
                                     size: (progress.size.total / 1024 / 1024).toFixed(1)
                                 });
 
-                                if (index == songs.length - 1) {
-                                    console.log("");
-                                }
+                                songDownloadCount++;
 
                                 fs.writeFile(song.file, songParser.output.file, error => {
                                     if (error) {
@@ -1104,9 +1104,20 @@ program
                         });
                     }
                 }, error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    if (songDownloadCount > 0) {
+                        console.log("");
+                    }
+
+                    callback();
                 });
             }, callback => {
+                let songConvertCount: number = 0;
+
                 async.eachOfSeries(songs, (song, index, callback) => {
                     ffmpeg.ffprobe(song.file, (error, data) => {
                         if (error) {
@@ -1128,7 +1139,7 @@ program
                             }
 
                             let progressBar: ProgressBar = new ProgressBar("Converting song "
-                                + (<number> index + 1) + "... [:bar] :percent :sizeMB :etas", {
+                                + (songConvertCount + 1) + "... [:bar] :percent :sizeMB :etas", {
                                 total: 100,
                                 width: 10,
                                 incomplete: " "
@@ -1151,9 +1162,7 @@ program
                                         size: (progress.targetSize / 1024).toFixed(1)
                                     });
 
-                                    if (index == songs.length - 1) {
-                                        console.log("");
-                                    }
+                                    songConvertCount++;
 
                                     fs.unlink(tempSongFile, error => {
                                         if (error) {
@@ -1168,7 +1177,16 @@ program
                         });
                     });
                 }, error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    if (songConvertCount > 0) {
+                        console.log("");
+                    }
+
+                    callback();
                 });
             }, callback => {
                 let albumArt: string = album.art;
@@ -1292,8 +1310,7 @@ program
             songTracks: string;
 
         let songIndexes: number[],
-            songFileMap: Map<number, string>,
-            songParserMap: Map<number, SongParser>;
+            songFileMap: Map<number, string>;
 
         let albumMap: Map<string, Album>,
             songsMap: Map<Album, Song[]>;
@@ -1439,14 +1456,16 @@ program
                         platformName = "saavn";
                     }
 
-                    songParserMap = new Map<number, SongParser>();
+                    let songParseCount: number = 0,
+                        songParserMap: Map<number, SongParser> = new Map<number, SongParser>();
 
                     musique.parsePlaylist(platformName, playlistUrl)
                         .then(playlistParser => playlistParser.parse())
                         .then(playlistParser => playlistParser.parseSongs((songParser, index) => {
-                            songParserMap.set(index, songParser);
+                            console.log("Parsing song " + (songParseCount + 1) + "...");
 
-                            console.log("Parsing song " + songParserMap.size + "...");
+                            songParseCount++;
+                            songParserMap.set(index, songParser);
 
                             return songParser.parse()
                                 .then(songParser => songParser.parseAlbum(albumParser => {
@@ -1542,7 +1561,7 @@ program
 
                             if (tagMap.has("APIC") && tagMap.has("TALB")) {
                                 album.art = path.dirname(songFile) + "/"
-                                    + tagMap.get("TALB").text.replace(/[/.]/g, "") + ".png";
+                                    + (<string> tagMap.get("TALB").text).replace(/[/.]/g, "") + ".png";
                             }
 
                             if (tagMap.has("TDRL")) {
@@ -1662,7 +1681,7 @@ program
                                 output: process.stdout
                             });
 
-                            rl.question("Update album? (no) ", answer => {
+                            rl.question("Update album " + (<number> index + 1) + "? (no) ", answer => {
                                 console.log("");
 
                                 if (!(answer === "y" || answer === "yes")) {
@@ -1831,10 +1850,12 @@ program
             }, callback => {
                 let albums: Album[] = [...albumMap.values()];
 
-                async.eachOfSeries(albums, (album, albumIndex, callback) => {
+                let songDownloadCount: number = 0;
+
+                async.eachOfSeries(albums, (album, index, callback) => {
                     let songs: Song[] = songsMap.get(album);
 
-                    async.eachOfSeries(songs, (song, songIndex, callback) => {
+                    async.eachOfSeries(songs, (song, index, callback) => {
                         let songFile: string;
 
                         if (song.file) {
@@ -1846,7 +1867,7 @@ program
 
                         if (!songFile) {
                             let progressBar: ProgressBar = new ProgressBar("Downloading song "
-                                + (<number> songIndex + 1) + "... [:bar] :percent :speedMBps :sizeMB :etas", {
+                                + (songDownloadCount + 1) + "... [:bar] :percent :speedMBps :sizeMB :etas", {
                                 total: 100,
                                 width: 10,
                                 incomplete: " "
@@ -1866,9 +1887,7 @@ program
                                         size: (progress.size.total / 1024 / 1024).toFixed(1)
                                     });
 
-                                    if (albumIndex == albums.length - 1 && songIndex == songs.length - 1) {
-                                        console.log("");
-                                    }
+                                    songDownloadCount++;
 
                                     fs.writeFile(song.file, songParser.output.file, error => {
                                         if (error) {
@@ -1896,15 +1915,26 @@ program
                         callback(error);
                     });
                 }, error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    if (songDownloadCount > 0) {
+                        console.log("");
+                    }
+
+                    callback();
                 });
             }, callback => {
                 let albums: Album[] = [...albumMap.values()];
 
-                async.eachOfSeries(albums, (album, albumIndex, callback) => {
+                let songConvertCount: number = 0;
+
+                async.eachOfSeries(albums, (album, index, callback) => {
                     let songs: Song[] = songsMap.get(album);
 
-                    async.eachOfSeries(songs, (song, songIndex, callback) => {
+                    async.eachOfSeries(songs, (song, index, callback) => {
                         ffmpeg.ffprobe(song.file, (error, data) => {
                             if (error) {
                                 callback(error);
@@ -1925,7 +1955,7 @@ program
                                 }
 
                                 let progressBar: ProgressBar = new ProgressBar("Converting song "
-                                    + (<number> songIndex + 1) + "... [:bar] :percent :sizeMB :etas", {
+                                    + (songConvertCount + 1) + "... [:bar] :percent :sizeMB :etas", {
                                     total: 100,
                                     width: 10,
                                     incomplete: " "
@@ -1948,9 +1978,7 @@ program
                                             size: (progress.targetSize / 1024).toFixed(1)
                                         });
 
-                                        if (albumIndex == albums.length - 1 && songIndex == songs.length - 1) {
-                                            console.log("");
-                                        }
+                                        songConvertCount++;
 
                                         fs.unlink(tempSongFile, error => {
                                             if (error) {
@@ -1968,7 +1996,16 @@ program
                         callback(error);
                     });
                 }, error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    if (songConvertCount > 0) {
+                        console.log("");
+                    }
+
+                    callback();
                 });
             }, callback => {
                 let albums: Album[] = [...albumMap.values()];
@@ -2037,7 +2074,7 @@ program
             }, callback => {
                 let albums: Album[] = [...albumMap.values()];
 
-                async.eachOfSeries(albums, (album, index, callback) => {
+                for (let album of albums) {
                     let songs: Song[] = songsMap.get(album);
 
                     for (let song of songs) {
@@ -2069,11 +2106,9 @@ program
 
                         tag.write();
                     }
+                }
 
-                    callback();
-                }, () => {
-                    callback();
-                });
+                callback();
             }, callback => {
                 let albums: Album[] = [...albumMap.values()];
 
@@ -2087,9 +2122,14 @@ program
                         callback();
                     });
                 }, error => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
                     console.log("Completed!");
 
-                    callback(error);
+                    callback();
                 });
             }
         ], error => {
