@@ -76,7 +76,7 @@ export default class DeezerSongParser extends SongParser {
 
             let hash: string = json.DATA.MD5_ORIGIN + "¤3¤" + json.DATA.SNG_ID + "¤" + json.DATA.MEDIA_VERSION;
 
-            let hashMd5 = crypto.createHash("md5").update(new Buffer(hash, "binary")).digest("hex");
+            let hashMd5 = crypto.createHash("md5").update(Buffer.from(hash, "binary")).digest("hex");
 
             hash = hashMd5 + "¤" + hash + "¤";
 
@@ -109,7 +109,7 @@ export default class DeezerSongParser extends SongParser {
 
             let hash: string = json.DATA.MD5_ORIGIN + "¤3¤" + json.DATA.SNG_ID + "¤" + json.DATA.MEDIA_VERSION;
 
-            let hashMd5 = crypto.createHash("md5").update(new Buffer(hash, "binary")).digest("hex");
+            let hashMd5 = crypto.createHash("md5").update(Buffer.from(hash, "binary")).digest("hex");
 
             hash = hashMd5 + "¤" + hash + "¤";
 
