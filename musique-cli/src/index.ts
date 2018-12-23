@@ -149,7 +149,7 @@ program
 
                     if (tagMap.has("APIC") && tagMap.has("TALB")) {
                         album.art = path.dirname(songFile) + "/"
-                            + (tagMap.get("TALB").text).replace(/[/.]/g, "") + ".png";
+                            + (<string> tagMap.get("TALB").text).replace(/[/.]/g, "") + ".png";
                     }
 
                     if (tagMap.has("TDRL")) {
