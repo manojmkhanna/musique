@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "gulp build",
-    "start": "gulp start"
+    "watch": "gulp watch",
+    "start": "node ."
   },
   "keywords": [],
   "author": {
@@ -37,7 +38,6 @@
     "@types/progress": "^2.0.3",
     "@types/request": "^2.48.1",
     "gulp": "^4.0.0",
-    "gulp-nodemon": "^2.4.2",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-typescript": "^5.0.0",
     "typescript": "^3.2.2"

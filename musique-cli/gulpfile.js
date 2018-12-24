@@ -1,24 +1,21 @@
 const gulp = require("gulp");
 const ts = require("gulp-typescript");
 const sourcemaps = require("gulp-sourcemaps");
-const nodemon = require("gulp-nodemon");
 
-gulp.task("build", () => {
-    let tsProject = ts.createProject("tsconfig.json");
+let tsProject = ts.createProject("tsconfig.json");
 
-    return tsProject.src()
+function build() {
+    return gulp.src("src/*.ts")
         .pipe(sourcemaps.init())
         .pipe(tsProject())
-        .pipe(sourcemaps.write("."))
-        .pipe(gulp.dest("dist"))
-});
+        .pipe(sourcemaps.write("./"))
+        .pipe(gulp.dest("dist/"));
+}
 
-gulp.task("start", gulp.series(["build"]), () => {
-    return nodemon({
-        watch: "src",
-        ext: "ts",
-        tasks: ["build"]
-    });
-});
+function watch() {
+    return gulp.watch("src/*.ts", build);
+}
 
-gulp.task("default", gulp.series(["start"]));
+exports.build = build;
+exports.watch = watch;
+exports.default = watch;
