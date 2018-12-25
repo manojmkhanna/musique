@@ -5,10 +5,10 @@ const sourcemaps = require("gulp-sourcemaps");
 let tsProject = ts.createProject("tsconfig.json");
 
 function build() {
-    return gulp.src("src/*.ts")
+    return gulp.src("src/**/*.ts")
         .pipe(sourcemaps.init())
         .pipe(tsProject())
-        .pipe(sourcemaps.write("./"))
+        .pipe(sourcemaps.write("/"))
         .pipe(gulp.dest("dist/"));
 }
 
@@ -18,4 +18,4 @@ function watch() {
 
 exports.build = build;
 exports.watch = watch;
-exports.default = watch;
+exports.default = build;

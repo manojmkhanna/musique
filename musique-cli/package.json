@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "start": "node .",
     "build": "gulp build",
-    "watch": "gulp watch",
-    "start": "node ."
+    "watch": "gulp watch"
   },
   "keywords": [],
   "author": {
