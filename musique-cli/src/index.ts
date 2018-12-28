@@ -156,8 +156,8 @@ program
                         album.date = tagMap.get("TDRL").text;
                     }
 
-                    if (tagMap.has("TCON")) {
-                        album.language = tagMap.get("TCON").text;
+                    if (tagMap.has("TLAN")) {
+                        album.language = tagMap.get("TLAN").text;
                     }
 
                     if (tagMap.has("TALB")) {
@@ -553,6 +553,7 @@ program
                 tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                 tag.addFrame("TDRL", [album.date]);
                 tag.addFrame("TIT2", [song.title]);
+                tag.addFrame("TLAN", [album.language]);
                 tag.addFrame("TPE1", [song.artists]);
                 tag.addFrame("TPE2", [album.artists]);
                 tag.addFrame("TRCK", [song.track]);
@@ -818,8 +819,8 @@ program
                         album.date = tagMap.get("TDRL").text;
                     }
 
-                    if (tagMap.has("TCON")) {
-                        album.language = tagMap.get("TCON").text;
+                    if (tagMap.has("TLAN")) {
+                        album.language = tagMap.get("TLAN").text;
                     }
 
                     if (tagMap.has("TALB")) {
@@ -1266,6 +1267,7 @@ program
                     tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                     tag.addFrame("TDRL", [album.date]);
                     tag.addFrame("TIT2", [song.title]);
+                    tag.addFrame("TLAN", [album.language]);
                     tag.addFrame("TPE1", [song.artists]);
                     tag.addFrame("TPE2", [album.artists]);
                     tag.addFrame("TRCK", [song.track]);
@@ -1568,8 +1570,8 @@ program
                                 album.date = tagMap.get("TDRL").text;
                             }
 
-                            if (tagMap.has("TCON")) {
-                                album.language = tagMap.get("TCON").text;
+                            if (tagMap.has("TLAN")) {
+                                album.language = tagMap.get("TLAN").text;
                             }
 
                             if (tagMap.has("TALB")) {
@@ -2096,6 +2098,7 @@ program
                         tag.addFrame("TDRC", [album.date.substr(0, 4)]);
                         tag.addFrame("TDRL", [album.date]);
                         tag.addFrame("TIT2", [song.title]);
+                        tag.addFrame("TLAN", [album.language]);
                         tag.addFrame("TPE1", [song.artists]);
                         tag.addFrame("TPE2", [album.artists]);
                         tag.addFrame("TRCK", [song.track]);
