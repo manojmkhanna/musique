@@ -1,10 +1,11 @@
 {
-  "name": "musique-cli",
+  "name": "musique",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "start": "gulp && node ."
+    "start": "gulp"
   },
   "keywords": [],
   "author": {
@@ -13,21 +14,17 @@
   },
   "license": "MIT",
   "dependencies": {
-    "async": "^2.6.1",
-    "commander": "^2.19.0",
-    "fluent-ffmpeg": "^2.1.2",
-    "jimp": "^0.6.0",
+    "bluebird": "^3.5.3",
+    "cheerio": "^1.0.0-rc.2",
     "moment": "^2.23.0",
-    "musique": "file:../musique",
-    "node-id3v2.4": "^0.0.4",
-    "progress": "^2.0.3",
-    "request": "^2.88.0"
+    "parsque": "file:../../parsque/parsque",
+    "request": "^2.88.0",
+    "request-progress": "^3.0.0"
   },
   "devDependencies": {
-    "@types/async": "^2.0.50",
-    "@types/fluent-ffmpeg": "^2.1.9",
+    "@types/bluebird": "^3.5.25",
+    "@types/cheerio": "^0.22.10",
     "@types/node": "^10.12.18",
-    "@types/progress": "^2.0.3",
     "@types/request": "^2.48.1",
     "gulp": "^4.0.0",
     "gulp-sourcemaps": "^2.6.4",
