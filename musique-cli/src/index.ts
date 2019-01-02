@@ -1,17 +1,15 @@
-import * as musique from "musique";
-import {AlbumOutput, PlaylistOutput, SongOutput, SongParser} from "musique";
 import * as async from "async";
 import * as program from "commander";
 import * as ffmpeg from "fluent-ffmpeg";
-import * as mkdirp from "mkdirp";
-import * as moment from "moment";
-import * as ProgressBar from "progress";
-import * as readdirp from "readdirp";
-import * as request from "request";
 import * as fs from "fs";
+import * as moment from "moment";
+import * as musique from "musique";
+import {AlbumOutput, PlaylistOutput, SongOutput, SongParser} from "musique";
 import * as os from "os";
 import * as path from "path";
+import * as ProgressBar from "progress";
 import * as readline from "readline";
+import * as request from "request";
 import Jimp = require("jimp");
 import nodeID3 = require("node-id3v2.4");
 

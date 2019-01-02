@@ -1,9 +1,9 @@
 import * as Promise from "bluebird";
-import BaseParser from "./base_parser";
+import PlaylistContent from "../content/playlist_content";
 import PlaylistInput from "../input/playlist_input";
 import PlaylistOutput from "../output/playlist_output";
-import PlaylistContent from "../content/playlist_content";
 import SongOutput from "../output/song_output";
+import BaseParser from "./base_parser";
 import SongParser from "./song_parser";
 
 export default class PlaylistParser extends BaseParser<PlaylistInput, PlaylistOutput, PlaylistContent> {

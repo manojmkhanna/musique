@@ -1,11 +1,11 @@
 import * as Promise from "bluebird";
-import BaseParser from "./base_parser";
+import AlbumContent from "../content/album_content";
 import AlbumInput from "../input/album_input";
 import AlbumOutput from "../output/album_output";
-import AlbumContent from "../content/album_content";
 import ArtistOutput from "../output/artist_output";
 import SongOutput from "../output/song_output";
 import ArtistParser from "./artist_parser";
+import BaseParser from "./base_parser";
 import SongParser from "./song_parser";
 
 export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, AlbumContent> {

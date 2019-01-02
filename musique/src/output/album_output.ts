@@ -1,5 +1,5 @@
-import BaseOutput from "./base_output";
 import ArtistOutput from "./artist_output";
+import BaseOutput from "./base_output";
 import SongOutput from "./song_output";
 
 export default class AlbumOutput extends BaseOutput {

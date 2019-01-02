@@ -1,14 +1,14 @@
 import * as Promise from "bluebird";
-import BaseParser from "./base_parser";
-import ArtistInput from "../input/artist_input";
-import ArtistOutput from "../output/artist_output";
 import ArtistContent from "../content/artist_content";
+import ArtistInput from "../input/artist_input";
 import AlbumOutput from "../output/album_output";
-import SongOutput from "../output/song_output";
+import ArtistOutput from "../output/artist_output";
 import PlaylistOutput from "../output/playlist_output";
+import SongOutput from "../output/song_output";
 import AlbumParser from "./album_parser";
-import SongParser from "./song_parser";
+import BaseParser from "./base_parser";
 import PlaylistParser from "./playlist_parser";
+import SongParser from "./song_parser";
 
 export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, ArtistContent> {
     protected createInput(): Promise<ArtistInput> {

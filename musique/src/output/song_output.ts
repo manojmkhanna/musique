@@ -1,6 +1,6 @@
-import BaseOutput from "./base_output";
 import AlbumOutput from "./album_output";
 import ArtistOutput from "./artist_output";
+import BaseOutput from "./base_output";
 
 export default class SongOutput extends BaseOutput {
     public duration: string;

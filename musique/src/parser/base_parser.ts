@@ -1,8 +1,8 @@
-import {Parser} from "parsque";
 import * as Promise from "bluebird";
+import {Parser} from "parsque";
+import BaseContent from "../content/base_content";
 import BaseInput from "../input/base_input";
 import BaseOutput from "../output/base_output";
-import BaseContent from "../content/base_content";
 import Platform from "../platform/platform";
 
 export default class BaseParser<I extends BaseInput,
