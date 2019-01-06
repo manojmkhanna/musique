@@ -30,6 +30,120 @@ class Song {
     parser: SongParser;
 }
 
+function mkdir(folder: string, callback: (error?: any) => void): void {
+    fs.access(folder, fs.constants.F_OK, error => {
+        if (!error) {
+            callback();
+            return;
+        }
+
+        mkdir(path.dirname(folder), error => {
+            if (error) {
+                callback(error);
+                return;
+            }
+
+            fs.mkdir(folder, error => {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+
+                callback();
+            });
+        });
+    });
+}
+
+function rmdir(folder: string, callback: (error?: any) => void): void {
+    fs.access(folder, fs.constants.F_OK, error => {
+        if (error) {
+            rmdir(path.dirname(folder), error => {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+
+                callback();
+            });
+        } else {
+            fs.readdir(folder, (error, files) => {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+
+                if (files.length > 0) {
+                    callback();
+                    return;
+                }
+
+                fs.rmdir(folder, error => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    rmdir(path.dirname(folder), error => {
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
+                        callback();
+                    });
+                });
+            });
+        }
+    });
+}
+
+function readdir(folder: string, callback: (error?: any, files?: string[]) => void): void {
+    fs.readdir(folder, (error, files) => {
+        if (error) {
+            callback(error);
+            return;
+        }
+
+        async.mapSeries(files, (file, callback) => {
+            fs.stat(folder + "/" + file, (error, stats) => {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+
+                if (!stats.isDirectory()) {
+                    callback(undefined, []);
+                    return;
+                }
+
+                readdir(folder + "/" + file, (error, files) => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    callback(undefined, files);
+                });
+            });
+        }, (error, results) => {
+            if (error) {
+                callback(error);
+                return;
+            }
+
+            let allFiles: string[] = [];
+
+            for (let i = 0; i < files.length; i++) {
+                allFiles.push(files[i]);
+                allFiles.push(...(<string[]> results[i]));
+            }
+
+            callback(undefined, allFiles);
+        });
+    });
+}
+
 program
     .command("song")
     .option("-y, --yes")
@@ -62,10 +176,6 @@ program
                         });
                     }, callback => {
                         rl.question("Song file: ", answer => {
-                            console.log("");
-
-                            rl.close();
-
                             if (answer) {
                                 songFile = answer;
                             }
@@ -73,6 +183,10 @@ program
                             callback();
                         });
                     }, callback => {
+                        console.log("");
+
+                        rl.close();
+
                         if (!songUrl && !songFile) {
                             callback(new Error());
                             return;
@@ -81,7 +195,12 @@ program
                         callback();
                     }
                 ], error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    callback();
                 });
             }, callback => {
                 if (songUrl) {
@@ -260,18 +379,25 @@ program
                             });
                         }, callback => {
                             rl.question("Album art: (" + album.art + ") ", answer => {
-                                console.log("");
-
-                                rl.close();
-
                                 if (answer) {
                                     album.art = answer;
                                 }
 
                                 callback();
                             });
+                        }, callback => {
+                            console.log("");
+
+                            rl.close();
+
+                            callback();
                         }
-                    ], () => {
+                    ], error => {
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
                         callback();
                     });
                 });
@@ -321,18 +447,25 @@ program
                             });
                         }, callback => {
                             rl.question("Song artists: (" + song.artists + ") ", answer => {
-                                console.log("");
-
-                                rl.close();
-
                                 if (answer) {
                                     song.artists = answer;
                                 }
 
                                 callback();
                             });
+                        }, callback => {
+                            console.log("");
+
+                            rl.close();
+
+                            callback();
                         }
-                    ], () => {
+                    ], error => {
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
                         callback();
                     });
                 });
@@ -352,7 +485,7 @@ program
                 album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
                 album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
 
-                mkdirp(album.folder, error => {
+                mkdir(album.folder, error => {
                     if (error) {
                         callback(error);
                         return;
@@ -568,10 +701,21 @@ program
                         return;
                     }
 
-                    console.log("Completed!");
+                    callback();
+                });
+            }, callback => {
+                rmdir(path.dirname(songFile), error => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
 
                     callback();
                 });
+            }, callback => {
+                console.log("Completed!");
+
+                callback();
             }
         ], error => {
             if (error) {
@@ -624,10 +768,6 @@ program
                         });
                     }, callback => {
                         rl.question("Song tracks: ", answer => {
-                            console.log("");
-
-                            rl.close();
-
                             if (answer) {
                                 songTracks = answer;
                             }
@@ -635,6 +775,10 @@ program
                             callback();
                         });
                     }, callback => {
+                        console.log("");
+
+                        rl.close();
+
                         if (!albumUrl && !albumFolder) {
                             callback(new Error());
                             return;
@@ -643,7 +787,12 @@ program
                         callback();
                     }
                 ], error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    callback();
                 });
             }, callback => {
                 if (!songTracks) {
@@ -937,18 +1086,25 @@ program
                             });
                         }, callback => {
                             rl.question("Album art: (" + album.art + ") ", answer => {
-                                console.log("");
-
-                                rl.close();
-
                                 if (answer) {
                                     album.art = answer;
                                 }
 
                                 callback();
                             });
+                        }, callback => {
+                            console.log("");
+
+                            rl.close();
+
+                            callback();
                         }
-                    ], () => {
+                    ], error => {
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
                         callback();
                     });
                 });
@@ -999,18 +1155,25 @@ program
                                 });
                             }, callback => {
                                 rl.question("Song artists: (" + song.artists + ") ", answer => {
-                                    console.log("");
-
-                                    rl.close();
-
                                     if (answer) {
                                         song.artists = answer;
                                     }
 
                                     callback();
                                 });
+                            }, callback => {
+                                console.log("");
+
+                                rl.close();
+
+                                callback();
                             }
-                        ], () => {
+                        ], error => {
+                            if (error) {
+                                callback(error);
+                                return;
+                            }
+
                             callback();
                         });
                     });
@@ -1020,7 +1183,12 @@ program
                     } else if (options.no) {
                         rl.write("no" + os.EOL);
                     }
-                }, () => {
+                }, error => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
                     callback();
                 });
             }, callback => {
@@ -1033,7 +1201,7 @@ program
                 album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
                 album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
 
-                mkdirp(album.folder, error => {
+                mkdir(album.folder, error => {
                     if (error) {
                         callback(error);
                         return;
@@ -1281,10 +1449,21 @@ program
                         return;
                     }
 
-                    console.log("Completed!");
+                    callback();
+                });
+            }, callback => {
+                rmdir(albumFolder, error => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
 
                     callback();
                 });
+            }, callback => {
+                console.log("Completed!");
+
+                callback();
             }
         ], error => {
             if (error) {
@@ -1337,10 +1516,6 @@ program
                         });
                     }, callback => {
                         rl.question("Song tracks: ", answer => {
-                            console.log("");
-
-                            rl.close();
-
                             if (answer) {
                                 songTracks = answer;
                             }
@@ -1348,6 +1523,10 @@ program
                             callback();
                         });
                     }, callback => {
+                        console.log("");
+
+                        rl.close();
+
                         if (!playlistUrl && !playlistFolder) {
                             callback(new Error());
                             return;
@@ -1356,7 +1535,12 @@ program
                         callback();
                     }
                 ], error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    callback();
                 });
             }, callback => {
                 if (!songTracks) {
@@ -1377,18 +1561,10 @@ program
 
                 songFileMap = new Map<number, string>();
 
-                readdirp({
-                    root: playlistFolder
-                }, (error, entries) => {
+                readdir(playlistFolder, (error, files) => {
                     if (error) {
                         callback(error);
                         return;
-                    }
-
-                    let files: string[] = [];
-
-                    for (let entry of entries.files) {
-                        files.push(entry.path);
                     }
 
                     let songFiles: string[] = files.filter(file => file.endsWith(".mp3")),
@@ -1621,7 +1797,12 @@ program
                             callback();
                         });
                     }, error => {
-                        callback(error);
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
+                        callback();
                     });
                 }
             }, callback => {
@@ -1722,18 +1903,25 @@ program
                                         });
                                     }, callback => {
                                         rl.question("Album art: (" + album.art + ") ", answer => {
-                                            console.log("");
-
-                                            rl.close();
-
                                             if (answer) {
                                                 album.art = answer;
                                             }
 
                                             callback();
                                         });
+                                    }, callback => {
+                                        console.log("");
+
+                                        rl.close();
+
+                                        callback();
                                     }
-                                ], () => {
+                                ], error => {
+                                    if (error) {
+                                        callback(error);
+                                        return;
+                                    }
+
                                     callback();
                                 });
                             });
@@ -1786,18 +1974,25 @@ program
                                             });
                                         }, callback => {
                                             rl.question("Song artists: (" + song.artists + ") ", answer => {
-                                                console.log("");
-
-                                                rl.close();
-
                                                 if (answer) {
                                                     song.artists = answer;
                                                 }
 
                                                 callback();
                                             });
+                                        }, callback => {
+                                            console.log("");
+
+                                            rl.close();
+
+                                            callback();
                                         }
-                                    ], () => {
+                                    ], error => {
+                                        if (error) {
+                                            callback(error);
+                                            return;
+                                        }
+
                                         callback();
                                     });
                                 });
@@ -1807,14 +2002,29 @@ program
                                 } else if (options.no) {
                                     rl.write("no" + os.EOL);
                                 }
-                            }, () => {
+                            }, error => {
+                                if (error) {
+                                    callback(error);
+                                    return;
+                                }
+
                                 callback();
                             });
                         }
-                    ], () => {
+                    ], error => {
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
                         callback();
                     });
-                }, () => {
+                }, error => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
                     callback();
                 });
             }, callback => {
@@ -1832,7 +2042,7 @@ program
                     album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
                     album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
 
-                    mkdirp(album.folder, error => {
+                    mkdir(album.folder, error => {
                         if (error) {
                             callback(error);
                             return;
@@ -1841,7 +2051,12 @@ program
                         callback();
                     });
                 }, error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    callback();
                 });
             }, callback => {
                 let albums: Album[] = [...albumMap.values()];
@@ -1908,7 +2123,12 @@ program
                             });
                         }
                     }, error => {
-                        callback(error);
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
+                        callback();
                     });
                 }, error => {
                     if (error) {
@@ -1989,7 +2209,12 @@ program
                             });
                         });
                     }, error => {
-                        callback(error);
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
+                        callback();
                     });
                 }, error => {
                     if (error) {
@@ -2065,7 +2290,12 @@ program
                             });
                     }
                 }, error => {
-                    callback(error);
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+
+                    callback();
                 });
             }, callback => {
                 let albums: Album[] = [...albumMap.values()];
@@ -2122,10 +2352,21 @@ program
                         return;
                     }
 
-                    console.log("Completed!");
+                    callback();
+                });
+            }, callback => {
+                rmdir(playlistFolder, error => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
 
                     callback();
                 });
+            }, callback => {
+                console.log("Completed!");
+
+                callback();
             }
         ], error => {
             if (error) {
