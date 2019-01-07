@@ -667,14 +667,12 @@ program
                 }
             }, callback => {
                 let id3 = nodeID3.readTag(song.file, {
-                    targetversion: 4,
-                    encoding: 3
+                    targetversion: 4
                 });
 
                 if (id3.iserror) {
                     id3 = nodeID3.createTag(song.file, {
-                        targetversion: 4,
-                        encoding: 3
+                        targetversion: 4
                     });
                 }
 
@@ -691,6 +689,14 @@ program
                 id3.addFrame("TPE2", [album.artists + "\u0000"]);
                 id3.addFrame("TRCK", [song.track + "\u0000"]);
 
+                for (let frame of id3.frames) {
+                    if (frame.type === "APIC") {
+                        frame.data.encoding = 0;
+                    } else {
+                        frame.data.encoding = 3;
+                    }
+                }
+
                 id3.write();
 
                 callback();
@@ -704,6 +710,11 @@ program
                     callback();
                 });
             }, callback => {
+                if (!songFile) {
+                    callback();
+                    return;
+                }
+
                 rmdir(path.dirname(songFile), error => {
                     if (error) {
                         callback(error);
@@ -1414,14 +1425,12 @@ program
             }, callback => {
                 for (let song of songs) {
                     let id3 = nodeID3.readTag(song.file, {
-                        targetversion: 4,
-                        encoding: 3
+                        targetversion: 4
                     });
 
                     if (id3.iserror) {
                         id3 = nodeID3.createTag(song.file, {
-                            targetversion: 4,
-                            encoding: 3
+                            targetversion: 4
                         });
                     }
 
@@ -1438,6 +1447,14 @@ program
                     id3.addFrame("TPE2", [album.artists + "\u0000"]);
                     id3.addFrame("TRCK", [song.track + "\u0000"]);
 
+                    for (let frame of id3.frames) {
+                        if (frame.type === "APIC") {
+                            frame.data.encoding = 0;
+                        } else {
+                            frame.data.encoding = 3;
+                        }
+                    }
+
                     id3.write();
                 }
 
@@ -1452,6 +1469,11 @@ program
                     callback();
                 });
             }, callback => {
+                if (!albumFolder) {
+                    callback();
+                    return;
+                }
+
                 rmdir(albumFolder, error => {
                     if (error) {
                         callback(error);
@@ -2305,14 +2327,12 @@ program
 
                     for (let song of songs) {
                         let id3 = nodeID3.readTag(song.file, {
-                            targetversion: 4,
-                            encoding: 3
+                            targetversion: 4
                         });
 
                         if (id3.iserror) {
                             id3 = nodeID3.createTag(song.file, {
-                                targetversion: 4,
-                                encoding: 3
+                                targetversion: 4
                             });
                         }
 
@@ -2328,6 +2348,14 @@ program
                         id3.addFrame("TPE1", [song.artists + "\u0000"]);
                         id3.addFrame("TPE2", [album.artists + "\u0000"]);
                         id3.addFrame("TRCK", [song.track + "\u0000"]);
+
+                        for (let frame of id3.frames) {
+                            if (frame.type === "APIC") {
+                                frame.data.encoding = 0;
+                            } else {
+                                frame.data.encoding = 3;
+                            }
+                        }
 
                         id3.write();
                     }
@@ -2355,6 +2383,11 @@ program
                     callback();
                 });
             }, callback => {
+                if (!playlistFolder) {
+                    callback();
+                    return;
+                }
+
                 rmdir(playlistFolder, error => {
                     if (error) {
                         callback(error);
