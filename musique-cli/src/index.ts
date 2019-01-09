@@ -2,16 +2,16 @@ import * as async from "async";
 import * as program from "commander";
 import * as ffmpeg from "fluent-ffmpeg";
 import * as fs from "fs";
+import * as Jimp from "jimp";
 import * as moment from "moment";
 import * as musique from "musique";
 import {AlbumOutput, PlaylistOutput, SongOutput, SongParser} from "musique";
+import * as nodeID3v2 from "node-id3v2.4";
 import * as os from "os";
 import * as path from "path";
 import * as ProgressBar from "progress";
 import * as readline from "readline";
 import * as request from "request";
-import Jimp = require("jimp");
-import nodeID3 = require("node-id3v2.4");
 
 class Album {
     title: string;
@@ -19,6 +19,7 @@ class Album {
     date: string;
     language: string;
     art: string;
+
     folder: string;
 }
 
@@ -26,18 +27,19 @@ class Song {
     track: string;
     title: string;
     artists: string;
+
     file: string;
     parser: SongParser;
 }
 
-function mkdir(folder: string, callback: (error?: any) => void): void {
-    fs.access(folder, fs.constants.F_OK, error => {
+function mkdirp(folder: string, callback: (error?: any) => void): void {
+    fs.stat(folder, error => {
         if (!error) {
             callback();
             return;
         }
 
-        mkdir(path.dirname(folder), error => {
+        mkdirp(path.dirname(folder), error => {
             if (error) {
                 callback(error);
                 return;
@@ -55,10 +57,25 @@ function mkdir(folder: string, callback: (error?: any) => void): void {
     });
 }
 
-function rmdir(folder: string, callback: (error?: any) => void): void {
-    fs.access(folder, fs.constants.F_OK, error => {
+function rmdirp(folder: string, callback: (error?: any) => void): void {
+    fs.readdir(folder, (error, files) => {
         if (error) {
-            rmdir(path.dirname(folder), error => {
+            callback(error);
+            return;
+        }
+
+        if (files.length > 0) {
+            callback();
+            return;
+        }
+
+        fs.rmdir(folder, error => {
+            if (error) {
+                callback(error);
+                return;
+            }
+
+            rmdirp(path.dirname(folder), error => {
                 if (error) {
                     callback(error);
                     return;
@@ -66,39 +83,11 @@ function rmdir(folder: string, callback: (error?: any) => void): void {
 
                 callback();
             });
-        } else {
-            fs.readdir(folder, (error, files) => {
-                if (error) {
-                    callback(error);
-                    return;
-                }
-
-                if (files.length > 0) {
-                    callback();
-                    return;
-                }
-
-                fs.rmdir(folder, error => {
-                    if (error) {
-                        callback(error);
-                        return;
-                    }
-
-                    rmdir(path.dirname(folder), error => {
-                        if (error) {
-                            callback(error);
-                            return;
-                        }
-
-                        callback();
-                    });
-                });
-            });
-        }
+        });
     });
 }
 
-function readdir(folder: string, callback: (error?: any, files?: string[]) => void): void {
+function readdirp(folder: string, callback: (error?: any, files?: string[]) => void): void {
     fs.readdir(folder, (error, files) => {
         if (error) {
             callback(error);
@@ -106,7 +95,7 @@ function readdir(folder: string, callback: (error?: any, files?: string[]) => vo
         }
 
         async.mapSeries(files, (file, callback) => {
-            fs.stat(folder + "/" + file, (error, stats) => {
+            fs.stat(path.join(folder, file), (error, stats) => {
                 if (error) {
                     callback(error);
                     return;
@@ -117,7 +106,7 @@ function readdir(folder: string, callback: (error?: any, files?: string[]) => vo
                     return;
                 }
 
-                readdir(folder + "/" + file, (error, files) => {
+                readdirp(path.join(folder, file), (error, files) => {
                     if (error) {
                         callback(error);
                         return;
@@ -126,7 +115,7 @@ function readdir(folder: string, callback: (error?: any, files?: string[]) => vo
                     callback(undefined, files);
                 });
             });
-        }, (error, results) => {
+        }, (error, childFiles) => {
             if (error) {
                 callback(error);
                 return;
@@ -136,7 +125,10 @@ function readdir(folder: string, callback: (error?: any, files?: string[]) => vo
 
             for (let i = 0; i < files.length; i++) {
                 allFiles.push(files[i]);
-                allFiles.push(...(<string[]> results[i]));
+
+                for (let childFile of (<string[]> childFiles[i])) {
+                    allFiles.push(files[i] + path.sep + childFile);
+                }
             }
 
             callback(undefined, allFiles);
@@ -252,7 +244,7 @@ program
                             callback(error);
                         });
                 } else if (songFile) {
-                    let id3 = nodeID3.readTag(songFile);
+                    let id3 = nodeID3v2.readTag(songFile);
 
                     let id3FrameMap: Map<string, any> = new Map<string, any>();
 
@@ -265,8 +257,8 @@ program
                     album = new Album();
 
                     if (id3FrameMap.has("APIC") && id3FrameMap.has("TALB")) {
-                        album.art = path.dirname(songFile) + "/"
-                            + (<string> id3FrameMap.get("TALB").text).replace(/[/.]/g, "") + ".png";
+                        album.art = path.join(path.dirname(songFile), (<string> id3FrameMap
+                            .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
                     }
 
                     if (id3FrameMap.has("TDRL")) {
@@ -476,16 +468,16 @@ program
                     rl.write("no" + os.EOL);
                 }
             }, callback => {
-                album.folder = "Songs/" + album.language + "/";
+                album.folder = path.join("Songs", album.language);
 
-                if (album.language === "English" && song.title === album.title && song.track === "1") {
-                    album.folder += "Singles/";
+                if (album.language === "English" && song.track === "1" && song.title === album.title) {
+                    album.folder = path.join(album.folder, "Singles");
                 }
 
-                album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
-                album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
+                album.folder = path.join(album.folder, album.date.substr(0, 4),
+                    album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " "));
 
-                mkdir(album.folder, error => {
+                mkdirp(album.folder, error => {
                     if (error) {
                         callback(error);
                         return;
@@ -500,8 +492,8 @@ program
                     songFile = song.file;
                 }
 
-                song.file = album.folder + song.track + " - " + song.title.replace(/[/.]/g, "") + ".mp3";
-                song.file = song.file.replace(/[\\:*?"<>|]/g, "");
+                song.file = path.join(album.folder, song.track + " - "
+                    + song.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".mp3");
 
                 if (!songFile) {
                     let progressBar: ProgressBar = new ProgressBar("Downloading song"
@@ -610,8 +602,8 @@ program
             }, callback => {
                 let albumArt: string = album.art;
 
-                album.art = album.folder + album.title.replace(/[/.]/g, "") + ".png";
-                album.art = album.art.replace(/[\\:*?"<>|]/g, "");
+                album.art = path.join(album.folder,
+                    album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
 
                 if (albumArt.startsWith("http")) {
                     request(albumArt)
@@ -666,12 +658,12 @@ program
                         });
                 }
             }, callback => {
-                let id3 = nodeID3.readTag(song.file, {
+                let id3 = nodeID3v2.readTag(song.file, {
                     targetversion: 4
                 });
 
                 if (id3.iserror) {
-                    id3 = nodeID3.createTag(song.file, {
+                    id3 = nodeID3v2.createTag(song.file, {
                         targetversion: 4
                     });
                 }
@@ -715,7 +707,7 @@ program
                     return;
                 }
 
-                rmdir(path.dirname(songFile), error => {
+                rmdirp(path.dirname(songFile), error => {
                     if (error) {
                         callback(error);
                         return;
@@ -873,7 +865,7 @@ program
                         }
 
                         if (songIndex >= 0) {
-                            songFileMap.set(songIndex, albumFolder + "/" + songFile);
+                            songFileMap.set(songIndex, path.join(albumFolder, songFile));
                         }
                     }
 
@@ -954,7 +946,7 @@ program
                             callback(error);
                         });
                 } else if (albumFolder) {
-                    let id3 = nodeID3.readTag(songFileMap.values().next().value);
+                    let id3 = nodeID3v2.readTag(songFileMap.values().next().value);
 
                     let id3FrameMap: Map<string, any> = new Map<string, any>();
 
@@ -967,8 +959,8 @@ program
                     album = new Album();
 
                     if (id3FrameMap.has("APIC") && id3FrameMap.has("TALB")) {
-                        album.art = path.dirname(songFileMap.values().next().value) + "/"
-                            + (<string> id3FrameMap.get("TALB").text).replace(/[/.]/g, "") + ".png";
+                        album.art = path.join(path.dirname(songFileMap.values().next().value), (<string> id3FrameMap
+                            .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
                     }
 
                     if (id3FrameMap.has("TDRL")) {
@@ -990,7 +982,7 @@ program
                     songs = [];
 
                     for (let songFile of songFileMap.values()) {
-                        let id3 = nodeID3.readTag(songFile);
+                        let id3 = nodeID3v2.readTag(songFile);
 
                         let id3FrameMap: Map<string, any> = new Map<string, any>();
 
@@ -1203,16 +1195,16 @@ program
                     callback();
                 });
             }, callback => {
-                album.folder = "Songs/" + album.language + "/";
+                album.folder = path.join("Songs", album.language);
 
-                if (album.language === "English" && songs[0].title === album.title && songs[0].track === "1") {
-                    album.folder += "Singles/";
+                if (album.language === "English" && songs[0].track === "1" && songs[0].title === album.title) {
+                    album.folder = path.join(album.folder, "Singles");
                 }
 
-                album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
-                album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
+                album.folder = path.join(album.folder, album.date.substr(0, 4),
+                    album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " "));
 
-                mkdir(album.folder, error => {
+                mkdirp(album.folder, error => {
                     if (error) {
                         callback(error);
                         return;
@@ -1230,8 +1222,8 @@ program
                         songFile = song.file;
                     }
 
-                    song.file = album.folder + song.track + " - " + song.title.replace(/[/.]/g, "") + ".mp3";
-                    song.file = song.file.replace(/[\\:*?"<>|]/g, "");
+                    song.file = path.join(album.folder, song.track + " - " +
+                        song.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".mp3");
 
                     if (!songFile) {
                         let progressBar: ProgressBar = new ProgressBar("Downloading song "
@@ -1367,8 +1359,8 @@ program
             }, callback => {
                 let albumArt: string = album.art;
 
-                album.art = album.folder + album.title.replace(/[/.]/g, "") + ".png";
-                album.art = album.art.replace(/[\\:*?"<>|]/g, "");
+                album.art = path.join(album.folder,
+                    album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
 
                 if (albumArt.startsWith("http")) {
                     request(albumArt)
@@ -1424,12 +1416,12 @@ program
                 }
             }, callback => {
                 for (let song of songs) {
-                    let id3 = nodeID3.readTag(song.file, {
+                    let id3 = nodeID3v2.readTag(song.file, {
                         targetversion: 4
                     });
 
                     if (id3.iserror) {
-                        id3 = nodeID3.createTag(song.file, {
+                        id3 = nodeID3v2.createTag(song.file, {
                             targetversion: 4
                         });
                     }
@@ -1474,7 +1466,7 @@ program
                     return;
                 }
 
-                rmdir(albumFolder, error => {
+                rmdirp(albumFolder, error => {
                     if (error) {
                         callback(error);
                         return;
@@ -1583,7 +1575,7 @@ program
 
                 songFileMap = new Map<number, string>();
 
-                readdir(playlistFolder, (error, files) => {
+                readdirp(playlistFolder, (error, files) => {
                     if (error) {
                         callback(error);
                         return;
@@ -1632,7 +1624,7 @@ program
                         }
 
                         if (songIndex >= 0) {
-                            songFileMap.set(songIndex, playlistFolder + "/" + songFile);
+                            songFileMap.set(songIndex, path.join(playlistFolder, songFile));
                         }
                     }
 
@@ -1738,7 +1730,7 @@ program
                     songsMap = new Map<Album, Song[]>();
 
                     for (let songFile of songFileMap.values()) {
-                        let id3 = nodeID3.readTag(songFile);
+                        let id3 = nodeID3v2.readTag(songFile);
 
                         let id3FrameMap: Map<string, any> = new Map<string, any>();
 
@@ -1754,8 +1746,8 @@ program
                             let album: Album = new Album();
 
                             if (id3FrameMap.has("APIC") && id3FrameMap.has("TALB")) {
-                                album.art = path.dirname(songFile) + "/"
-                                    + (<string> id3FrameMap.get("TALB").text).replace(/[/.]/g, "") + ".png";
+                                album.art = path.join(path.dirname(songFile), (<string> id3FrameMap
+                                    .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
                             }
 
                             if (id3FrameMap.has("TDRL")) {
@@ -2055,16 +2047,16 @@ program
                 async.eachOfSeries(albums, (album, index, callback) => {
                     let songs: Song[] = songsMap.get(album);
 
-                    album.folder = "Songs/" + album.language + "/";
+                    album.folder = path.join("Songs", album.language);
 
-                    if (album.language === "English" && songs[0].title === album.title && songs[0].track === "1") {
-                        album.folder += "Singles/";
+                    if (album.language === "English" && songs[0].track === "1" && songs[0].title === album.title) {
+                        album.folder = path.join(album.folder, "Singles");
                     }
 
-                    album.folder += album.date.substr(0, 4) + "/" + album.title.replace(/[/.]/g, "") + "/";
-                    album.folder = album.folder.replace(/[\\:*?"<>|]/g, "");
+                    album.folder = path.join(album.folder, album.date.substr(0, 4),
+                        album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " "));
 
-                    mkdir(album.folder, error => {
+                    mkdirp(album.folder, error => {
                         if (error) {
                             callback(error);
                             return;
@@ -2095,8 +2087,8 @@ program
                             songFile = song.file;
                         }
 
-                        song.file = album.folder + song.track + " - " + song.title.replace(/[/.]/g, "") + ".mp3";
-                        song.file = song.file.replace(/[\\:*?"<>|]/g, "");
+                        song.file = path.join(album.folder, song.track + " - "
+                            + song.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".mp3");
 
                         if (!songFile) {
                             let progressBar: ProgressBar = new ProgressBar("Downloading song "
@@ -2256,8 +2248,8 @@ program
                 async.eachOfSeries(albums, (album, index, callback) => {
                     let albumArt: string = album.art;
 
-                    album.art = album.folder + album.title.replace(/[/.]/g, "") + ".png";
-                    album.art = album.art.replace(/[\\:*?"<>|]/g, "");
+                    album.art = path.join(album.folder,
+                        album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
 
                     if (albumArt.startsWith("http")) {
                         request(albumArt)
@@ -2326,12 +2318,12 @@ program
                     let songs: Song[] = songsMap.get(album);
 
                     for (let song of songs) {
-                        let id3 = nodeID3.readTag(song.file, {
+                        let id3 = nodeID3v2.readTag(song.file, {
                             targetversion: 4
                         });
 
                         if (id3.iserror) {
-                            id3 = nodeID3.createTag(song.file, {
+                            id3 = nodeID3v2.createTag(song.file, {
                                 targetversion: 4
                             });
                         }
@@ -2388,7 +2380,7 @@ program
                     return;
                 }
 
-                rmdir(playlistFolder, error => {
+                rmdirp(playlistFolder, error => {
                     if (error) {
                         callback(error);
                         return;
