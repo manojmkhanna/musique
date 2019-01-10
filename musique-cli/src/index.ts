@@ -2380,7 +2380,19 @@ program
                     return;
                 }
 
-                rmdirp(playlistFolder, error => {
+                let albumFolders: string[] = [...new Set<string>(
+                    [...songFileMap.values()].map(songFile => path.dirname(songFile)))];
+
+                async.eachOfSeries(albumFolders, (albumFolder, index, callback) => {
+                    rmdirp(albumFolder, error => {
+                        if (error) {
+                            callback(error);
+                            return;
+                        }
+
+                        callback();
+                    });
+                }, error => {
                     if (error) {
                         callback(error);
                         return;
