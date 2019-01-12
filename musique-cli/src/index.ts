@@ -94,7 +94,11 @@ function readdirp(folder: string, callback: (error?: any, files?: string[]) => v
             return;
         }
 
-        async.mapSeries(files, (file, callback) => {
+        let allFiles: string[] = [];
+
+        async.eachOfSeries(files, (file, index, callback) => {
+            allFiles.push(file);
+
             fs.stat(path.join(folder, file), (error, stats) => {
                 if (error) {
                     callback(error);
@@ -102,33 +106,27 @@ function readdirp(folder: string, callback: (error?: any, files?: string[]) => v
                 }
 
                 if (!stats.isDirectory()) {
-                    callback(undefined, []);
+                    callback();
                     return;
                 }
 
-                readdirp(path.join(folder, file), (error, files) => {
+                readdirp(path.join(folder, file), (error, childFiles) => {
                     if (error) {
                         callback(error);
                         return;
                     }
 
-                    callback(undefined, files);
+                    for (let childFile of childFiles) {
+                        allFiles.push(file + path.sep + childFile);
+                    }
+
+                    callback();
                 });
             });
-        }, (error, childFiles) => {
+        }, error => {
             if (error) {
                 callback(error);
                 return;
-            }
-
-            let allFiles: string[] = [];
-
-            for (let i = 0; i < files.length; i++) {
-                allFiles.push(files[i]);
-
-                for (let childFile of (<string[]> childFiles[i])) {
-                    allFiles.push(files[i] + path.sep + childFile);
-                }
             }
 
             callback(undefined, allFiles);
@@ -219,20 +217,32 @@ program
                             let songOutput: SongOutput = songParser.output,
                                 albumOutput: AlbumOutput = songOutput.album;
 
+                            let albumArtists: string[] = [...new Set<string>(
+                                albumOutput.artists.map(artistOutput => artistOutput.title))];
+
+                            if (albumOutput.language !== "English") {
+                                albumArtists = albumArtists.sort();
+                            }
+
                             album = new Album();
                             album.art = albumOutput.art;
                             album.date = albumOutput.date;
                             album.language = albumOutput.language;
                             album.title = albumOutput.title;
-                            album.artists = [...new Set<string>(albumOutput.artists
-                                .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                            album.artists = albumArtists.join("; ").replace(/\.(\w)/g, ". $1");
+
+                            let songArtists: string[] = [...new Set<string>(
+                                songOutput.artists.map(artistOutput => artistOutput.title))];
+
+                            if (albumOutput.language !== "English") {
+                                songArtists = songArtists.sort();
+                            }
 
                             song = new Song();
                             song.parser = songParser;
                             song.title = songOutput.title;
                             song.track = songOutput.track;
-                            song.artists = [...new Set<string>(songOutput.artists
-                                .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                            song.artists = songArtists.join("; ").replace(/\.(\w)/g, ". $1");
 
                             if (songFile) {
                                 song.file = songFile;
@@ -901,6 +911,20 @@ program
 
                             let albumOutput: AlbumOutput = albumParser.output;
 
+                            let albumArtists: string[] = [...new Set<string>(
+                                albumOutput.artists.map(artistOutput => artistOutput.title))];
+
+                            if (albumOutput.language !== "English") {
+                                albumArtists = albumArtists.sort();
+                            }
+
+                            album = new Album();
+                            album.art = albumOutput.art;
+                            album.date = albumOutput.date;
+                            album.language = albumOutput.language;
+                            album.title = albumOutput.title;
+                            album.artists = albumArtists.join("; ").replace(/\.(\w)/g, ". $1");
+
                             if (!songIndexes) {
                                 songIndexes = [];
 
@@ -909,25 +933,23 @@ program
                                 }
                             }
 
-                            album = new Album();
-                            album.art = albumOutput.art;
-                            album.date = albumOutput.date;
-                            album.language = albumOutput.language;
-                            album.title = albumOutput.title;
-                            album.artists = [...new Set<string>(albumOutput.artists
-                                .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
-
                             songs = [];
 
                             for (let songIndex of songIndexes) {
                                 let songOutput: SongOutput = albumOutput.songs[songIndex];
 
+                                let songArtists: string[] = [...new Set<string>(
+                                    songOutput.artists.map(artistOutput => artistOutput.title))];
+
+                                if (albumOutput.language !== "English") {
+                                    songArtists = songArtists.sort();
+                                }
+
                                 let song: Song = new Song();
                                 song.parser = songParserMap.get(songIndex);
                                 song.title = songOutput.title;
                                 song.track = songOutput.track;
-                                song.artists = [...new Set<string>(songOutput.artists
-                                    .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                                song.artists = songArtists.join("; ").replace(/\.(\w)/g, ". $1");
 
                                 if (songFileMap) {
                                     let songFile: string = songFileMap.get(songIndex);
@@ -1197,7 +1219,8 @@ program
             }, callback => {
                 album.folder = path.join("Songs", album.language);
 
-                if (album.language === "English" && songs[0].track === "1" && songs[0].title === album.title) {
+                if (album.language === "English" && songs.length == 1
+                    && songs[0].track === "1" && songs[0].title === album.title) {
                     album.folder = path.join(album.folder, "Singles");
                 }
 
@@ -1683,13 +1706,19 @@ program
                                 let songs: Song[];
 
                                 if (!albumMap.has(albumOutput.title)) {
+                                    let albumArtists: string[] = [...new Set<string>(
+                                        albumOutput.artists.map(artistOutput => artistOutput.title))];
+
+                                    if (albumOutput.language !== "English") {
+                                        albumArtists = albumArtists.sort();
+                                    }
+
                                     let album: Album = new Album();
                                     album.art = albumOutput.art;
                                     album.date = albumOutput.date;
                                     album.language = albumOutput.language;
                                     album.title = albumOutput.title;
-                                    album.artists = [...new Set<string>(albumOutput.artists
-                                        .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                                    album.artists = albumArtists.join("; ").replace(/\.(\w)/g, ". $1");
 
                                     albumMap.set(albumOutput.title, album);
 
@@ -1700,12 +1729,18 @@ program
                                     songs = songsMap.get(albumMap.get(albumOutput.title));
                                 }
 
+                                let songArtists: string[] = [...new Set<string>(
+                                    songOutput.artists.map(artistOutput => artistOutput.title))];
+
+                                if (albumOutput.language !== "English") {
+                                    songArtists = songArtists.sort();
+                                }
+
                                 let song: Song = new Song();
                                 song.parser = songParserMap.get(songIndex);
                                 song.title = songOutput.title;
                                 song.track = songOutput.track;
-                                song.artists = [...new Set<string>(songOutput.artists
-                                    .map(artist => artist.title))].join("; ").replace(/\.(\w)/g, ". $1");
+                                song.artists = songArtists.join("; ").replace(/\.(\w)/g, ". $1");
 
                                 if (songFileMap) {
                                     let songFile: string = songFileMap.get(songIndex);
@@ -1724,10 +1759,10 @@ program
                             callback(error);
                         });
                 } else if (playlistFolder) {
-                    let albumArtFileMap: Map<Album, any> = new Map<Album, any>();
-
                     albumMap = new Map<string, Album>();
                     songsMap = new Map<Album, Song[]>();
+
+                    let albumArtFileMap: Map<Album, any> = new Map<Album, any>();
 
                     for (let songFile of songFileMap.values()) {
                         let id3 = nodeID3v2.readTag(songFile);
@@ -2049,7 +2084,8 @@ program
 
                     album.folder = path.join("Songs", album.language);
 
-                    if (album.language === "English" && songs[0].track === "1" && songs[0].title === album.title) {
+                    if (album.language === "English" && songs.length == 1
+                        && songs[0].track === "1" && songs[0].title === album.title) {
                         album.folder = path.join(album.folder, "Singles");
                     }
 
