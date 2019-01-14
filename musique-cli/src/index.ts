@@ -217,32 +217,22 @@ program
                             let songOutput: SongOutput = songParser.output,
                                 albumOutput: AlbumOutput = songOutput.album;
 
-                            let albumArtists: string[] = [...new Set<string>(
-                                albumOutput.artists.map(artistOutput => artistOutput.title))];
-
-                            if (albumOutput.language !== "English") {
-                                albumArtists = albumArtists.sort();
-                            }
-
                             album = new Album();
                             album.art = albumOutput.art;
                             album.date = albumOutput.date;
                             album.language = albumOutput.language;
                             album.title = albumOutput.title;
-                            album.artists = albumArtists.join("; ").replace(/\.(\w)/g, ". $1");
-
-                            let songArtists: string[] = [...new Set<string>(
-                                songOutput.artists.map(artistOutput => artistOutput.title))];
-
-                            if (albumOutput.language !== "English") {
-                                songArtists = songArtists.sort();
-                            }
+                            album.artists = [...new Set<string>(albumOutput.artists
+                                .map(artistOutput => artistOutput.title))]
+                                .join("; ").replace(/\.(\w)/g, ". $1");
 
                             song = new Song();
                             song.parser = songParser;
                             song.title = songOutput.title;
                             song.track = songOutput.track;
-                            song.artists = songArtists.join("; ").replace(/\.(\w)/g, ". $1");
+                            song.artists = [...new Set<string>(songOutput.artists
+                                .map(artistOutput => artistOutput.title))]
+                                .join("; ").replace(/\.(\w)/g, ". $1");
 
                             if (songFile) {
                                 song.file = songFile;
@@ -480,7 +470,9 @@ program
             }, callback => {
                 album.folder = path.join("Songs", album.language);
 
-                if (album.language === "English" && song.track === "1" && song.title === album.title) {
+                if (album.language === "English"
+                    && song.track === "1"
+                    && song.title === album.title) {
                     album.folder = path.join(album.folder, "Singles");
                 }
 
@@ -511,7 +503,9 @@ program
                         total: 100,
                         width: 10,
                         incomplete: " "
-                    }), progress: any;
+                    });
+
+                    let progress: any;
 
                     song.parser.parseFile(downloadProgress => {
                         progressBar.update(downloadProgress.percent, {
@@ -576,7 +570,9 @@ program
                             total: 100,
                             width: 10,
                             incomplete: " "
-                        }), progress: any;
+                        });
+
+                        let progress: any;
 
                         ffmpeg(tempSongFile)
                             .audioBitrate("320k")
@@ -642,7 +638,8 @@ program
                     Jimp.read(albumArt)
                         .then(image => {
                             if (image.getMIME() !== "image/png"
-                                || image.bitmap.width !== 512 || image.bitmap.height !== 512) {
+                                || image.bitmap.width !== 512
+                                || image.bitmap.height !== 512) {
                                 image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
                                     .write(album.art, error => {
                                         if (error) {
@@ -911,19 +908,14 @@ program
 
                             let albumOutput: AlbumOutput = albumParser.output;
 
-                            let albumArtists: string[] = [...new Set<string>(
-                                albumOutput.artists.map(artistOutput => artistOutput.title))];
-
-                            if (albumOutput.language !== "English") {
-                                albumArtists = albumArtists.sort();
-                            }
-
                             album = new Album();
                             album.art = albumOutput.art;
                             album.date = albumOutput.date;
                             album.language = albumOutput.language;
                             album.title = albumOutput.title;
-                            album.artists = albumArtists.join("; ").replace(/\.(\w)/g, ". $1");
+                            album.artists = [...new Set<string>(albumOutput.artists
+                                .map(artistOutput => artistOutput.title))]
+                                .join("; ").replace(/\.(\w)/g, ". $1");
 
                             if (!songIndexes) {
                                 songIndexes = [];
@@ -938,18 +930,13 @@ program
                             for (let songIndex of songIndexes) {
                                 let songOutput: SongOutput = albumOutput.songs[songIndex];
 
-                                let songArtists: string[] = [...new Set<string>(
-                                    songOutput.artists.map(artistOutput => artistOutput.title))];
-
-                                if (albumOutput.language !== "English") {
-                                    songArtists = songArtists.sort();
-                                }
-
                                 let song: Song = new Song();
                                 song.parser = songParserMap.get(songIndex);
                                 song.title = songOutput.title;
                                 song.track = songOutput.track;
-                                song.artists = songArtists.join("; ").replace(/\.(\w)/g, ". $1");
+                                song.artists = [...new Set<string>(songOutput.artists
+                                    .map(artistOutput => artistOutput.title))]
+                                    .join("; ").replace(/\.(\w)/g, ". $1");
 
                                 if (songFileMap) {
                                     let songFile: string = songFileMap.get(songIndex);
@@ -1219,8 +1206,10 @@ program
             }, callback => {
                 album.folder = path.join("Songs", album.language);
 
-                if (album.language === "English" && songs.length == 1
-                    && songs[0].track === "1" && songs[0].title === album.title) {
+                if (album.language === "English"
+                    && songs.length == 1
+                    && songs[0].track === "1"
+                    && songs[0].title === album.title) {
                     album.folder = path.join(album.folder, "Singles");
                 }
 
@@ -1254,7 +1243,9 @@ program
                             total: 100,
                             width: 10,
                             incomplete: " "
-                        }), progress: any;
+                        });
+
+                        let progress: any;
 
                         song.parser.parseFile(downloadProgress => {
                             progressBar.update(downloadProgress.percent, {
@@ -1334,7 +1325,9 @@ program
                                 total: 100,
                                 width: 10,
                                 incomplete: " "
-                            }), progress: any;
+                            });
+
+                            let progress: any;
 
                             ffmpeg(tempSongFile)
                                 .audioBitrate("320k")
@@ -1412,7 +1405,8 @@ program
                     Jimp.read(albumArt)
                         .then(image => {
                             if (image.getMIME() !== "image/png"
-                                || image.bitmap.width !== 512 || image.bitmap.height !== 512) {
+                                || image.bitmap.width !== 512
+                                || image.bitmap.height !== 512) {
                                 image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
                                     .write(album.art, error => {
                                         if (error) {
@@ -1706,19 +1700,14 @@ program
                                 let songs: Song[];
 
                                 if (!albumMap.has(albumOutput.title)) {
-                                    let albumArtists: string[] = [...new Set<string>(
-                                        albumOutput.artists.map(artistOutput => artistOutput.title))];
-
-                                    if (albumOutput.language !== "English") {
-                                        albumArtists = albumArtists.sort();
-                                    }
-
                                     let album: Album = new Album();
                                     album.art = albumOutput.art;
                                     album.date = albumOutput.date;
                                     album.language = albumOutput.language;
                                     album.title = albumOutput.title;
-                                    album.artists = albumArtists.join("; ").replace(/\.(\w)/g, ". $1");
+                                    album.artists = [...new Set<string>(albumOutput.artists
+                                        .map(artistOutput => artistOutput.title))]
+                                        .join("; ").replace(/\.(\w)/g, ". $1");
 
                                     albumMap.set(albumOutput.title, album);
 
@@ -1729,18 +1718,13 @@ program
                                     songs = songsMap.get(albumMap.get(albumOutput.title));
                                 }
 
-                                let songArtists: string[] = [...new Set<string>(
-                                    songOutput.artists.map(artistOutput => artistOutput.title))];
-
-                                if (albumOutput.language !== "English") {
-                                    songArtists = songArtists.sort();
-                                }
-
                                 let song: Song = new Song();
                                 song.parser = songParserMap.get(songIndex);
                                 song.title = songOutput.title;
                                 song.track = songOutput.track;
-                                song.artists = songArtists.join("; ").replace(/\.(\w)/g, ". $1");
+                                song.artists = [...new Set<string>(songOutput.artists
+                                    .map(artistOutput => artistOutput.title))]
+                                    .join("; ").replace(/\.(\w)/g, ". $1");
 
                                 if (songFileMap) {
                                     let songFile: string = songFileMap.get(songIndex);
@@ -2084,8 +2068,10 @@ program
 
                     album.folder = path.join("Songs", album.language);
 
-                    if (album.language === "English" && songs.length == 1
-                        && songs[0].track === "1" && songs[0].title === album.title) {
+                    if (album.language === "English"
+                        && songs.length == 1
+                        && songs[0].track === "1"
+                        && songs[0].title === album.title) {
                         album.folder = path.join(album.folder, "Singles");
                     }
 
@@ -2132,7 +2118,9 @@ program
                                 total: 100,
                                 width: 10,
                                 incomplete: " "
-                            }), progress: any;
+                            });
+
+                            let progress: any;
 
                             song.parser.parseFile(downloadProgress => {
                                 progressBar.update(downloadProgress.percent, {
@@ -2225,7 +2213,9 @@ program
                                     total: 100,
                                     width: 10,
                                     incomplete: " "
-                                }), progress: any;
+                                });
+
+                                let progress: any;
 
                                 ffmpeg(tempSongFile)
                                     .audioBitrate("320k")
@@ -2314,7 +2304,8 @@ program
                         Jimp.read(albumArt)
                             .then(image => {
                                 if (image.getMIME() !== "image/png"
-                                    || image.bitmap.width !== 512 || image.bitmap.height !== 512) {
+                                    || image.bitmap.width !== 512
+                                    || image.bitmap.height !== 512) {
                                     image.resize(512, 512, Jimp.RESIZE_NEAREST_NEIGHBOR)
                                         .write(album.art, error => {
                                             if (error) {
