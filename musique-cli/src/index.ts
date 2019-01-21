@@ -29,6 +29,7 @@ class Song {
     artists: string;
 
     file: string;
+
     parser: SongParser;
 }
 
@@ -150,7 +151,7 @@ program
 
         async.series([
             callback => {
-                let rl = readline.createInterface({
+                let rl: any = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout
                 });
@@ -244,51 +245,51 @@ program
                             callback(error);
                         });
                 } else if (songFile) {
-                    let id3 = nodeID3v2.readTag(songFile);
+                    let id3: any = nodeID3v2.readTag(songFile);
 
-                    let id3FrameMap: Map<string, any> = new Map<string, any>();
+                    let id3DataMap: Map<string, any> = new Map<string, any>();
 
                     if (id3.frames) {
                         for (let id3Frame of id3.frames) {
-                            id3FrameMap.set(id3Frame.type, id3Frame.data);
+                            id3DataMap.set(id3Frame.type, id3Frame.data);
                         }
                     }
 
                     album = new Album();
 
-                    if (id3FrameMap.has("APIC") && id3FrameMap.has("TALB")) {
-                        album.art = path.join(path.dirname(songFile), (<string> id3FrameMap
+                    if (id3DataMap.has("APIC") && id3DataMap.has("TALB")) {
+                        album.art = path.join(path.dirname(songFile), (<string> id3DataMap
                             .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
                     }
 
-                    if (id3FrameMap.has("TDRL")) {
-                        album.date = id3FrameMap.get("TDRL").text;
+                    if (id3DataMap.has("TDRL")) {
+                        album.date = id3DataMap.get("TDRL").text;
                     }
 
-                    if (id3FrameMap.has("TLAN")) {
-                        album.language = id3FrameMap.get("TLAN").text;
+                    if (id3DataMap.has("TLAN")) {
+                        album.language = id3DataMap.get("TLAN").text;
                     }
 
-                    if (id3FrameMap.has("TALB")) {
-                        album.title = id3FrameMap.get("TALB").text;
+                    if (id3DataMap.has("TALB")) {
+                        album.title = id3DataMap.get("TALB").text;
                     }
 
-                    if (id3FrameMap.has("TPE2")) {
-                        album.artists = id3FrameMap.get("TPE2").text;
+                    if (id3DataMap.has("TPE2")) {
+                        album.artists = id3DataMap.get("TPE2").text;
                     }
 
                     song = new Song();
 
-                    if (id3FrameMap.has("TIT2")) {
-                        song.title = id3FrameMap.get("TIT2").text;
+                    if (id3DataMap.has("TIT2")) {
+                        song.title = id3DataMap.get("TIT2").text;
                     }
 
-                    if (id3FrameMap.has("TRCK")) {
-                        song.track = id3FrameMap.get("TRCK").text;
+                    if (id3DataMap.has("TRCK")) {
+                        song.track = id3DataMap.get("TRCK").text;
                     }
 
-                    if (id3FrameMap.has("TPE1")) {
-                        song.artists = id3FrameMap.get("TPE1").text;
+                    if (id3DataMap.has("TPE1")) {
+                        song.artists = id3DataMap.get("TPE1").text;
                     }
 
                     song.file = songFile;
@@ -298,7 +299,7 @@ program
                         return;
                     }
 
-                    fs.writeFile(album.art, id3FrameMap.get("APIC").picture, error => {
+                    fs.writeFile(album.art, id3DataMap.get("APIC").picture, error => {
                         if (error) {
                             callback(error);
                             return;
@@ -321,7 +322,7 @@ program
                 console.log("Album language: " + album.language);
                 console.log("Album art: " + album.art);
 
-                let rl = readline.createInterface({
+                let rl: any = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout
                 });
@@ -405,7 +406,7 @@ program
                 console.log("Song title: " + song.title);
                 console.log("Song artists: " + song.artists);
 
-                let rl = readline.createInterface({
+                let rl: any = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout
                 });
@@ -665,7 +666,7 @@ program
                         });
                 }
             }, callback => {
-                let id3 = nodeID3v2.readTag(song.file, {
+                let id3: any = nodeID3v2.readTag(song.file, {
                     targetversion: 4
                 });
 
@@ -688,11 +689,11 @@ program
                 id3.addFrame("TPE2", [album.artists + "\u0000"]);
                 id3.addFrame("TRCK", [song.track + "\u0000"]);
 
-                for (let frame of id3.frames) {
-                    if (frame.type === "APIC") {
-                        frame.data.encoding = 0;
+                for (let id3Frame of id3.frames) {
+                    if (id3Frame.type === "APIC") {
+                        id3Frame.data.encoding = 0;
                     } else {
-                        frame.data.encoding = 3;
+                        id3Frame.data.encoding = 3;
                     }
                 }
 
@@ -754,7 +755,7 @@ program
 
         async.series([
             callback => {
-                let rl = readline.createInterface({
+                let rl: any = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout
                 });
@@ -833,7 +834,7 @@ program
                         songIndexMap: Map<string, number> = new Map<string, number>();
 
                     for (let songFile of songFiles) {
-                        let songFileMatch = songFile.match(/^(\d+) - .+?\.mp3$/);
+                        let songFileMatch: any = songFile.match(/^(\d+) - .+?\.mp3$/);
 
                         if (songFileMatch) {
                             songIndexMap.set(songFile, parseInt(songFileMatch[1]) - 1);
@@ -853,20 +854,20 @@ program
                             if (!songIndexes) {
                                 songIndex = songIndexMap.get(songFile);
                             } else {
-                                let tempSongIndex: number = songIndexMap.get(songFile);
+                                let index: number = songIndexMap.get(songFile);
 
-                                if (songIndexes.includes(tempSongIndex)) {
-                                    songIndex = tempSongIndex;
+                                if (songIndexes.includes(index)) {
+                                    songIndex = index;
                                 }
                             }
                         } else {
                             if (!songIndexes) {
                                 songIndex = songFileMap.size;
                             } else {
-                                let tempSongIndex: number = songIndexes[songFileMap.size];
+                                let index: number = songIndexes[songFileMap.size];
 
-                                if (tempSongIndex >= 0) {
-                                    songIndex = tempSongIndex;
+                                if (index >= 0) {
+                                    songIndex = index;
                                 }
                             }
                         }
@@ -955,64 +956,66 @@ program
                             callback(error);
                         });
                 } else if (albumFolder) {
-                    let id3 = nodeID3v2.readTag(songFileMap.values().next().value);
+                    let songFile: string = songFileMap.values().next().value;
 
-                    let id3FrameMap: Map<string, any> = new Map<string, any>();
+                    let id3: any = nodeID3v2.readTag(songFile);
+
+                    let id3DataMap: Map<string, any> = new Map<string, any>();
 
                     if (id3.frames) {
                         for (let id3Frame of id3.frames) {
-                            id3FrameMap.set(id3Frame.type, id3Frame.data);
+                            id3DataMap.set(id3Frame.type, id3Frame.data);
                         }
                     }
 
                     album = new Album();
 
-                    if (id3FrameMap.has("APIC") && id3FrameMap.has("TALB")) {
-                        album.art = path.join(path.dirname(songFileMap.values().next().value), (<string> id3FrameMap
+                    if (id3DataMap.has("APIC") && id3DataMap.has("TALB")) {
+                        album.art = path.join(path.dirname(songFile), (<string> id3DataMap
                             .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
                     }
 
-                    if (id3FrameMap.has("TDRL")) {
-                        album.date = id3FrameMap.get("TDRL").text;
+                    if (id3DataMap.has("TDRL")) {
+                        album.date = id3DataMap.get("TDRL").text;
                     }
 
-                    if (id3FrameMap.has("TLAN")) {
-                        album.language = id3FrameMap.get("TLAN").text;
+                    if (id3DataMap.has("TLAN")) {
+                        album.language = id3DataMap.get("TLAN").text;
                     }
 
-                    if (id3FrameMap.has("TALB")) {
-                        album.title = id3FrameMap.get("TALB").text;
+                    if (id3DataMap.has("TALB")) {
+                        album.title = id3DataMap.get("TALB").text;
                     }
 
-                    if (id3FrameMap.has("TPE2")) {
-                        album.artists = id3FrameMap.get("TPE2").text;
+                    if (id3DataMap.has("TPE2")) {
+                        album.artists = id3DataMap.get("TPE2").text;
                     }
 
                     songs = [];
 
                     for (let songFile of songFileMap.values()) {
-                        let id3 = nodeID3v2.readTag(songFile);
+                        let id3: any = nodeID3v2.readTag(songFile);
 
-                        let id3FrameMap: Map<string, any> = new Map<string, any>();
+                        let id3DataMap: Map<string, any> = new Map<string, any>();
 
                         if (id3.frames) {
                             for (let id3Frame of id3.frames) {
-                                id3FrameMap.set(id3Frame.type, id3Frame.data);
+                                id3DataMap.set(id3Frame.type, id3Frame.data);
                             }
                         }
 
                         let song: Song = new Song();
 
-                        if (id3FrameMap.has("TIT2")) {
-                            song.title = id3FrameMap.get("TIT2").text;
+                        if (id3DataMap.has("TIT2")) {
+                            song.title = id3DataMap.get("TIT2").text;
                         }
 
-                        if (id3FrameMap.has("TRCK")) {
-                            song.track = id3FrameMap.get("TRCK").text;
+                        if (id3DataMap.has("TRCK")) {
+                            song.track = id3DataMap.get("TRCK").text;
                         }
 
-                        if (id3FrameMap.has("TPE1")) {
-                            song.artists = id3FrameMap.get("TPE1").text;
+                        if (id3DataMap.has("TPE1")) {
+                            song.artists = id3DataMap.get("TPE1").text;
                         }
 
                         song.file = songFile;
@@ -1025,7 +1028,7 @@ program
                         return;
                     }
 
-                    fs.writeFile(album.art, id3FrameMap.get("APIC").picture, error => {
+                    fs.writeFile(album.art, id3DataMap.get("APIC").picture, error => {
                         if (error) {
                             callback(error);
                             return;
@@ -1048,7 +1051,7 @@ program
                 console.log("Album language: " + album.language);
                 console.log("Album art: " + album.art);
 
-                let rl = readline.createInterface({
+                let rl: any = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout
                 });
@@ -1133,7 +1136,7 @@ program
                     console.log("Song title: " + song.title);
                     console.log("Song artists: " + song.artists);
 
-                    let rl = readline.createInterface({
+                    let rl: any = readline.createInterface({
                         input: process.stdin,
                         output: process.stdout
                     });
@@ -1433,7 +1436,7 @@ program
                 }
             }, callback => {
                 for (let song of songs) {
-                    let id3 = nodeID3v2.readTag(song.file, {
+                    let id3: any = nodeID3v2.readTag(song.file, {
                         targetversion: 4
                     });
 
@@ -1456,11 +1459,11 @@ program
                     id3.addFrame("TPE2", [album.artists + "\u0000"]);
                     id3.addFrame("TRCK", [song.track + "\u0000"]);
 
-                    for (let frame of id3.frames) {
-                        if (frame.type === "APIC") {
-                            frame.data.encoding = 0;
+                    for (let id3Frame of id3.frames) {
+                        if (id3Frame.type === "APIC") {
+                            id3Frame.data.encoding = 0;
                         } else {
-                            frame.data.encoding = 3;
+                            id3Frame.data.encoding = 3;
                         }
                     }
 
@@ -1523,7 +1526,7 @@ program
 
         async.series([
             callback => {
-                let rl = readline.createInterface({
+                let rl: any = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout
                 });
@@ -1602,7 +1605,7 @@ program
                         songIndexMap: Map<string, number> = new Map<string, number>();
 
                     for (let songFile of songFiles) {
-                        let songFileMatch = songFile.match(/^(\d+) - .+?\.mp3$/);
+                        let songFileMatch: any = songFile.match(/^(\d+) - .+?\.mp3$/);
 
                         if (songFileMatch) {
                             songIndexMap.set(songFile, parseInt(songFileMatch[1]) - 1);
@@ -1622,20 +1625,20 @@ program
                             if (!songIndexes) {
                                 songIndex = songIndexMap.get(songFile);
                             } else {
-                                let tempSongIndex: number = songIndexMap.get(songFile);
+                                let index: number = songIndexMap.get(songFile);
 
-                                if (songIndexes.includes(tempSongIndex)) {
-                                    songIndex = tempSongIndex;
+                                if (songIndexes.includes(index)) {
+                                    songIndex = index;
                                 }
                             }
                         } else {
                             if (!songIndexes) {
                                 songIndex = songFileMap.size;
                             } else {
-                                let tempSongIndex: number = songIndexes[songFileMap.size];
+                                let index: number = songIndexes[songFileMap.size];
 
-                                if (tempSongIndex >= 0) {
-                                    songIndex = tempSongIndex;
+                                if (index >= 0) {
+                                    songIndex = index;
                                 }
                             }
                         }
@@ -1746,68 +1749,74 @@ program
                     albumMap = new Map<string, Album>();
                     songsMap = new Map<Album, Song[]>();
 
-                    let albumArtFileMap: Map<Album, any> = new Map<Album, any>();
+                    let id3PictureMap: Map<Album, any> = new Map<Album, any>();
 
                     for (let songFile of songFileMap.values()) {
-                        let id3 = nodeID3v2.readTag(songFile);
+                        let id3: any = nodeID3v2.readTag(songFile);
 
-                        let id3FrameMap: Map<string, any> = new Map<string, any>();
+                        let id3DataMap: Map<string, any> = new Map<string, any>();
 
                         if (id3.frames) {
                             for (let id3Frame of id3.frames) {
-                                id3FrameMap.set(id3Frame.type, id3Frame.data);
+                                id3DataMap.set(id3Frame.type, id3Frame.data);
                             }
+                        }
+
+                        let albumTitle: string;
+
+                        if (id3DataMap.has("TALB")) {
+                            albumTitle = id3DataMap.get("TALB").text;
                         }
 
                         let songs: Song[];
 
-                        if (!albumMap.has(id3FrameMap.get("TALB").text)) {
+                        if (!albumMap.has(albumTitle)) {
                             let album: Album = new Album();
 
-                            if (id3FrameMap.has("APIC") && id3FrameMap.has("TALB")) {
-                                album.art = path.join(path.dirname(songFile), (<string> id3FrameMap
+                            if (id3DataMap.has("APIC") && id3DataMap.has("TALB")) {
+                                album.art = path.join(path.dirname(songFile), (<string> id3DataMap
                                     .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
                             }
 
-                            if (id3FrameMap.has("TDRL")) {
-                                album.date = id3FrameMap.get("TDRL").text;
+                            if (id3DataMap.has("TDRL")) {
+                                album.date = id3DataMap.get("TDRL").text;
                             }
 
-                            if (id3FrameMap.has("TLAN")) {
-                                album.language = id3FrameMap.get("TLAN").text;
+                            if (id3DataMap.has("TLAN")) {
+                                album.language = id3DataMap.get("TLAN").text;
                             }
 
-                            if (id3FrameMap.has("TALB")) {
-                                album.title = id3FrameMap.get("TALB").text;
+                            if (id3DataMap.has("TALB")) {
+                                album.title = id3DataMap.get("TALB").text;
                             }
 
-                            if (id3FrameMap.has("TPE2")) {
-                                album.artists = id3FrameMap.get("TPE2").text;
+                            if (id3DataMap.has("TPE2")) {
+                                album.artists = id3DataMap.get("TPE2").text;
                             }
 
-                            albumArtFileMap.set(album, id3FrameMap.get("APIC").picture);
+                            id3PictureMap.set(album, id3DataMap.get("APIC").picture);
 
-                            albumMap.set(id3FrameMap.get("TALB").text, album);
+                            albumMap.set(albumTitle, album);
 
                             songs = [];
 
                             songsMap.set(album, songs);
                         } else {
-                            songs = songsMap.get(albumMap.get(id3FrameMap.get("TALB").text));
+                            songs = songsMap.get(albumMap.get(albumTitle));
                         }
 
                         let song: Song = new Song();
 
-                        if (id3FrameMap.has("TIT2")) {
-                            song.title = id3FrameMap.get("TIT2").text;
+                        if (id3DataMap.has("TIT2")) {
+                            song.title = id3DataMap.get("TIT2").text;
                         }
 
-                        if (id3FrameMap.has("TRCK")) {
-                            song.track = id3FrameMap.get("TRCK").text;
+                        if (id3DataMap.has("TRCK")) {
+                            song.track = id3DataMap.get("TRCK").text;
                         }
 
-                        if (id3FrameMap.has("TPE1")) {
-                            song.artists = id3FrameMap.get("TPE1").text;
+                        if (id3DataMap.has("TPE1")) {
+                            song.artists = id3DataMap.get("TPE1").text;
                         }
 
                         song.file = songFile;
@@ -1821,7 +1830,7 @@ program
                             return;
                         }
 
-                        fs.writeFile(album.art, albumArtFileMap.get(album), error => {
+                        fs.writeFile(album.art, id3PictureMap.get(album), error => {
                             if (error) {
                                 callback(error);
                                 return;
@@ -1886,7 +1895,7 @@ program
                             console.log("Album language: " + album.language);
                             console.log("Album art: " + album.art);
 
-                            let rl = readline.createInterface({
+                            let rl: any = readline.createInterface({
                                 input: process.stdin,
                                 output: process.stdout
                             });
@@ -1973,7 +1982,7 @@ program
                                 console.log("Song title: " + song.title);
                                 console.log("Song artists: " + song.artists);
 
-                                let rl = readline.createInterface({
+                                let rl: any = readline.createInterface({
                                     input: process.stdin,
                                     output: process.stdout
                                 });
@@ -2345,7 +2354,7 @@ program
                     let songs: Song[] = songsMap.get(album);
 
                     for (let song of songs) {
-                        let id3 = nodeID3v2.readTag(song.file, {
+                        let id3: any = nodeID3v2.readTag(song.file, {
                             targetversion: 4
                         });
 
@@ -2368,11 +2377,11 @@ program
                         id3.addFrame("TPE2", [album.artists + "\u0000"]);
                         id3.addFrame("TRCK", [song.track + "\u0000"]);
 
-                        for (let frame of id3.frames) {
-                            if (frame.type === "APIC") {
-                                frame.data.encoding = 0;
+                        for (let id3Frame of id3.frames) {
+                            if (id3Frame.type === "APIC") {
+                                id3Frame.data.encoding = 0;
                             } else {
-                                frame.data.encoding = 3;
+                                id3Frame.data.encoding = 3;
                             }
                         }
 
