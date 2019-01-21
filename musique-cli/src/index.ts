@@ -258,8 +258,8 @@ program
                     album = new Album();
 
                     if (id3DataMap.has("APIC") && id3DataMap.has("TALB")) {
-                        album.art = path.join(path.dirname(songFile), (<string> id3DataMap
-                            .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
+                        album.art = path.join(path.dirname(songFile), (<string> id3DataMap.get("TALB").text)
+                            .replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".png");
                     }
 
                     if (id3DataMap.has("TDRL")) {
@@ -478,7 +478,7 @@ program
                 }
 
                 album.folder = path.join(album.folder, album.date.substr(0, 4),
-                    album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " "));
+                    album.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim());
 
                 mkdirp(album.folder, error => {
                     if (error) {
@@ -496,7 +496,7 @@ program
                 }
 
                 song.file = path.join(album.folder, song.track + " - "
-                    + song.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".mp3");
+                    + song.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".mp3");
 
                 if (!songFile) {
                     let progressBar: ProgressBar = new ProgressBar("Downloading song"
@@ -610,7 +610,7 @@ program
                 let albumArt: string = album.art;
 
                 album.art = path.join(album.folder,
-                    album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
+                    album.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".png");
 
                 if (albumArt.startsWith("http")) {
                     request(albumArt)
@@ -971,8 +971,8 @@ program
                     album = new Album();
 
                     if (id3DataMap.has("APIC") && id3DataMap.has("TALB")) {
-                        album.art = path.join(path.dirname(songFile), (<string> id3DataMap
-                            .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
+                        album.art = path.join(path.dirname(songFile), (<string> id3DataMap.get("TALB").text)
+                            .replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".png");
                     }
 
                     if (id3DataMap.has("TDRL")) {
@@ -1217,7 +1217,7 @@ program
                 }
 
                 album.folder = path.join(album.folder, album.date.substr(0, 4),
-                    album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " "));
+                    album.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim());
 
                 mkdirp(album.folder, error => {
                     if (error) {
@@ -1238,7 +1238,7 @@ program
                     }
 
                     song.file = path.join(album.folder, song.track + " - " +
-                        song.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".mp3");
+                        song.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".mp3");
 
                     if (!songFile) {
                         let progressBar: ProgressBar = new ProgressBar("Downloading song "
@@ -1379,7 +1379,7 @@ program
                 let albumArt: string = album.art;
 
                 album.art = path.join(album.folder,
-                    album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
+                    album.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".png");
 
                 if (albumArt.startsWith("http")) {
                     request(albumArt)
@@ -1774,8 +1774,8 @@ program
                             let album: Album = new Album();
 
                             if (id3DataMap.has("APIC") && id3DataMap.has("TALB")) {
-                                album.art = path.join(path.dirname(songFile), (<string> id3DataMap
-                                    .get("TALB").text).replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
+                                album.art = path.join(path.dirname(songFile), (<string> id3DataMap.get("TALB").text)
+                                    .replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".png");
                             }
 
                             if (id3DataMap.has("TDRL")) {
@@ -2085,7 +2085,7 @@ program
                     }
 
                     album.folder = path.join(album.folder, album.date.substr(0, 4),
-                        album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " "));
+                        album.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim());
 
                     mkdirp(album.folder, error => {
                         if (error) {
@@ -2119,7 +2119,7 @@ program
                         }
 
                         song.file = path.join(album.folder, song.track + " - "
-                            + song.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".mp3");
+                            + song.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".mp3");
 
                         if (!songFile) {
                             let progressBar: ProgressBar = new ProgressBar("Downloading song "
@@ -2284,7 +2284,7 @@ program
                     let albumArt: string = album.art;
 
                     album.art = path.join(album.folder,
-                        album.title.replace(/[\\/:*?"<>|]/g, " ").replace(/\s+/g, " ") + ".png");
+                        album.title.replace(/[\\/:*?"<>|.]/g, " ").replace(/\s+/g, " ").trim() + ".png");
 
                     if (albumArt.startsWith("http")) {
                         request(albumArt)
