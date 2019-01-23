@@ -29,8 +29,6 @@ class Song {
     artists: string;
 
     file: string;
-
-    parser: SongParser;
 }
 
 function mkdirp(folder: string, callback: (error?: any) => void): void {
@@ -146,6 +144,8 @@ program
         let songUrl: string,
             songFile: string;
 
+        let songParser: SongParser;
+
         let album: Album,
             song: Song;
 
@@ -206,6 +206,7 @@ program
                     }
 
                     musique.parseSong(platformName, songUrl)
+                        .then(parser => songParser = parser)
                         .then(songParser => songParser.parse())
                         .then(songParser => songParser.parseAlbum(albumParser => {
                             console.log("Parsing album...");
@@ -228,7 +229,6 @@ program
                                 .join("; ").replace(/\.(\w)/g, ". $1");
 
                             song = new Song();
-                            song.parser = songParser;
                             song.title = songOutput.title;
                             song.track = songOutput.track;
                             song.artists = [...new Set<string>(songOutput.artists
@@ -508,7 +508,7 @@ program
 
                     let progress: any;
 
-                    song.parser.parseFile(downloadProgress => {
+                    songParser.parseFile(downloadProgress => {
                         progressBar.update(downloadProgress.percent, {
                             speed: (downloadProgress.speed / 1024 / 1024).toFixed(1),
                             size: (downloadProgress.size.transferred / 1024 / 1024).toFixed(1)
@@ -748,7 +748,8 @@ program
             songTracks: string;
 
         let songIndexes: number[],
-            songFileMap: Map<number, string>;
+            songFileMap: Map<number, string>,
+            songParserMap: Map<number, SongParser>;
 
         let album: Album,
             songs: Song[];
@@ -842,11 +843,15 @@ program
                     }
 
                     for (let songFile of songFiles.sort((songFileA, songFileB) => {
-                        if (songIndexMap.has(songFileA) && songIndexMap.has(songFileB)) {
+                        if (songIndexMap.has(songFileA) && !songIndexMap.has(songFileB)) {
+                            return -1;
+                        } else if (!songIndexMap.has(songFileA) && !songIndexMap.has(songFileB)) {
+                            return 0;
+                        } else if (!songIndexMap.has(songFileA) && songIndexMap.has(songFileB)) {
+                            return 1;
+                        } else {
                             return songIndexMap.get(songFileA) - songIndexMap.get(songFileB);
                         }
-
-                        return 0;
                     })) {
                         let songIndex: number;
 
@@ -891,8 +896,9 @@ program
                         platformName = "saavn";
                     }
 
-                    let songParseCount: number = 0,
-                        songParserMap: Map<number, SongParser> = new Map<number, SongParser>();
+                    let songParseCount: number = 0;
+
+                    songParserMap = new Map<number, SongParser>();
 
                     musique.parseAlbum(platformName, albumUrl)
                         .then(albumParser => albumParser.parse())
@@ -900,6 +906,7 @@ program
                             console.log("Parsing song " + (songParseCount + 1) + "...");
 
                             songParseCount++;
+
                             songParserMap.set(index, songParser);
 
                             return songParser.parse();
@@ -932,7 +939,6 @@ program
                                 let songOutput: SongOutput = albumOutput.songs[songIndex];
 
                                 let song: Song = new Song();
-                                song.parser = songParserMap.get(songIndex);
                                 song.title = songOutput.title;
                                 song.track = songOutput.track;
                                 song.artists = [...new Set<string>(songOutput.artists
@@ -1250,7 +1256,7 @@ program
 
                         let progress: any;
 
-                        song.parser.parseFile(downloadProgress => {
+                        songParserMap.get(<number> index).parseFile(downloadProgress => {
                             progressBar.update(downloadProgress.percent, {
                                 speed: (downloadProgress.speed / 1024 / 1024).toFixed(1),
                                 size: (downloadProgress.size.transferred / 1024 / 1024).toFixed(1)
@@ -1519,7 +1525,8 @@ program
             songTracks: string;
 
         let songIndexes: number[],
-            songFileMap: Map<number, string>;
+            songFileMap: Map<number, string>,
+            songParserMap: Map<number, SongParser>;
 
         let albumMap: Map<string, Album>,
             songsMap: Map<Album, Song[]>;
@@ -1613,11 +1620,15 @@ program
                     }
 
                     for (let songFile of songFiles.sort((songFileA, songFileB) => {
-                        if (songIndexMap.has(songFileA) && songIndexMap.has(songFileB)) {
+                        if (songIndexMap.has(songFileA) && !songIndexMap.has(songFileB)) {
+                            return -1;
+                        } else if (!songIndexMap.has(songFileA) && !songIndexMap.has(songFileB)) {
+                            return 0;
+                        } else if (!songIndexMap.has(songFileA) && songIndexMap.has(songFileB)) {
+                            return 1;
+                        } else {
                             return songIndexMap.get(songFileA) - songIndexMap.get(songFileB);
                         }
-
-                        return 0;
                     })) {
                         let songIndex: number;
 
@@ -1662,8 +1673,9 @@ program
                         platformName = "saavn";
                     }
 
-                    let songParseCount: number = 0,
-                        songParserMap: Map<number, SongParser> = new Map<number, SongParser>();
+                    let songParseCount: number = 0;
+
+                    songParserMap = new Map<number, SongParser>();
 
                     musique.parsePlaylist(platformName, playlistUrl)
                         .then(playlistParser => playlistParser.parse())
@@ -1671,6 +1683,7 @@ program
                             console.log("Parsing song " + (songParseCount + 1) + "...");
 
                             songParseCount++;
+
                             songParserMap.set(index, songParser);
 
                             return songParser.parse()
@@ -1722,7 +1735,6 @@ program
                                 }
 
                                 let song: Song = new Song();
-                                song.parser = songParserMap.get(songIndex);
                                 song.title = songOutput.title;
                                 song.track = songOutput.track;
                                 song.artists = [...new Set<string>(songOutput.artists
@@ -1851,11 +1863,15 @@ program
                 let sortedAlbumMap: Map<string, Album> = new Map<string, Album>();
 
                 for (let album of [...albumMap.values()].sort((albumA, albumB) => {
-                    if (albumA.title && albumB.title) {
+                    if (albumA.title && !albumB.title) {
+                        return -1;
+                    } else if (!albumA.title && !albumB.title) {
+                        return 0;
+                    } else if (!albumA.title && albumB.title) {
+                        return 1;
+                    } else {
                         return albumA.title.localeCompare(albumB.title);
                     }
-
-                    return 0;
                 })) {
                     sortedAlbumMap.set(album.title, album);
                 }
@@ -1864,11 +1880,15 @@ program
 
                 for (let album of sortedAlbumMap.values()) {
                     sortedSongsMap.set(album, songsMap.get(album).sort((songA, songB) => {
-                        if (songA.track && songB.track) {
+                        if (songA.track && !songB.track) {
+                            return -1;
+                        } else if (!songA.track && !songB.track) {
+                            return 0;
+                        } else if (!songA.track && songB.track) {
+                            return 1;
+                        } else {
                             return parseInt(songA.track) - parseInt(songB.track);
                         }
-
-                        return 0;
                     }));
                 }
 
@@ -2131,7 +2151,7 @@ program
 
                             let progress: any;
 
-                            song.parser.parseFile(downloadProgress => {
+                            songParserMap.get(<number> index).parseFile(downloadProgress => {
                                 progressBar.update(downloadProgress.percent, {
                                     speed: (downloadProgress.speed / 1024 / 1024).toFixed(1),
                                     size: (downloadProgress.size.transferred / 1024 / 1024).toFixed(1)
