@@ -5,6 +5,6 @@ import SongInput from "./song_input";
 
 export default class ArtistInput extends BaseInput {
     public albums: AlbumInput[];
-    public songs: SongInput[];
     public playlists: PlaylistInput[];
+    public songs: SongInput[];
 }

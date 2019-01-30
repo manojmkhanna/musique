@@ -5,6 +5,6 @@ import SongContent from "./song_content";
 
 export default class ArtistContent extends BaseContent {
     public albums: AlbumContent[];
-    public songs: SongContent[];
     public playlists: PlaylistContent[];
+    public songs: SongContent[];
 }

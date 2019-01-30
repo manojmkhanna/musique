@@ -33,6 +33,7 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
         return super.parse()
             .then(() => this.parseTitle())
             .then(() => this.parseAlbums())
+            .then(() => this.parsePlaylists())
             .then(() => this.parseSongs());
     }
 
@@ -48,14 +49,14 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
         });
     }
 
-    protected createSongs(): Promise<SongOutput[]> {
-        return new Promise<SongOutput[]>(resolve => {
+    protected createPlaylists(): Promise<PlaylistOutput[]> {
+        return new Promise<PlaylistOutput[]>(resolve => {
             resolve();
         });
     }
 
-    protected createPlaylists(): Promise<PlaylistOutput[]> {
-        return new Promise<PlaylistOutput[]>(resolve => {
+    protected createSongs(): Promise<SongOutput[]> {
+        return new Promise<SongOutput[]>(resolve => {
             resolve();
         });
     }
@@ -75,17 +76,6 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
         }
     }
 
-    public parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>,
-                      ...indexes: number[]): Promise<this> {
-        if (!outputsParser) {
-            return this.parseValue("songs", () => this.createSongs());
-        } else {
-            return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {
-                resolve(this.platform.createSongParser());
-            }), outputsParser, ...indexes);
-        }
-    }
-
     public parsePlaylists(outputsParser?: (childParser: PlaylistParser, index: number) => Promise<any>,
                           ...indexes: number[]): Promise<this> {
         if (!outputsParser) {
@@ -93,6 +83,17 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
         } else {
             return this.parseOutputs("playlists", () => new Promise<PlaylistParser>(resolve => {
                 resolve(this.platform.createPlaylistParser());
+            }), outputsParser, ...indexes);
+        }
+    }
+
+    public parseSongs(outputsParser?: (childParser: SongParser, index: number) => Promise<any>,
+                      ...indexes: number[]): Promise<this> {
+        if (!outputsParser) {
+            return this.parseValue("songs", () => this.createSongs());
+        } else {
+            return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {
+                resolve(this.platform.createSongParser());
             }), outputsParser, ...indexes);
         }
     }

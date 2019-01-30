@@ -6,6 +6,6 @@ import SongOutput from "./song_output";
 export default class ArtistOutput extends BaseOutput {
     public title: string;
     public albums: AlbumOutput[];
-    public songs: SongOutput[];
     public playlists: PlaylistOutput[];
+    public songs: SongOutput[];
 }
