@@ -30,7 +30,6 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     public parse(): Promise<this> {
         return super.parse()
             .then(() => this.parseDuration())
-            .then(() => this.parseGenre())
             .then(() => this.parseLyrics())
             .then(() => this.parseMp3())
             .then(() => this.parseTitle())
@@ -40,12 +39,6 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
     }
 
     protected createDuration(): Promise<string> {
-        return new Promise<string>(resolve => {
-            resolve();
-        });
-    }
-
-    protected createGenre(): Promise<string> {
         return new Promise<string>(resolve => {
             resolve();
         });
@@ -95,10 +88,6 @@ export default class SongParser extends BaseParser<SongInput, SongOutput, SongCo
 
     public parseDuration(): Promise<this> {
         return this.parseValue("duration", () => this.createDuration());
-    }
-
-    public parseGenre(): Promise<this> {
-        return this.parseValue("genre", () => this.createGenre());
     }
 
     public parseLyrics(): Promise<this> {

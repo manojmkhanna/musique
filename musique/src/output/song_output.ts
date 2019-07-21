@@ -4,7 +4,6 @@ import BaseOutput from "./base_output";
 
 export default class SongOutput extends BaseOutput {
     public duration: string;
-    public genre: string;
     public lyrics: string;
     public mp3: string;
     public title: string;
