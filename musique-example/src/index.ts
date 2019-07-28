@@ -3,14 +3,14 @@ import * as Promise from "bluebird";
 import * as fs from "fs";
 import * as musique from "musique";
 
-const PLATFORM_NAME: any = "deezer";
+const PROVIDER_NAME: any = "deezer";
 const SONG_URL: string = "https://www.deezer.com/en/track/698905582";
 const ALBUM_URL: string = "https://www.deezer.com/en/album/100856872";
 const ARTIST_URL: string = "https://www.deezer.com/en/artist/5962948";
 const PLAYLIST_URL: string = "https://www.deezer.com/en/playlist/1111142221";
 const SEARCH_QUERY: string = "senorita";
 
-// const PLATFORM_NAME: any = "saavn";
+// const PROVIDER_NAME: any = "saavn";
 // const SONG_URL: string = "https://www.jiosaavn.com/song/bekhayali/PxwgWUFzBwU";
 // const ALBUM_URL: string = "https://www.jiosaavn.com/album/kabir-singh/kLG-OKbVmvM_";
 // const ARTIST_URL: string = "https://www.jiosaavn.com/artist/sachet-tandon-songs/wVwhaAx3x6c_";
@@ -19,7 +19,7 @@ const SEARCH_QUERY: string = "senorita";
 
 async.series([
     callback => {
-        musique.parseSong(PLATFORM_NAME, SONG_URL)
+        musique.parseSong(PROVIDER_NAME, SONG_URL)
             .then(parser => parser.parse())
             .then(parser => parser.parseFile(() => {
             }))
@@ -46,7 +46,7 @@ async.series([
             });
     },
     callback => {
-        musique.parseAlbum(PLATFORM_NAME, ALBUM_URL)
+        musique.parseAlbum(PROVIDER_NAME, ALBUM_URL)
             .then(parser => parser.parse())
             .then(parser => {
                 console.log(JSON.stringify(parser.output, null, 4));
@@ -59,7 +59,7 @@ async.series([
             });
     },
     callback => {
-        musique.parseArtist(PLATFORM_NAME, ARTIST_URL)
+        musique.parseArtist(PROVIDER_NAME, ARTIST_URL)
             .then(parser => parser.parse())
             .then(parser => {
                 console.log(JSON.stringify(parser.output, null, 4));
@@ -72,7 +72,7 @@ async.series([
             });
     },
     callback => {
-        musique.parsePlaylist(PLATFORM_NAME, PLAYLIST_URL)
+        musique.parsePlaylist(PROVIDER_NAME, PLAYLIST_URL)
             .then(parser => parser.parse())
             .then(parser => {
                 console.log(JSON.stringify(parser.output, null, 4));
@@ -85,7 +85,7 @@ async.series([
             });
     },
     callback => {
-        musique.parseSearch(PLATFORM_NAME, SEARCH_QUERY)
+        musique.parseSearch(PROVIDER_NAME, SEARCH_QUERY)
             .then(parser => parser.parse())
             .then(parser => {
                 console.log(JSON.stringify(parser.output, null, 4));

@@ -117,7 +117,7 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
             return this.parseValue("artists", () => this.createArtists());
         } else {
             return this.parseOutputs("artists", () => new Promise<ArtistParser>(resolve => {
-                resolve(this.platform.createArtistParser());
+                resolve(this.provider.createArtistParser());
             }), outputsParser, ...indexes);
         }
     }
@@ -128,7 +128,7 @@ export default class AlbumParser extends BaseParser<AlbumInput, AlbumOutput, Alb
             return this.parseValue("songs", () => this.createSongs());
         } else {
             return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {
-                resolve(this.platform.createSongParser());
+                resolve(this.provider.createSongParser());
             }), outputsParser, ...indexes);
         }
     }

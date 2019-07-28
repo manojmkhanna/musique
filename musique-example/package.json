@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/async": "^3.0.1",
     "@types/bluebird": "^3.5.27",
-    "@types/node": "^12.6.8",
+    "@types/node": "^12.6.9",
     "gulp": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^5.0.1",

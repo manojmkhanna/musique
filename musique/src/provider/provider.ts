@@ -4,7 +4,7 @@ import PlaylistParser from "../parser/playlist_parser";
 import SearchParser from "../parser/search_parser";
 import SongParser from "../parser/song_parser";
 
-export default class Platform {
+export default class Provider {
     public createSongParser(): SongParser {
         return new SongParser(this);
     }

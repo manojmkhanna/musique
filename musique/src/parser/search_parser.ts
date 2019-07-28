@@ -7,14 +7,14 @@ import ArtistOutput from "../output/artist_output";
 import PlaylistOutput from "../output/playlist_output";
 import SearchOutput from "../output/search_output";
 import SongOutput from "../output/song_output";
-import Platform from "../platform/platform";
+import Provider from "../provider/provider";
 import AlbumParser from "./album_parser";
 import ArtistParser from "./artist_parser";
 import PlaylistParser from "./playlist_parser";
 import SongParser from "./song_parser";
 
 export default class SearchParser extends Parser<SearchInput, SearchOutput, SearchContent> {
-    public constructor(protected readonly platform: Platform) {
+    public constructor(protected readonly provider: Provider) {
         super();
     }
 
@@ -73,7 +73,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
             return this.parseValue("songs", () => this.createSongs());
         } else {
             return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {
-                resolve(this.platform.createSongParser());
+                resolve(this.provider.createSongParser());
             }), outputsParser, ...indexes);
         }
     }
@@ -84,7 +84,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
             return this.parseValue("albums", () => this.createAlbums());
         } else {
             return this.parseOutputs("albums", () => new Promise<AlbumParser>(resolve => {
-                resolve(this.platform.createAlbumParser());
+                resolve(this.provider.createAlbumParser());
             }), outputsParser, ...indexes);
         }
     }
@@ -95,7 +95,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
             return this.parseValue("artists", () => this.createArtists());
         } else {
             return this.parseOutputs("artists", () => new Promise<ArtistParser>(resolve => {
-                resolve(this.platform.createArtistParser());
+                resolve(this.provider.createArtistParser());
             }), outputsParser, ...indexes);
         }
     }
@@ -106,7 +106,7 @@ export default class SearchParser extends Parser<SearchInput, SearchOutput, Sear
             return this.parseValue("playlists", () => this.createPlaylists());
         } else {
             return this.parseOutputs("playlists", () => new Promise<PlaylistParser>(resolve => {
-                resolve(this.platform.createPlaylistParser());
+                resolve(this.provider.createPlaylistParser());
             }), outputsParser, ...indexes);
         }
     }

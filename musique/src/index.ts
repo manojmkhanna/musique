@@ -9,6 +9,8 @@ import ArtistInput from "./input/artist_input";
 import PlaylistInput from "./input/playlist_input";
 import SearchInput from "./input/search_input";
 import SongInput from "./input/song_input";
+import DeezerProvider from "./other/deezer/deezer_provider";
+import SaavnProvider from "./other/saavn/saavn_provider";
 import AlbumOutput from "./output/album_output";
 import ArtistOutput from "./output/artist_output";
 import PlaylistOutput from "./output/playlist_output";
@@ -19,7 +21,7 @@ import ArtistParser from "./parser/artist_parser";
 import PlaylistParser from "./parser/playlist_parser";
 import SearchParser from "./parser/search_parser";
 import SongParser from "./parser/song_parser";
-import Platforms from "./platform/platforms";
+import Provider from "./provider/provider";
 
 export {
     SongInput, SongOutput, SongContent, SongParser,
@@ -29,59 +31,55 @@ export {
     SearchInput, SearchOutput, SearchContent, SearchParser
 };
 
-let platforms: Platforms = new Platforms();
-
-export function parseSong(platformName: keyof Platforms,
-                          url: string): Promise<SongParser> {
-    return platforms[platformName].createSongParser()
-        .create(() => new Promise<SongInput>(resolve => {
-            let input: SongInput = new SongInput();
-            input.url = url;
-
-            resolve(input);
-        }));
+function createProvider(name: "deezer" | "saavn"): Provider {
+    if (name == "deezer") {
+        return new DeezerProvider();
+    } else if (name == "saavn") {
+        return new SaavnProvider();
+    }
 }
 
-export function parseAlbum(platformName: keyof Platforms,
-                           url: string): Promise<AlbumParser> {
-    return platforms[platformName].createAlbumParser()
-        .create(() => new Promise<AlbumInput>(resolve => {
-            let input: AlbumInput = new AlbumInput();
-            input.url = url;
+export function parseSong(name: "deezer" | "saavn", url: string): Promise<SongParser> {
+    return createProvider(name).createSongParser().create(() => new Promise<SongInput>(resolve => {
+        let input: SongInput = new SongInput();
+        input.url = url;
 
-            resolve(input);
-        }));
+        resolve(input);
+    }));
 }
 
-export function parseArtist(platformName: keyof Platforms,
-                            url: string): Promise<ArtistParser> {
-    return platforms[platformName].createArtistParser()
-        .create(() => new Promise<ArtistInput>(resolve => {
-            let input: ArtistInput = new ArtistInput();
-            input.url = url;
+export function parseAlbum(name: "deezer" | "saavn", url: string): Promise<AlbumParser> {
+    return createProvider(name).createAlbumParser().create(() => new Promise<AlbumInput>(resolve => {
+        let input: AlbumInput = new AlbumInput();
+        input.url = url;
 
-            resolve(input);
-        }));
+        resolve(input);
+    }));
 }
 
-export function parsePlaylist(platformName: keyof Platforms,
-                              url: string): Promise<PlaylistParser> {
-    return platforms[platformName].createPlaylistParser()
-        .create(() => new Promise<PlaylistInput>(resolve => {
-            let input: PlaylistInput = new PlaylistInput();
-            input.url = url;
+export function parseArtist(name: "deezer" | "saavn", url: string): Promise<ArtistParser> {
+    return createProvider(name).createArtistParser().create(() => new Promise<ArtistInput>(resolve => {
+        let input: ArtistInput = new ArtistInput();
+        input.url = url;
 
-            resolve(input);
-        }));
+        resolve(input);
+    }));
 }
 
-export function parseSearch(platformName: keyof Platforms,
-                            query: string): Promise<SearchParser> {
-    return platforms[platformName].createSearchParser()
-        .create(() => new Promise<SearchInput>(resolve => {
-            let input: SearchInput = new SearchInput();
-            input.query = query;
+export function parsePlaylist(name: "deezer" | "saavn", url: string): Promise<PlaylistParser> {
+    return createProvider(name).createPlaylistParser().create(() => new Promise<PlaylistInput>(resolve => {
+        let input: PlaylistInput = new PlaylistInput();
+        input.url = url;
 
-            resolve(input);
-        }));
+        resolve(input);
+    }));
+}
+
+export function parseSearch(name: "deezer" | "saavn", query: string): Promise<SearchParser> {
+    return createProvider(name).createSearchParser().create(() => new Promise<SearchInput>(resolve => {
+        let input: SearchInput = new SearchInput();
+        input.query = query;
+
+        resolve(input);
+    }));
 }

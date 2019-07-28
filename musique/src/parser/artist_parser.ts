@@ -71,7 +71,7 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
             return this.parseValue("albums", () => this.createAlbums());
         } else {
             return this.parseOutputs("albums", () => new Promise<AlbumParser>(resolve => {
-                resolve(this.platform.createAlbumParser());
+                resolve(this.provider.createAlbumParser());
             }), outputsParser, ...indexes);
         }
     }
@@ -82,7 +82,7 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
             return this.parseValue("playlists", () => this.createPlaylists());
         } else {
             return this.parseOutputs("playlists", () => new Promise<PlaylistParser>(resolve => {
-                resolve(this.platform.createPlaylistParser());
+                resolve(this.provider.createPlaylistParser());
             }), outputsParser, ...indexes);
         }
     }
@@ -93,7 +93,7 @@ export default class ArtistParser extends BaseParser<ArtistInput, ArtistOutput, 
             return this.parseValue("songs", () => this.createSongs());
         } else {
             return this.parseOutputs("songs", () => new Promise<SongParser>(resolve => {
-                resolve(this.platform.createSongParser());
+                resolve(this.provider.createSongParser());
             }), outputsParser, ...indexes);
         }
     }

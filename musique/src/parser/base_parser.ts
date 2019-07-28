@@ -3,11 +3,10 @@ import {Parser} from "parsque";
 import BaseContent from "../content/base_content";
 import BaseInput from "../input/base_input";
 import BaseOutput from "../output/base_output";
-import Platform from "../platform/platform";
+import Provider from "../provider/provider";
 
-export default class BaseParser<I extends BaseInput,
-    O extends BaseOutput, C extends BaseContent> extends Parser<I, O, C> {
-    public constructor(protected readonly platform: Platform) {
+export default class BaseParser<I extends BaseInput, O extends BaseOutput, C extends BaseContent> extends Parser<I, O, C> {
+    public constructor(protected readonly provider: Provider) {
         super();
     }
 
